@@ -2,17 +2,17 @@
     ViewData["Title"] = "Home Page";
 }
 
-@model YourNamespace.Models.Client
+@model CAPS.Models.CLIENT
 
 @using (Html.BeginForm())
 {
-    <p>
+    @* <p>
         @Html.LabelFor(m => m.FullName)
         @Html.TextBoxFor(m => m.FullName)
     </p>
     <p>
         @Html.LabelFor(m => m.ContactNumber)
         @Html.TextBoxFor(m => m.ContactNumber)
-    </p>
+    </p> *@
     <button type="submit">Save</button>
 }
