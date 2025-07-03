@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model YourNamespace.Models.Client
+
+@using (Html.BeginForm())
+{
+    <p>
+        @Html.LabelFor(m => m.FullName)
+        @Html.TextBoxFor(m => m.FullName)
+    </p>
+    <p>
+        @Html.LabelFor(m => m.ContactNumber)
+        @Html.TextBoxFor(m => m.ContactNumber)
+    </p>
+    <button type="submit">Save</button>
+}
