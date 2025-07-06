@@ -52,5 +52,21 @@
         <a asp-action="Index" class="btn btn-secondary ms-2">
             <i class="bi bi-arrow-left"></i> Back to List
         </a>
+
+        <form asp-action="UpSert" method="post">
+
+  
+
+            <!-- STAFF FIELDS -->
+            <h4>Staff Info</h4>
+            <input name="Staff.FullName" placeholder="Full Name" />
+            <input name="Staff.Gender" placeholder="Gender" />
+            <input name="Staff.Expertise" placeholder="Expertise" />
+            <input name="Staff.Email" placeholder="Email" />
+            <input name="Staff.PhoneNumber" placeholder="Phone" />
+            <input name="Staff.DateHired" type="date" placeholder="Date Hired" />
+
+            <button type="submit">Save</button>
+        </form>
     </form>
 </div>
