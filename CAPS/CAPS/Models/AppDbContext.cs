@@ -10,5 +10,6 @@ namespace CAPS.Models
 
         public DbSet<Service> Services { get; set; }
         public DbSet<Staff> Staffs { get; set; }
+        public DbSet<Client> Clients { get; set; }
     }
 }

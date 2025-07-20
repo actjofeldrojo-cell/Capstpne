@@ -1,0 +1,53 @@
+﻿@model IEnumerable<CAPS.Models.Client>
+
+@{
+    ViewBag.Title = "Manage Clients";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Manage Clients</h2>
+
+<p>
+    @Html.ActionLink("Register New Client", "UpSert", null, new { @class = "btn btn-success" })
+</p>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Registered On</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var client in Model)
+        {
+            <tr>
+                <td>@client.FirstName @client.LastName</td>
+                <td>@client.Gender</td>
+                <td>@client.PhoneNumber</td>
+                <td>@client.Email</td>
+                <td>@client.DateRegistered.ToString("yyyy-MM-dd")</td>
+                <td>
+                    @if (client.IsActive)
+                    {
+                        <span class="text-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Inactive</span>
+                    }
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = client.ClientId }, new { @class = "btn btn-info btn-sm" }) |
+                    @Html.ActionLink("Edit", "UpSert", new { id = client.ClientId }, new { @class = "btn btn-primary btn-sm" }) |
+                    @Html.ActionLink("Deactivate", "Delete", new { id = client.ClientId }, new { @class = "btn btn-warning btn-sm" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
