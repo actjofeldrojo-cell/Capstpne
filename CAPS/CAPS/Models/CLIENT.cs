@@ -17,7 +17,7 @@ namespace CAPS.Models
         public string LastName { get; set; }
 
         [StringLength(100)]
-        public string? MiddleName { get; set; }
+        public string? Age { get; set; }
 
         [Required]
         [StringLength(20)]
@@ -28,9 +28,9 @@ namespace CAPS.Models
         [StringLength(20)]
         public string PhoneNumber { get; set; }
 
-        [EmailAddress]
-        [StringLength(100)]
-        public string? Email { get; set; }
+        //[EmailAddress]
+        //[StringLength(100)]
+        //public string? Email { get; set; }
 
         public bool IsActive { get; set; } = true;
 
