@@ -1,0 +1,213 @@
+﻿@model CAPS.Controllers.AppointmentWithClientDto
+
+@{
+    ViewData["Title"] = Model.AppointmentId == 0 ? "Create Appointment" : "Edit Appointment";
+}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <form asp-action="UpSert" method="post" class="mt-3">
+        @Html.HiddenFor(m => m.AppointmentId)
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <!-- Personal Information Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person"></i> Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ClientFirstName" class="form-label">First Name *</label>
+                        <input asp-for="ClientFirstName" class="form-control" placeholder="Enter your first name" required />
+                        <span asp-validation-for="ClientFirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ClientLastName" class="form-label">Last Name *</label>
+                        <input asp-for="ClientLastName" class="form-control" placeholder="Enter your last name" required />
+                        <span asp-validation-for="ClientLastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ClientPhoneNumber" class="form-label">Phone Number *</label>
+                        <input asp-for="ClientPhoneNumber" type="tel" class="form-control" placeholder="Enter your phone number" required />
+                        <span asp-validation-for="ClientPhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ClientGender" class="form-label">Gender *</label>
+                        <select asp-for="ClientGender" class="form-select" required>
+                            <option value="">-- Select Gender --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="ClientGender" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ClientAge" class="form-label">Age</label>
+                        <input asp-for="ClientAge" class="form-control" placeholder="Enter your age" />
+                        <span asp-validation-for="ClientAge" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Details Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Appointment Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="ServiceId" class="form-label">Service *</label>
+                        <select asp-for="ServiceId" class="form-select" asp-items="@(new SelectList(ViewBag.Services, "ServiceId", "Name"))">
+                            <option value="">-- Select Service --</option>
+                        </select>
+                        <span asp-validation-for="ServiceId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="AppointmentDate" class="form-label">Date *</label>
+                        <input asp-for="AppointmentDate" class="form-control" type="date" />
+                        <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="AppointmentTime" class="form-label">Time *</label>
+                        <input asp-for="AppointmentTime" class="form-control" type="time" />
+                        <span asp-validation-for="AppointmentTime" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Duration" class="form-label">Duration (minutes)</label>
+                        <input asp-for="Duration" class="form-control" type="number" readonly style="background-color: #f8f9fa;" placeholder="Select a service first" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Cost" class="form-label">Cost</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Cost" class="form-control" type="number" step="0.01" min="0" readonly style="background-color: #f8f9fa;" placeholder="Select a service first" />
+                        </div>
+                        <span asp-validation-for="Cost" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label">Special Instructions or Notes</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Any special requirements, allergies, or notes for your appointment"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> @(Model.AppointmentId == 0 ? "Schedule" : "Update") Appointment
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Auto-populate duration and cost when service is selected
+        document.getElementById('ServiceId').addEventListener('change', function() {
+            var serviceId = this.value;
+            var durationField = document.getElementById('Duration');
+            var costField = document.getElementById('Cost');
+            
+            if (serviceId) {
+                // Get service details from the services data
+                var services = @Html.Raw(Json.Serialize(ViewBag.Services));
+                var selectedService = services.find(s => s.serviceId == serviceId);
+                
+                if (selectedService) {
+                    durationField.value = selectedService.duration;
+                    costField.value = selectedService.price.toFixed(2);
+                    
+                    // Update background colors to show they're populated
+                    durationField.style.backgroundColor = '#e9ecef';
+                    costField.style.backgroundColor = '#e9ecef';
+                }
+            } else {
+                durationField.value = '';
+                costField.value = '';
+                durationField.style.backgroundColor = '#f8f9fa';
+                costField.style.backgroundColor = '#f8f9fa';
+            }
+        });
+
+
+
+        // Set minimum date to today
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('AppointmentDate').min = today;
+
+        // Phone number formatting
+        document.getElementById('ClientPhoneNumber').addEventListener('input', function(e) {
+            var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    </script>
+}
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .card-header h5 {
+        color: #495057;
+        margin: 0;
+    }
+
+    /* Style for readonly fields */
+    input[readonly] {
+        background-color: #f8f9fa !important;
+        cursor: not-allowed;
+    }
+</style>
