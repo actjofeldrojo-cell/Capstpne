@@ -1,58 +1,296 @@
 ﻿@model CAPS.Models.Service
 
 @{
-	ViewData["Title"] = "Create Service";
+    ViewData["Title"] = Model.ServiceId == 0 ? "Create Service" : "Edit Service";
 }
 
 <div class="container my-4">
-    <h2>@ViewData["Title"]</h2>
-
-    <form asp-action="UpSert" method="post" class="mt-3">
-        @Html.HiddenFor(m => m.ServiceId)
-        @Html.HiddenFor(m => m.DateCreated)
-        @Html.HiddenFor(m => m.DateModified)
-        @Html.HiddenFor(m => m.isActive)
-
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-        <div class="mb-3">
-            <label asp-for="Name" class="form-label"></label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Description" class="form-label"></label>
-            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Category" class="form-label"></label>
-            <input asp-for="Category" class="form-control" />
-            <span asp-validation-for="Category" class="text-danger"></span>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="Price" class="form-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label asp-for="Duration" class="form-label"></label>
-                <input asp-for="Duration" class="form-control" />
-                <span asp-validation-for="Duration" class="text-danger"></span>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-save"></i> Save
-        </button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">
-            <i class="bi bi-arrow-left"></i> Back to List
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-mint fw-bold">@ViewData["Title"]</h2>
+        <a asp-action="Index" class="btn btn-outline-mint">
+            <i class="bi bi-arrow-left me-2"></i>Back to Services
         </a>
+    </div>
 
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form asp-action="UpSert" method="post">
+                @Html.HiddenFor(m => m.ServiceId)
+                @Html.HiddenFor(m => m.DateCreated)
+                @Html.HiddenFor(m => m.DateModified)
+                @Html.HiddenFor(m => m.isActive)
 
-    </form>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold text-mint">Service Template *</label>
+                        <select id="serviceTemplate" class="form-select">
+                            <option value="">-- Select Service Template --</option>
+                            @foreach (var service in ViewBag.ServiceTemplates)
+                            {
+                                <option value="@service.Name" 
+                                        data-name="@service.Name"
+                                        data-description="@service.Description"
+                                        data-category="@service.Category"
+                                        data-price="@service.Price"
+                                        data-duration="@service.Duration">
+                                    @service.Name - @service.Category - $@service.Price - @service.Duration min
+                                </option>
+                            }
+                        </select>
+                        <small class="text-muted">Select a predefined service or choose "Custom Service" to create your own</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label fw-semibold text-mint">Service Name *</label>
+                        <input asp-for="Name" id="serviceName" class="form-control" placeholder="Enter service name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Category" class="form-label fw-semibold text-mint">Category *</label>
+                        <select asp-for="Category" id="serviceCategory" class="form-select">
+                            <option value="">-- Select Category --</option>
+                            <option value="Massage">Massage</option>
+                            <option value="Facial">Facial</option>
+                            <option value="Body Treatment">Body Treatment</option>
+                            <option value="Manicure/Pedicure">Manicure/Pedicure</option>
+                            <option value="Hair Treatment">Hair Treatment</option>
+                            <option value="Wellness">Wellness</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Description" class="form-label fw-semibold text-mint">Description</label>
+                        <textarea asp-for="Description" id="serviceDescription" class="form-control" rows="3" placeholder="Describe the service, benefits, and what clients can expect"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Price" class="form-label fw-semibold text-mint">Price *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Price" id="servicePrice" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
+                        </div>
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Duration" class="form-label fw-semibold text-mint">Duration (minutes) *</label>
+                        <div class="input-group">
+                            <input asp-for="Duration" id="serviceDuration" class="form-control" type="number" min="1" max="600" placeholder="30" />
+                            <span class="input-group-text">min</span>
+                        </div>
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-mint">
+                        <i class="bi bi-save me-2"></i>@(Model.ServiceId == 0 ? "Create" : "Update") Service
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-mint">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Service templates with predefined values
+        const serviceTemplates = {
+            'swedish-massage': {
+                name: 'Swedish Massage',
+                category: 'Massage',
+                description: 'Classic relaxation massage using long strokes, kneading, and circular movements to promote relaxation and improve circulation.',
+                price: 75.00,
+                duration: 60
+            },
+            'deep-tissue-massage': {
+                name: 'Deep Tissue Massage',
+                category: 'Massage',
+                description: 'Intensive massage targeting deep muscle layers to release chronic tension and improve mobility.',
+                price: 85.00,
+                duration: 60
+            },
+            'hot-stone-massage': {
+                name: 'Hot Stone Massage',
+                category: 'Massage',
+                description: 'Therapeutic massage using heated stones to relax muscles and provide deep warmth for ultimate relaxation.',
+                price: 95.00,
+                duration: 75
+            },
+            'aromatherapy-massage': {
+                name: 'Aromatherapy Massage',
+                category: 'Massage',
+                description: 'Massage combined with essential oils to enhance relaxation and provide therapeutic benefits.',
+                price: 80.00,
+                duration: 60
+            },
+            'classic-facial': {
+                name: 'Classic Facial',
+                category: 'Facial',
+                description: 'Basic facial treatment including cleansing, exfoliation, mask, and moisturizing for healthy, glowing skin.',
+                price: 65.00,
+                duration: 45
+            },
+            'anti-aging-facial': {
+                name: 'Anti-Aging Facial',
+                category: 'Facial',
+                description: 'Advanced facial treatment targeting fine lines and wrinkles with specialized serums and techniques.',
+                price: 85.00,
+                duration: 60
+            },
+            'acne-treatment-facial': {
+                name: 'Acne Treatment Facial',
+                category: 'Facial',
+                description: 'Specialized facial treatment for acne-prone skin with deep cleansing and healing properties.',
+                price: 75.00,
+                duration: 50
+            },
+            'body-scrub': {
+                name: 'Body Scrub',
+                category: 'Body Treatment',
+                description: 'Exfoliating body treatment to remove dead skin cells and improve skin texture and tone.',
+                price: 70.00,
+                duration: 45
+            },
+            'mud-wrap': {
+                name: 'Mud Wrap',
+                category: 'Body Treatment',
+                description: 'Detoxifying body treatment using therapeutic mud to draw out impurities and nourish the skin.',
+                price: 90.00,
+                duration: 60
+            },
+            'classic-manicure': {
+                name: 'Classic Manicure',
+                category: 'Manicure/Pedicure',
+                description: 'Basic nail care including shaping, cuticle care, polish application, and hand massage.',
+                price: 35.00,
+                duration: 30
+            },
+            'gel-manicure': {
+                name: 'Gel Manicure',
+                category: 'Manicure/Pedicure',
+                description: 'Long-lasting manicure with gel polish that provides chip-resistant color for up to two weeks.',
+                price: 45.00,
+                duration: 45
+            },
+            'classic-pedicure': {
+                name: 'Classic Pedicure',
+                category: 'Manicure/Pedicure',
+                description: 'Complete foot care including nail shaping, cuticle care, exfoliation, and polish application.',
+                price: 45.00,
+                duration: 45
+            },
+            'luxury-pedicure': {
+                name: 'Luxury Pedicure',
+                category: 'Manicure/Pedicure',
+                description: 'Premium pedicure with extended foot massage, paraffin treatment, and premium polish.',
+                price: 65.00,
+                duration: 60
+            },
+            'scalp-treatment': {
+                name: 'Scalp Treatment',
+                category: 'Hair Treatment',
+                description: 'Therapeutic scalp treatment to promote hair growth, reduce dandruff, and improve scalp health.',
+                price: 40.00,
+                duration: 30
+            },
+            'reiki-session': {
+                name: 'Reiki Session',
+                category: 'Wellness',
+                description: 'Energy healing session to promote balance, reduce stress, and enhance overall well-being.',
+                price: 60.00,
+                duration: 45
+            }
+        };
+
+        // Auto-populate fields when service template is selected
+        document.getElementById('serviceTemplate').addEventListener('change', function() {
+            var selectedTemplate = this.value;
+            var template = serviceTemplates[selectedTemplate];
+            
+            if (template) {
+                document.getElementById('serviceName').value = template.name;
+                document.getElementById('serviceCategory').value = template.category;
+                document.getElementById('serviceDescription').value = template.description;
+                document.getElementById('servicePrice').value = template.price.toFixed(2);
+                document.getElementById('serviceDuration').value = template.duration;
+                
+                // Update background colors to show they're populated
+                document.getElementById('serviceName').style.backgroundColor = '#e9ecef';
+                document.getElementById('serviceCategory').style.backgroundColor = '#e9ecef';
+                document.getElementById('serviceDescription').style.backgroundColor = '#e9ecef';
+                document.getElementById('servicePrice').style.backgroundColor = '#e9ecef';
+                document.getElementById('serviceDuration').style.backgroundColor = '#e9ecef';
+            } else if (selectedTemplate === 'custom') {
+                // Clear fields for custom service
+                document.getElementById('serviceName').value = '';
+                document.getElementById('serviceCategory').value = '';
+                document.getElementById('serviceDescription').value = '';
+                document.getElementById('servicePrice').value = '';
+                document.getElementById('serviceDuration').value = '';
+                
+                // Reset background colors
+                document.getElementById('serviceName').style.backgroundColor = '#ffffff';
+                document.getElementById('serviceCategory').style.backgroundColor = '#ffffff';
+                document.getElementById('serviceDescription').style.backgroundColor = '#ffffff';
+                document.getElementById('servicePrice').style.backgroundColor = '#ffffff';
+                document.getElementById('serviceDuration').style.backgroundColor = '#ffffff';
+            }
+        });
+    </script>
+}
+
+<style>
+    .text-mint {
+        color: #2D5A4A !important;
+    }
+    
+    .btn-mint {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-mint:hover {
+        background-color: #1a3a2e;
+        border-color: #1a3a2e;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-mint {
+        color: #2D5A4A;
+        border-color: #2D5A4A;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-mint:hover {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #2D5A4A;
+        box-shadow: 0 0 0 0.2rem rgba(45, 90, 74, 0.25);
+    }
+    
+    .input-group-text {
+        background-color: #98D8C8;
+        border-color: #98D8C8;
+        color: #2D5A4A;
+    }
+</style>

@@ -10,7 +10,17 @@ namespace CAPS.Controllers
 
         public ActionResult Index()
         {
-            return View(db.Staffs.Where(s => s.IsActive).ToList());
+            var staffWithAppointments = db.Staffs
+                .Where(s => s.IsActive)
+                .Select(s => new StaffWithAppointmentCount
+                {
+                    Staff = s,
+                    TotalAppointments = db.Appointments.Count(a => a.StaffId == s.StaffId && a.IsActive),
+                    UpcomingAppointments = db.Appointments.Count(a => a.StaffId == s.StaffId && a.IsActive && a.AppointmentDate >= DateTime.Today)
+                })
+                .ToList();
+                
+            return View(staffWithAppointments);
         }
 
         // Update and Insert Viewing
@@ -51,6 +61,28 @@ namespace CAPS.Controllers
             return RedirectToAction("Index", "Staff");
         }
 
+        // GET: Staff/GetActiveStaff (AJAX endpoint)
+        [HttpGet]
+        public JsonResult GetActiveStaff()
+        {
+            var activeStaff = db.Staffs
+                .Where(s => s.IsActive)
+                .Select(s => new
+                {
+                    staffId = s.StaffId,
+                    fullName = s.FullName,
+                    expertise = s.Expertise
+                })
+                .ToList();
 
+            return Json(activeStaff);
+        }
+    }
+
+    public class StaffWithAppointmentCount
+    {
+        public Staff Staff { get; set; }
+        public int TotalAppointments { get; set; }
+        public int UpcomingAppointments { get; set; }
     }
 }

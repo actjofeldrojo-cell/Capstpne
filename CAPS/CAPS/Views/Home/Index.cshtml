@@ -1,18 +1,111 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "CAPSTONE";
 }
 
-@model CAPS.Models.Client
+<div class="text-center py-5">
+    <div class="container">
+        <h2 class="display-1 fw-bold text-mint mb-4">Tenderbody Therapeutic Massage & Spa</h2>
 
-@using (Html.BeginForm())
-{
-    @* <p>
-        @Html.LabelFor(m => m.FullName)
-        @Html.TextBoxFor(m => m.FullName)
-    </p>
-    <p>
-        @Html.LabelFor(m => m.ContactNumber)
-        @Html.TextBoxFor(m => m.ContactNumber)
-    </p> *@
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8 mb-4">
+                <div class="card border-0 shadow-sm spa-card">
+                    <div class="card-body text-center p-5">
+                        <div class="spa-image mb-4">
+                            <img src="https://images.unsplash.com/photo-1544161512-6afdf0ecf4fe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Tenderbody Therapeutic Massage & Spa" class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+                        </div>
+                        <h3 class="text-mint mb-3">Relaxing Spa Experience</h3>
+                        <p class="text-muted mb-4">
+                            Indulge in our premium spa treatments designed to rejuvenate your mind, body, and soul. 
+                            Our expert therapists provide personalized care in a serene, tranquil environment.
+                        </p>
+                        <div class="row justify-content-center text-center">
+                            <div class="col-md-4 mb-3">
+                                <a href="@Url.Action("Index", "Service")" class="btn btn-mint btn-lg w-100">
+                                    <i class="bi bi-list-ul me-2"></i>View Services
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <a href="@Url.Action("UpSert", "Appointment")" class="btn btn-outline-mint btn-lg w-100">
+                                    <i class="bi bi-calendar-plus me-2"></i>Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-}
+<style>
+    .text-mint {
+        color: #2D5A4A !important;
+    }
+    
+    .spa-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+        border: 2px solid #98D8C8;
+    }
+    
+    .spa-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 2rem rgba(45, 90, 74, 0.15) !important;
+        border-color: #2D5A4A;
+    }
+    
+    .spa-image img {
+        transition: all 0.3s ease;
+    }
+    
+    .spa-card:hover .spa-image img {
+        transform: scale(1.02);
+    }
+    
+    .btn-mint {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-mint:hover {
+        background-color: #1a3a2e;
+        border-color: #1a3a2e;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-mint {
+        color: #2D5A4A;
+        border-color: #2D5A4A;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-mint:hover {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    @@media (max-width: 768px) {
+        .display-1 {
+            font-size: 3rem;
+        }
+        
+        .card-body {
+            padding: 2rem !important;
+        }
+        
+        .spa-image img {
+            max-height: 200px !important;
+        }
+    }
+</style>

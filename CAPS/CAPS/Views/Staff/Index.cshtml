@@ -1,4 +1,4 @@
-﻿@model List<CAPS.Models.Staff>
+﻿@model List<CAPS.Controllers.StaffWithAppointmentCount>
 
 @{
     ViewData["Title"] = "Staff";
@@ -24,30 +24,44 @@
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Hired</th>
+                    <th>Appointments</th>
                     <th>Active</th>
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var staff in Model)
+                @foreach (var item in Model)
                 {
                     <tr class="small">
-                        <td>@staff.FullName</td>
-                        <td>@staff.Gender</td>
-                        <td>@staff.Expertise</td>
-                        <td class="text-truncate" style="max-width: 150px;">@staff.Email</td>
-                        <td>@staff.PhoneNumber</td>
-                        <td>@staff.DateHired.ToString("yyyy-MM-dd")</td>
+                        <td>@item.Staff.FullName</td>
+                        <td>@item.Staff.Gender</td>
+                        <td>@item.Staff.Expertise</td>
+                        <td class="text-truncate" style="max-width: 150px;">@item.Staff.Email</td>
+                        <td>@item.Staff.PhoneNumber</td>
+                        <td>@item.Staff.DateHired.ToString("yyyy-MM-dd")</td>
                         <td>
-                            <span class="badge @((staff.IsActive ? "bg-success" : "bg-secondary"))">
-                                @(staff.IsActive ? "Yes" : "No")
+                            <div class="d-flex flex-column align-items-start">
+                                <span class="badge bg-primary mb-1" title="Total appointments">
+                                    <i class="bi bi-calendar-event"></i> @item.TotalAppointments
+                                </span>
+                                <span class="badge bg-success" title="Upcoming appointments">
+                                    <i class="bi bi-clock"></i> @item.UpcomingAppointments
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge @((item.Staff.IsActive ? "bg-success" : "bg-secondary"))">
+                                @(item.Staff.IsActive ? "Yes" : "No")
                             </span>
                         </td>
                         <td class="text-center">
-                            <a asp-action="UpSert" asp-route-id="@staff.StaffId" class="btn btn-sm btn-outline-warning" title="Edit">
+                            <a asp-action="UpSert" asp-route-id="@item.Staff.StaffId" class="btn btn-sm btn-outline-warning" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form asp-action="Delete" asp-route-id="@staff.StaffId" method="post" class="d-inline">
+                            <a asp-controller="Appointment" asp-action="Index" asp-route-staffId="@item.Staff.StaffId" class="btn btn-sm btn-outline-info" title="View Appointments">
+                                <i class="bi bi-calendar2-event"></i>
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@item.Staff.StaffId" method="post" class="d-inline">
                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"
                                         onclick="return confirm('Are you sure you want to delete this staff?');">
                                     <i class="bi bi-trash"></i>

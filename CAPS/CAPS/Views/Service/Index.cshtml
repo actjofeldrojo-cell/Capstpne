@@ -5,74 +5,151 @@
 }
 
 <div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>@ViewData["Title"]</h2>
-        <a asp-action="UpSert" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> New Service
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-mint fw-bold">@ViewData["Title"]</h2>
+        <a asp-action="UpSert" class="btn btn-mint">
+            <i class="bi bi-plus-lg me-2"></i>Add New Service
         </a>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Duration (min)</th>
-                    <th>Active</th>
-                    <th>Date Created</th>
-                    <th>Date Modified</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    @if (Model.Count == 0)
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-list-ul text-muted" style="font-size: 4rem;"></i>
+            <h4 class="text-muted mt-3">No services available</h4>
+            <p class="text-muted">Add your first spa service to get started.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover service-table">
+                <thead class="table-mint">
                     <tr>
-                        <td>@item.Name</td>
-                        <td class="text-truncate">
-                            @(
-                                !string.IsNullOrEmpty(item.Description) && item.Description.Length > 50
-                                ? item.Description.Substring(0, 50) + "…"
-                                : item.Description
-                                )
-                        </td>
-                        <td>@item.Category</td>
-                        <td>@item.Price.ToString("C")</td>
-                        <td>@item.Duration</td>
-                        <td>
-                            @if (item.isActive)
-                            {
-                                <span class="badge bg-success">Yes</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">No</span>
-                            }
-                        </td>
-                        <td>@item.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                        <td>@item.DateModified?.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                        <td class="text-center">
-                            <a asp-action="UpSert" asp-route-id="@item.ServiceId" class="btn btn-sm btn-warning" title="Edit">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <form asp-action="Delete" asp-route-id="@item.ServiceId" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"
-                                        onclick="return confirm('Are you sure you want to delete this service?');">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <th class="text-white">Service Name</th>
+                        <th class="text-white">Category</th>
+                        <th class="text-white">Description</th>
+                        <th class="text-white text-center">Price</th>
+                        <th class="text-white text-center">Duration</th>
+                        <th class="text-white text-center">Status</th>
+                        <th class="text-white text-center">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="service-row">
+                            <td class="fw-bold text-mint">@item.Name</td>
+                            <td>
+                                <span class="badge bg-mint-light text-mint">@item.Category</span>
+                            </td>
+                            <td class="text-muted">
+                                @(string.IsNullOrEmpty(item.Description) ? "No description" : 
+                                    (item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description))
+                            </td>
+                            <td class="text-center fw-bold text-success">@item.Price.ToString("C")</td>
+                            <td class="text-center">
+                                <span class="badge bg-info text-white">
+                                    <i class="bi bi-clock me-1"></i>@item.Duration min
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (item.isActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a asp-action="UpSert" asp-route-id="@item.ServiceId" class="btn btn-outline-mint btn-sm" title="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.ServiceId" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete"
+                                                onclick="return confirm('Are you sure you want to delete this service?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
 
-@if (Model.Count == 0)
-{
-    <h4 class="text-center text-muted">No services found.</h4>
-}
+<style>
+    .text-mint {
+        color: #2D5A4A !important;
+    }
+    
+    .btn-mint {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-mint:hover {
+        background-color: #1a3a2e;
+        border-color: #1a3a2e;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-mint {
+        color: #2D5A4A;
+        border-color: #2D5A4A;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-mint:hover {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+    }
+    
+    .table-mint {
+        background-color: #2D5A4A !important;
+    }
+    
+    .service-table {
+        border: 1px solid #98D8C8;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .service-row {
+        transition: all 0.3s ease;
+    }
+    
+    .service-row:hover {
+        background-color: #f8fffe !important;
+        transform: scale(1.01);
+    }
+    
+    .bg-mint-light {
+        background-color: #98D8C8 !important;
+    }
+    
+    .table th {
+        border-bottom: 2px solid #98D8C8;
+        font-weight: 600;
+    }
+    
+    .table td {
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
