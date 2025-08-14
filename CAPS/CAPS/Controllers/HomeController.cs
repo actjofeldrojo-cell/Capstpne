@@ -18,6 +18,11 @@ namespace CAPS.Controllers
             return View();
         }
 
+        public ActionResult kupal()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
