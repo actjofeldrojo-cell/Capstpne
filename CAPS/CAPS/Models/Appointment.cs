@@ -26,17 +26,21 @@ namespace CAPS.Models
 
         [Required]
         [Range(15, 480, ErrorMessage = "Duration must be between 15 and 480 minutes.")]
+        [Display(Name = "Duration (minutes)")]
         public int Duration { get; set; }
 
         [Required]
         [StringLength(50, ErrorMessage = "Status cannot exceed 50 characters.")]
+        [Display(Name = "Status")]
         public string Status { get; set; } = "Scheduled"; // Scheduled, Confirmed, Completed, Cancelled, No-Show
 
-        [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters.")]
+        [StringLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters.")]
+        [Display(Name = "Notes")]
         public string Notes { get; set; }
 
-        [Range(0, 99999.99, ErrorMessage = "Cost must be between 0 and 99999.99.")]
+        [Range(0.01, 99999.99, ErrorMessage = "Cost must be between 0.01 and 99999.99.")]
         [Column(TypeName = "decimal(10, 2)")]
+        [Display(Name = "Cost")]
         public decimal? Cost { get; set; }
 
 

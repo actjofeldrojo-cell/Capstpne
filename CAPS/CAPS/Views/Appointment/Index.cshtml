@@ -42,6 +42,7 @@
                     <th>Duration</th>
                     <th>Status</th>
                     <th>Cost</th>
+                    <th>Products Used</th>
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
@@ -108,6 +109,41 @@
                             @if (item.Cost.HasValue)
                             {
                                 <span class="fw-bold">@item.Cost.Value.ToString("C")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.Status?.ToLower() == "completed" && !string.IsNullOrEmpty(item.Notes) && item.Notes.Contains("[PRODUCTS USED]"))
+                            {
+                              
+                                
+                                    var productsUsedStart = item.Notes.IndexOf("[PRODUCTS USED]");
+                                    var productsUsedEnd = item.Notes.IndexOf("\n", productsUsedStart);
+                                    var productsUsedText = productsUsedEnd > 0 
+                                        ? item.Notes.Substring(productsUsedStart, productsUsedEnd - productsUsedStart)
+                                        : item.Notes.Substring(productsUsedStart);
+                                    var productsUsed = productsUsedText.Replace("[PRODUCTS USED]", "").Trim();
+                                
+                                <div class="d-flex flex-column gap-1">
+                                    @foreach (var product in productsUsed.Split(','))
+                                    {
+                                        var trimmedProduct = product.Trim();
+                                        if (!string.IsNullOrEmpty(trimmedProduct))
+                                        {
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-success me-2">
+                                                    <i class="bi bi-box-seam"></i>
+                                                </span>
+                                                <span class="fw-bold text-success">@trimmedProduct</span>
+                                            </div>
+                                        }
+                                    }
+                                }
+                                </div>
+                           
                             }
                             else
                             {
@@ -280,9 +316,84 @@
             </div>
         </div>
     </div>
-</div>
-
-<!-- Hidden form for actions -->
+  </div>
+  
+  <!-- Complete Appointment Modal -->
+  <div class="modal fade" id="completeAppointmentModal" tabindex="-1" aria-labelledby="completeAppointmentModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+              <div class="modal-header bg-success text-white">
+                  <h5 class="modal-title" id="completeAppointmentModalLabel">
+                      <i class="bi bi-check-circle"></i> Complete Appointment
+                  </h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="alert alert-info" role="alert">
+                      <i class="bi bi-info-circle"></i>
+                      <strong>Note:</strong> Please provide the number of products used during this appointment to help with inventory tracking.
+                  </div>
+                  
+                  <div id="completeAppointmentDetails">
+                      <!-- Content will be populated by JavaScript -->
+                  </div>
+                  
+                  <form id="completeAppointmentForm" method="post" action="/Appointment/Complete">
+                      @Html.AntiForgeryToken()
+                      <input type="hidden" id="completeAppointmentId" name="id" />
+                      
+                      <div class="mb-3">
+                          <label class="form-label fw-bold">
+                              <i class="bi bi-box-seam"></i> Products Used *
+                          </label>
+                          <div id="productSelectionContainer">
+                              <div class="product-row row mb-2">
+                                  <div class="col-md-6">
+                                      <select class="form-select product-select" name="ProductIds[]" required>
+                                          <option value="">-- Select Product --</option>
+                                          @foreach (var product in ViewBag.Products ?? new List<CAPS.Models.Products>())
+                                          {
+                                              <option value="@product.ProductId">@product.Name - @product.Category</option>
+                                          }
+                                      </select>
+                                  </div>
+                                  <div class="col-md-4">
+                                      <input type="number" class="form-control quantity-input" name="Quantities[]" 
+                                             min="1" max="100" required placeholder="Qty">
+                                  </div>
+                                  <div class="col-md-2">
+                                      <button type="button" class="btn btn-outline-danger btn-sm remove-product" style="display: none;">
+                                          <i class="bi bi-trash"></i>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addProductRow()">
+                              <i class="bi bi-plus-lg"></i> Add Another Product
+                          </button>
+                          <div class="form-text">Select the products used during this appointment session.</div>
+                      </div>
+                      
+                      <div class="mb-3">
+                          <label for="CompletionNotes" class="form-label fw-bold">
+                              <i class="bi bi-chat-text"></i> Completion Notes (Optional)
+                          </label>
+                          <textarea class="form-control" id="CompletionNotes" name="CompletionNotes" 
+                                    rows="3" placeholder="Any additional notes about the completed appointment..."></textarea>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-success" onclick="confirmComplete()">
+                      <i class="bi bi-check-circle"></i> Mark as Complete
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Hidden form for actions -->
 <form id="actionForm" method="post" style="display: none;">
     @Html.AntiForgeryToken()
     <input type="hidden" id="actionId" name="id" />
@@ -306,9 +417,81 @@
         white-space: nowrap;
     }
     
-    .btn-group .btn {
-        margin: 0 1px;
-    }
+         .btn-group .btn {
+         margin: 0 1px;
+     }
+     
+     .badge {
+         font-size: 0.75rem;
+         padding: 0.5rem 0.75rem;
+     }
+     
+     /* Modal styling */
+     .modal-header {
+         background-color: #f8f9fa;
+         border-bottom: 1px solid #dee2e6;
+     }
+     
+     .modal-footer {
+         background-color: #f8f9fa;
+         border-top: 1px solid #dee2e6;
+     }
+     
+     /* Completion modal specific styling */
+     .modal-header.bg-success {
+         background-color: #198754 !important;
+     }
+     
+     .btn-close-white {
+         filter: invert(1) grayscale(100%) brightness(200%);
+     }
+     
+     .modal-lg .modal-body {
+         padding: 1.5rem;
+     }
+     
+     .form-label.fw-bold {
+         color: #495057;
+         margin-bottom: 0.5rem;
+     }
+     
+     .form-text {
+         font-size: 0.875rem;
+         color: #6c757d;
+         margin-top: 0.25rem;
+     }
+     
+     /* Product selection form styling */
+     .product-row {
+         border: 1px solid #dee2e6;
+         border-radius: 0.375rem;
+         padding: 0.75rem;
+         background-color: #f8f9fa;
+         transition: all 0.2s ease;
+     }
+     
+     .product-row:hover {
+         background-color: #e9ecef;
+         border-color: #adb5bd;
+     }
+     
+     .product-select, .quantity-input {
+         border: 1px solid #ced4da;
+         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+     }
+     
+     .product-select:focus, .quantity-input:focus {
+         border-color: #198754;
+         box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+     }
+     
+     .remove-product {
+         transition: all 0.2s ease;
+     }
+     
+     .remove-product:hover {
+         transform: scale(1.1);
+     }
 </style>
 
 <script>
@@ -356,8 +539,9 @@
                                     <p class="text-muted mb-0">${staffExpertise}</p>
                                 </div>
                             </div>
-                            ${notes ? `<div class="mt-3"><h6>Notes:</h6><p class="text-muted">${notes}</p></div>` : ''}
-                        </div>
+                                                         ${notes ? `<div class="mt-3"><h6>Notes:</h6><p class="text-muted">${notes}</p></div>` : ''}
+                             ${notes && notes.includes('[PRODUCTS USED]') ? `<div class="mt-3"><h6>Products Used:</h6><p class="text-muted">${notes.substring(notes.indexOf('[PRODUCTS USED]')).split('\n')[0].replace('[PRODUCTS USED]', '').trim()}</p></div>` : ''}
+                         </div>
                     </div>
                 </div>
             </div>
@@ -413,16 +597,137 @@
         document.getElementById('actionForm').submit();
     }
 
-    function completeAppointment(id) {
-        if (confirm('Are you sure you want to mark this appointment as complete?')) {
-            document.getElementById('actionId').value = id;
-            document.getElementById('actionType').value = 'complete';
-            document.getElementById('actionForm').action = '/Appointment/Complete';
-            document.getElementById('actionForm').submit();
-        }
-    }
-
-    function getStatusBadgeColor(status) {
+         function completeAppointment(id) {
+         currentAppointmentId = id;
+         
+         // Get appointment details from the table row
+         const row = event.target.closest('tr');
+         const dateTime = row.cells[0].textContent;
+         const clientName = row.cells[1].textContent.trim();
+         const serviceName = row.cells[2].textContent.trim();
+         
+         const modalBody = document.getElementById('completeAppointmentDetails');
+         modalBody.innerHTML = `
+             <h6 class="fw-bold mb-3">Appointment Details:</h6>
+             <div class="row">
+                 <div class="col-md-6">
+                     <p class="mb-1"><strong>Date & Time:</strong></p>
+                     <p class="text-muted">${dateTime}</p>
+                 </div>
+                 <div class="col-md-6">
+                     <p class="mb-1"><strong>Client:</strong></p>
+                     <p class="text-muted">${clientName}</p>
+                 </div>
+             </div>
+             <div class="row">
+                 <div class="col-md-6">
+                     <p class="mb-1"><strong>Service:</strong></p>
+                     <p class="text-muted">${serviceName}</p>
+                 </div>
+             </div>
+         `;
+         
+         // Clear previous form data
+         clearProductForm();
+         
+                  const modal = new bootstrap.Modal(document.getElementById('completeAppointmentModal'));
+         modal.show();
+     }
+     
+     function clearProductForm() {
+         // Clear all product rows except the first one
+         const container = document.getElementById('productSelectionContainer');
+         const rows = container.querySelectorAll('.product-row');
+         
+         for (let i = 1; i < rows.length; i++) {
+             rows[i].remove();
+         }
+         
+         // Clear the first row
+         const firstRow = rows[0];
+         firstRow.querySelector('.product-select').value = '';
+         firstRow.querySelector('.quantity-input').value = '';
+         firstRow.querySelector('.remove-product').style.display = 'none';
+         
+         // Clear completion notes
+         document.getElementById('CompletionNotes').value = '';
+     }
+     
+     function addProductRow() {
+         const container = document.getElementById('productSelectionContainer');
+         const newRow = document.createElement('div');
+         newRow.className = 'product-row row mb-2';
+         
+         // Clone the first row structure
+         const firstRow = container.querySelector('.product-row');
+         const productSelect = firstRow.querySelector('.product-select').cloneNode(true);
+         const quantityInput = firstRow.querySelector('.quantity-input').cloneNode(true);
+         
+         // Clear the cloned values
+         productSelect.value = '';
+         quantityInput.value = '';
+         
+         newRow.innerHTML = `
+             <div class="col-md-6">
+                 ${productSelect.outerHTML.replace('name="ProductIds[]"', 'name="ProductIds[]"')}
+             </div>
+             <div class="col-md-4">
+                 ${quantityInput.outerHTML.replace('name="Quantities[]"', 'name="Quantities[]"')}
+             </div>
+             <div class="col-md-2">
+                 <button type="button" class="btn btn-outline-danger btn-sm remove-product" onclick="removeProductRow(this)">
+                     <i class="bi bi-trash"></i>
+                 </button>
+             </div>
+         `;
+         
+         container.appendChild(newRow);
+         
+         // Show remove button on first row if we have multiple rows
+         const rows = container.querySelectorAll('.product-row');
+         if (rows.length > 1) {
+             rows[0].querySelector('.remove-product').style.display = 'block';
+         }
+     }
+     
+     function removeProductRow(button) {
+         const row = button.closest('.product-row');
+         row.remove();
+         
+         // Hide remove button on first row if only one row remains
+         const container = document.getElementById('productSelectionContainer');
+         const rows = container.querySelectorAll('.product-row');
+         if (rows.length === 1) {
+             rows[0].querySelector('.remove-product').style.display = 'none';
+         }
+     }
+     
+     function confirmComplete() {
+         // Validate that at least one product is selected
+         const productSelects = document.querySelectorAll('.product-select');
+         const quantityInputs = document.querySelectorAll('.quantity-input');
+         let hasValidProduct = false;
+         
+         for (let i = 0; i < productSelects.length; i++) {
+             if (productSelects[i].value && quantityInputs[i].value && quantityInputs[i].value > 0) {
+                 hasValidProduct = true;
+                 break;
+             }
+         }
+         
+         if (!hasValidProduct) {
+             alert('Please select at least one product and specify the quantity used.');
+             return false;
+         }
+         
+         // Set the appointment ID in the form
+         document.getElementById('completeAppointmentId').value = currentAppointmentId;
+         
+         // Submit the form
+         document.getElementById('completeAppointmentForm').submit();
+     }
+     
+     function getStatusBadgeColor(status) {
         switch (status.toLowerCase()) {
             case 'scheduled': return 'primary';
             case 'confirmed': return 'success';

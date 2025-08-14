@@ -37,6 +37,9 @@ namespace CAPS.Controllers
                 .ThenBy(a => a.AppointmentTime)
                 .ToListAsync();
                 
+            // Get active products for the completion modal
+            ViewBag.Products = await _context.Products.Where(p => p.IsActive).OrderBy(p => p.Name).ToListAsync();
+                
             return View(appointments);
         }
 
@@ -270,39 +273,106 @@ namespace CAPS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Appointment/Complete/5
-        public async Task<IActionResult> Complete(int? id)
+        // GET: Appointment/Complete/5 (for debugging)
+        [HttpGet]
+        public IActionResult Complete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var appointment = await _context.Appointments
-                .Include(a => a.Client)
-                .Include(a => a.Service)
-                .FirstOrDefaultAsync(m => m.AppointmentId == id);
-            if (appointment == null)
-            {
-                return NotFound();
-            }
-
-            return View(appointment);
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: Appointment/Complete/5
         [HttpPost, ActionName("Complete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CompleteConfirmed(int id)
+        public async Task<IActionResult> CompleteConfirmed(int id, [FromForm] List<int> ProductIds, [FromForm] List<int> Quantities, [FromForm] string CompletionNotes)
         {
+            // Debug logging
+            Console.WriteLine($"CompleteConfirmed called with id: {id}");
+            Console.WriteLine($"ProductIds: {string.Join(", ", ProductIds ?? new List<int>())}");
+            Console.WriteLine($"Quantities: {string.Join(", ", Quantities ?? new List<int>())}");
+            Console.WriteLine($"CompletionNotes: {CompletionNotes}");
+            
+            // Try to get form data manually if the model binding fails
+            if (ProductIds == null || Quantities == null)
+            {
+                var form = Request.Form;
+                Console.WriteLine($"Form keys: {string.Join(", ", form.Keys)}");
+                if (form.ContainsKey("ProductIds[]"))
+                {
+                    ProductIds = form["ProductIds[]"].Select(int.Parse).ToList();
+                }
+                else if (form.ContainsKey("ProductIds"))
+                {
+                    ProductIds = form["ProductIds"].Select(int.Parse).ToList();
+                }
+                if (form.ContainsKey("Quantities[]"))
+                {
+                    Quantities = form["Quantities[]"].Select(int.Parse).ToList();
+                }
+                else if (form.ContainsKey("Quantities"))
+                {
+                    Quantities = form["Quantities"].Select(int.Parse).ToList();
+                }
+                if (form.ContainsKey("CompletionNotes"))
+                {
+                    CompletionNotes = form["CompletionNotes"].FirstOrDefault();
+                }
+            }
+            
             var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment != null)
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction(nameof(Index));
+            }
+            
+            try
             {
                 appointment.Status = "Completed";
+                
+                // Build products used information
+                var productsUsedInfo = "";
+                if (ProductIds != null && Quantities != null)
+                {
+                    var productsList = new List<string>();
+                    for (int i = 0; i < ProductIds.Count; i++)
+                    {
+                        if (ProductIds[i] > 0 && Quantities[i] > 0)
+                        {
+                            var product = await _context.Products.FindAsync(ProductIds[i]);
+                            if (product != null)
+                            {
+                                productsList.Add($"{Quantities[i]}x {product.Name}");
+                            }
+                        }
+                    }
+                    if (productsList.Any())
+                    {
+                        productsUsedInfo = $"\n\n[PRODUCTS USED] {string.Join(", ", productsList)}";
+                    }
+                }
+                
+                // Append completion notes and products used to existing notes
+                var completionInfo = "";
+                if (!string.IsNullOrEmpty(CompletionNotes))
+                {
+                    var timestamp = DateTime.Now.ToString("MMM dd, yyyy HH:mm");
+                    completionInfo = $"\n\n[COMPLETED {timestamp}] {CompletionNotes}";
+                }
+                
+                appointment.Notes = (appointment.Notes ?? "") + productsUsedInfo + completionInfo;
                 appointment.DateModified = DateTime.Now;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Appointment marked as completed!";
+                
+                var totalProducts = ProductIds?.Count(p => p > 0) ?? 0;
+                TempData["SuccessMessage"] = $"Appointment marked as completed! Products used: {totalProducts}";
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error completing appointment: {ex.Message}");
+                TempData["ErrorMessage"] = "An error occurred while completing the appointment.";
+                return RedirectToAction(nameof(Index));
+            }
+            
             return RedirectToAction(nameof(Index));
         }
 
