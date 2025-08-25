@@ -1,39 +1,150 @@
 ﻿@{
-    ViewData["Title"] = "CAPSTONE";
+    ViewData["Title"] = "Tenderbody Therapeutic Massage";
 }
 
-<div class="text-center py-5">
+<!-- Hero Section -->
+<div class="hero-section text-center py-5">
     <div class="container">
-        <h2 class="display-1 fw-bold text-mint mb-4">Tenderbody Therapeutic Massage & Spa</h2>
-
-        
-        <div class="row justify-content-center">
-            <div class="col-md-8 mb-4">
-                <div class="card border-0 shadow-sm spa-card">
-                    <div class="card-body text-center p-5">
-                        <div class="spa-image mb-4">
-                            <img src="https://images.unsplash.com/photo-1544161512-6afdf0ecf4fe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-                                 alt="Tenderbody Therapeutic Massage & Spa" class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-3 fw-bold text-mint mb-4">MASSAGE VIDEO GRAPHICS</h1>
+                    <div class="brand-info d-flex align-items-center justify-content-center mb-4">
+                        <div class="brand-logo me-3">
+                            <div class="logo-placeholder">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
                         </div>
-                        <h3 class="text-mint mb-3">Relaxing Spa Experience</h3>
-                        <p class="text-muted mb-4">
-                            Indulge in our premium spa treatments designed to rejuvenate your mind, body, and soul. 
-                            Our expert therapists provide personalized care in a serene, tranquil environment.
+                        <h2 class="text-mint mb-0">TENDERBODY THERAPEUTIC MASSAGE</h2>
+                    </div>
+                    <div class="hero-description">
+                        <p class="lead text-muted">
+                            Experience the art of therapeutic massage through our innovative video graphics and 
+                            professional techniques. Discover relaxation and healing in every session.
                         </p>
-                        <div class="row justify-content-center text-center">
-                            <div class="col-md-4 mb-3">
-                                <a href="@Url.Action("Index", "Service")" class="btn btn-mint btn-lg w-100">
-                                    <i class="bi bi-list-ul me-2"></i>View Services
-                                </a>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <a href="@Url.Action("UpSert", "Appointment")" class="btn btn-outline-mint btn-lg w-100">
-                                    <i class="bi bi-calendar-plus me-2"></i>Book Now
-                                </a>
-                            </div>
-                        </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-graphics">
+                    <div class="graphics-placeholder">
+                        <i class="bi bi-play-circle"></i>
+                        <span>MASSAGE GRAPHICS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Massage Video Graphics Section -->
+<div class="massage-graphics-section py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8">
+                <div class="graphics-placeholder large">
+                    <i class="bi bi-camera-video"></i>
+                    <span>MASSAGE GRAPHICS</span>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="description-placeholder">
+                    <h4 class="text-mint mb-3">Therapeutic Techniques</h4>
+                    <p class="text-muted">
+                        Our massage graphics showcase various therapeutic techniques including deep tissue, 
+                        Swedish, and hot stone massage methods.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="description-placeholder">
+                    <h4 class="text-mint mb-3">Relaxation Methods</h4>
+                    <p class="text-muted">
+                        Learn about our relaxation techniques and how they can help reduce stress, 
+                        improve circulation, and promote overall wellness.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="graphics-placeholder large">
+                    <i class="bi bi-camera-video"></i>
+                    <span>MASSAGE GRAPHICS</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Separator -->
+<div class="separator">
+    <div class="container">
+        <hr class="border-mint">
+    </div>
+</div>
+
+<!-- Our Story Section -->
+<div class="our-story-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold text-mint">OUR STORY</h2>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="graphics-placeholder large">
+                    <i class="bi bi-images"></i>
+                    <span>MASSAGE GRAPHICS</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="graphics-placeholder large">
+                    <i class="bi bi-images"></i>
+                    <span>MASSAGE GRAPHICS</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="description-placeholder">
+                    <h4 class="text-mint mb-3">Our Journey</h4>
+                    <p class="text-muted lead">
+                        Tenderbody Therapeutic Massage began with a simple mission: to provide healing touch 
+                        through professional massage therapy. Our story is one of passion, dedication, and 
+                        commitment to wellness. We believe in the power of therapeutic touch to transform lives 
+                        and promote healing from within.
+                    </p>
+                    <p class="text-muted">
+                        Through years of experience and continuous learning, we've developed unique techniques 
+                        that combine traditional methods with modern approaches. Our therapists are certified 
+                        professionals who understand the importance of personalized care and attention to detail.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action Section -->
+<div class="cta-section py-5 bg-light">
+    <div class="container text-center">
+        <h3 class="text-mint mb-4">Ready to Experience the Difference?</h3>
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-3">
+                <a href="@Url.Action("Book", "Appointment")" class="btn btn-mint btn-lg w-100">
+                    <i class="bi bi-calendar-check me-2"></i>Book Appointment
+                </a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <a href="@Url.Action("UserAppointments", "Appointment")" class="btn btn-outline-mint btn-lg w-100">
+                    <i class="bi bi-calendar-event me-2"></i>View Appointments
+                </a>
             </div>
         </div>
     </div>
@@ -44,26 +155,109 @@
         color: #2D5A4A !important;
     }
     
-    .spa-card {
-        transition: all 0.3s ease;
-        background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
-        border: 2px solid #98D8C8;
+    .border-mint {
+        border-color: #98D8C8 !important;
+        border-width: 2px;
     }
     
-    .spa-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 2rem rgba(45, 90, 74, 0.15) !important;
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #f8fffe 0%, #ffffff 100%);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .brand-logo {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .logo-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #98D8C8 0%, #2D5A4A 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        box-shadow: 0 4px 15px rgba(45, 90, 74, 0.2);
+    }
+    
+    /* Graphics Placeholders */
+    .graphics-placeholder {
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        border: 2px dashed #98D8C8;
+        border-radius: 15px;
+        padding: 3rem;
+        text-align: center;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .graphics-placeholder.large {
+        min-height: 300px;
+        padding: 4rem;
+    }
+    
+    .graphics-placeholder:hover {
         border-color: #2D5A4A;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(45, 90, 74, 0.1);
     }
     
-    .spa-image img {
-        transition: all 0.3s ease;
+    .graphics-placeholder i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #98D8C8;
     }
     
-    .spa-card:hover .spa-image img {
-        transform: scale(1.02);
+    .graphics-placeholder.large i {
+        font-size: 4rem;
     }
     
+    .graphics-placeholder span {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2D5A4A;
+    }
+    
+    /* Description Placeholders */
+    .description-placeholder {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 2rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    /* Separator */
+    .separator {
+        padding: 2rem 0;
+    }
+    
+    /* Our Story Section */
+    .our-story-section {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(135deg, #f8fffe 0%, #e9ecef 100%);
+    }
+    
+    /* Buttons */
     .btn-mint {
         background-color: #2D5A4A;
         border-color: #2D5A4A;
@@ -76,6 +270,7 @@
         border-color: #1a3a2e;
         color: white;
         transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(45, 90, 74, 0.2);
     }
     
     .btn-outline-mint {
@@ -89,23 +284,55 @@
         border-color: #2D5A4A;
         color: white;
         transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(45, 90, 74, 0.2);
     }
     
-    .btn {
-        transition: all 0.3s ease;
-    }
-    
+    /* Responsive Design */
     @@media (max-width: 768px) {
-        .display-1 {
-            font-size: 3rem;
+        .hero-section {
+            min-height: 60vh;
+            padding: 2rem 0;
         }
         
-        .card-body {
-            padding: 2rem !important;
+        .display-3 {
+            font-size: 2.5rem;
         }
         
-        .spa-image img {
-            max-height: 200px !important;
+        .display-4 {
+            font-size: 2rem;
+        }
+        
+        .graphics-placeholder.large {
+            min-height: 200px;
+            padding: 2rem;
+        }
+        
+        .graphics-placeholder.large i {
+            font-size: 2.5rem;
+        }
+        
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .logo-placeholder {
+            font-size: 1.5rem;
+        }
+    }
+    
+    @@media (max-width: 576px) {
+        .hero-content {
+            text-align: center;
+        }
+        
+        .brand-info {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .brand-logo {
+            margin-bottom: 1rem;
         }
     }
 </style>

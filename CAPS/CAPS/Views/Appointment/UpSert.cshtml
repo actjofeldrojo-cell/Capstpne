@@ -52,13 +52,7 @@
                         <span asp-validation-for="ClientGender" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="ClientAge" class="form-label">Age</label>
-                        <input asp-for="ClientAge" class="form-control" placeholder="Enter your age" />
-                        <span asp-validation-for="ClientAge" class="text-danger"></span>
-                    </div>
-                </div>
+
             </div>
         </div>
 
@@ -71,10 +65,47 @@
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label asp-for="ServiceId" class="form-label">Service *</label>
-                        <select asp-for="ServiceId" class="form-select" asp-items="@(new SelectList(ViewBag.Services, "ServiceId", "Name"))">
+                        <select asp-for="ServiceId" id="ServiceId" class="form-select" asp-items="@(new SelectList(ViewBag.Services, "ServiceId", "Name"))">
                             <option value="">-- Select Service --</option>
                         </select>
                         <span asp-validation-for="ServiceId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Service Details Display -->
+                <div id="serviceDetails" class="row mb-3" style="display: none;">
+                    <div class="col-12">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Service Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Category:</strong>
+                                        <span id="serviceCategory" class="text-muted"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Duration:</strong>
+                                        <span id="serviceDuration" class="text-muted"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Price:</strong>
+                                        <span id="servicePrice" class="text-success fw-bold"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Status:</strong>
+                                        <span class="badge bg-success">Available</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <strong>Description:</strong>
+                                        <p id="serviceDescription" class="text-muted mb-0"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -135,6 +166,7 @@
             var serviceId = this.value;
             var durationField = document.getElementById('Duration');
             var costField = document.getElementById('Cost');
+            var serviceDetails = document.getElementById('serviceDetails');
             
             if (serviceId) {
                 // Get service details from the services data
@@ -148,16 +180,24 @@
                     // Update background colors to show they're populated
                     durationField.style.backgroundColor = '#e9ecef';
                     costField.style.backgroundColor = '#e9ecef';
+                    
+                    // Show and populate service details
+                    serviceDetails.style.display = 'block';
+                    document.getElementById('serviceCategory').textContent = selectedService.category;
+                    document.getElementById('serviceDuration').textContent = selectedService.duration + ' minutes';
+                    document.getElementById('servicePrice').textContent = '$' + selectedService.price.toFixed(2);
+                    document.getElementById('serviceDescription').textContent = selectedService.description || 'No description available';
                 }
             } else {
                 durationField.value = '';
                 costField.value = '';
                 durationField.style.backgroundColor = '#f8f9fa';
                 costField.style.backgroundColor = '#f8f9fa';
+                
+                // Hide service details
+                serviceDetails.style.display = 'none';
             }
         });
-
-
 
         // Set minimum date to today
         var today = new Date().toISOString().split('T')[0];
@@ -209,5 +249,23 @@
     input[readonly] {
         background-color: #f8f9fa !important;
         cursor: not-allowed;
+    }
+    
+    /* Service details card styling */
+    .border-info {
+        border-color: #17a2b8 !important;
+    }
+    
+    .bg-info {
+        background-color: #17a2b8 !important;
+    }
+    
+    .text-success {
+        color: #28a745 !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
     }
 </style>

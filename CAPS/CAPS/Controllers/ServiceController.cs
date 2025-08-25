@@ -22,6 +22,24 @@ namespace CAPS.Controllers
             return View(services);
         }
 
+        // User-facing gallery of services (picture + description only)
+        public ActionResult Public(string? category)
+        {
+            var query = db.Services.Where(s => s.isActive);
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                query = query.Where(s => s.Category == category);
+            }
+            var services = query.ToList();
+            ViewBag.Categories = db.Services.Where(s => s.isActive)
+                .Select(s => s.Category)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+            ViewBag.SelectedCategory = category;
+            return View(services);
+        }
+
         // Update and Insert Viewing
         public ActionResult UpSert(int? id)
         {

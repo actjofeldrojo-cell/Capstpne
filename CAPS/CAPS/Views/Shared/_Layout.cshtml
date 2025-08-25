@@ -8,20 +8,50 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CAPS.styles.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-mint border-bottom box-shadow mb-3">
             <div class="container-fluid">
+                <!-- Left: Brand -->
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">CAPS</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <!-- Navigation items removed -->
+
+                <!-- Center + Right inside collapsible area -->
+                <div class="collapse navbar-collapse position-relative" id="mainNav">
+                    <!-- Desktop: absolutely centered nav -->
+                    <ul class="navbar-nav gap-4 position-absolute start-50 translate-middle-x d-none d-sm-flex">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Service" asp-action="Public">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Contacts</a>
+                        </li>
                     </ul>
+
+                    <!-- Mobile: stacked nav -->
+                    <ul class="navbar-nav d-sm-none me-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Service" asp-action="Public">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">About Us</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Contacts</a></li>
+                    </ul>
+
+                    <!-- Right: Book Now button -->
+                    <div class="d-flex ms-auto mt-2 mt-sm-0">
+                        <a class="btn btn-outline-secondary" asp-area="" asp-controller="Appointment" asp-action="Book">Book Now!</a>
+                    </div>
                 </div>
             </div>
         </nav>
