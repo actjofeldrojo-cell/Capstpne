@@ -121,7 +121,7 @@
                                 }
                             </td>
                             <td class="text-center">
-                                <div class="fw-bold text-success">@item.Price.ToString("C")</div>
+                                <div class="fw-bold text-success">₱@item.Price.ToString("N2")</div>
                                 <small class="text-muted">per session</small>
                             </td>
                             <td class="text-center">
@@ -211,7 +211,7 @@
             document.getElementById('modalServiceName').textContent = name;
             document.getElementById('modalServiceCategory').textContent = category;
             document.getElementById('modalServiceDuration').textContent = duration + ' minutes';
-            document.getElementById('modalServicePrice').textContent = '$' + price.toFixed(2);
+            document.getElementById('modalServicePrice').textContent = '₱' + price.toFixed(2);
             document.getElementById('modalServiceDescription').textContent = description || 'No description available';
             document.getElementById('modalEditLink').href = '/Service/UpSert/' + serviceId;
             

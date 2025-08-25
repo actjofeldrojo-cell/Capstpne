@@ -17,28 +17,17 @@ namespace CAPS.Controllers
         }
 
         // GET: Appointment
-        public async Task<IActionResult> Index(int? staffId)
+        public async Task<IActionResult> Index()
         {
             var appointmentsQuery = _context.Appointments
                 .Include(a => a.Client)
                 .Include(a => a.Service)
-                .Include(a => a.Staff)
                 .Where(a => a.IsActive);
-
-            if (staffId.HasValue)
-            {
-                appointmentsQuery = appointmentsQuery.Where(a => a.StaffId == staffId.Value);
-                var staff = await _context.Staffs.FindAsync(staffId.Value);
-                ViewBag.FilteredStaff = staff?.FullName;
-            }
 
             var appointments = await appointmentsQuery
                 .OrderByDescending(a => a.AppointmentDate)
                 .ThenBy(a => a.AppointmentTime)
                 .ToListAsync();
-                
-            // Get active products for the completion modal
-            ViewBag.Products = await _context.Products.Where(p => p.IsActive).OrderBy(p => p.Name).ToListAsync();
                 
             return View(appointments);
         }
@@ -54,7 +43,6 @@ namespace CAPS.Controllers
             var appointment = await _context.Appointments
                 .Include(a => a.Client)
                 .Include(a => a.Service)
-                .Include(a => a.Staff)
                 .FirstOrDefaultAsync(m => m.AppointmentId == id);
             if (appointment == null)
             {
@@ -68,7 +56,6 @@ namespace CAPS.Controllers
         public async Task<IActionResult> UpSert(int? id)
         {
             ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
-            ViewBag.Staffs = await _context.Staffs.Where(s => s.IsActive).ToListAsync();
             
             if (id == null || id == 0)
             {
@@ -91,7 +78,6 @@ namespace CAPS.Controllers
                 {
                     AppointmentId = appointment.AppointmentId,
                     ServiceId = appointment.ServiceId,
-                    StaffId = appointment.StaffId,
                     AppointmentDate = appointment.AppointmentDate,
                     AppointmentTime = appointment.AppointmentTime,
                     Duration = appointment.Duration,
@@ -100,8 +86,7 @@ namespace CAPS.Controllers
                     ClientFirstName = appointment.Client?.FirstName,
                     ClientLastName = appointment.Client?.LastName,
                     ClientPhoneNumber = appointment.Client?.PhoneNumber,
-                    ClientGender = appointment.Client?.Gender,
-                    ClientAge = appointment.Client?.Age
+                    ClientGender = appointment.Client?.Gender
                 };
                 
                 return View(dto);
@@ -116,7 +101,6 @@ namespace CAPS.Controllers
             // Remove validation for navigation properties that aren't being set
             ModelState.Remove("Client");
             ModelState.Remove("Service");
-            ModelState.Remove("Staff");
 
             if (ModelState.IsValid)
             {
@@ -137,7 +121,6 @@ namespace CAPS.Controllers
                             LastName = appointmentDto.ClientLastName,
                             PhoneNumber = appointmentDto.ClientPhoneNumber,
                             Gender = appointmentDto.ClientGender,
-                            Age = appointmentDto.ClientAge,
                             IsActive = true,
                             DateRegistered = DateTime.Now
                         };
@@ -150,7 +133,6 @@ namespace CAPS.Controllers
                     {
                         ClientId = client.ClientId,
                         ServiceId = appointmentDto.ServiceId,
-                        StaffId = appointmentDto.StaffId,
                         AppointmentDate = appointmentDto.AppointmentDate,
                         AppointmentTime = appointmentDto.AppointmentTime,
                         Duration = appointmentDto.Duration,
@@ -171,7 +153,6 @@ namespace CAPS.Controllers
                     if (appointment != null)
                     {
                         appointment.ServiceId = appointmentDto.ServiceId;
-                        appointment.StaffId = appointmentDto.StaffId;
                         appointment.AppointmentDate = appointmentDto.AppointmentDate;
                         appointment.AppointmentTime = appointmentDto.AppointmentTime;
                         appointment.Duration = appointmentDto.Duration;
@@ -190,7 +171,6 @@ namespace CAPS.Controllers
             
             ViewBag.Clients = await _context.Clients.Where(c => c.IsActive).ToListAsync();
             ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
-            ViewBag.Staffs = await _context.Staffs.Where(s => s.IsActive).ToListAsync();
             return View(appointmentDto);
         }
 
@@ -205,7 +185,6 @@ namespace CAPS.Controllers
             var appointment = await _context.Appointments
                 .Include(a => a.Client)
                 .Include(a => a.Service)
-                .Include(a => a.Staff)
                 .FirstOrDefaultAsync(m => m.AppointmentId == id);
             if (appointment == null)
             {
@@ -273,108 +252,201 @@ namespace CAPS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Appointment/Complete/5 (for debugging)
-        [HttpGet]
-        public IActionResult Complete(int id)
+        // GET: Appointment/UserAppointments
+        public async Task<IActionResult> UserAppointments()
         {
-            return RedirectToAction(nameof(Index));
+            // For now, we'll use a simple approach - in a real app you'd get the user ID from authentication
+            // This is a placeholder for user-specific appointment viewing
+            var appointmentsQuery = _context.Appointments
+                .Include(a => a.Client)
+                .Include(a => a.Service)
+                .Where(a => a.IsActive)
+                .OrderByDescending(a => a.AppointmentDate)
+                .ThenBy(a => a.AppointmentTime);
+
+            var appointments = await appointmentsQuery.ToListAsync();
+            ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
+            
+            return View(appointments);
         }
 
-        // POST: Appointment/Complete/5
-        [HttpPost, ActionName("Complete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CompleteConfirmed(int id, [FromForm] List<int> ProductIds, [FromForm] List<int> Quantities, [FromForm] string CompletionNotes)
+        // GET: Appointment/Book
+        public async Task<IActionResult> Book()
         {
-            // Debug logging
-            Console.WriteLine($"CompleteConfirmed called with id: {id}");
-            Console.WriteLine($"ProductIds: {string.Join(", ", ProductIds ?? new List<int>())}");
-            Console.WriteLine($"Quantities: {string.Join(", ", Quantities ?? new List<int>())}");
-            Console.WriteLine($"CompletionNotes: {CompletionNotes}");
-            
-            // Try to get form data manually if the model binding fails
-            if (ProductIds == null || Quantities == null)
+            ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
+            return View(new AppointmentWithClientDto());
+        }
+
+        // POST: Appointment/Book
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Book(AppointmentWithClientDto appointmentDto)
+        {
+            // Remove validation for navigation properties that aren't being set
+            ModelState.Remove("Client");
+            ModelState.Remove("Service");
+
+            if (ModelState.IsValid)
             {
-                var form = Request.Form;
-                Console.WriteLine($"Form keys: {string.Join(", ", form.Keys)}");
-                if (form.ContainsKey("ProductIds[]"))
+                Client client;
+                
+                // Check if client exists by phone number
+                client = await _context.Clients
+                    .FirstOrDefaultAsync(c => c.PhoneNumber == appointmentDto.ClientPhoneNumber && c.IsActive);
+                
+                if (client == null)
                 {
-                    ProductIds = form["ProductIds[]"].Select(int.Parse).ToList();
+                    // Create new client
+                    client = new Client
+                    {
+                        FirstName = appointmentDto.ClientFirstName,
+                        LastName = appointmentDto.ClientLastName,
+                        PhoneNumber = appointmentDto.ClientPhoneNumber,
+                        Gender = appointmentDto.ClientGender,
+                        IsActive = true,
+                        DateRegistered = DateTime.Now
+                    };
+                    _context.Clients.Add(client);
+                    await _context.SaveChangesAsync();
                 }
-                else if (form.ContainsKey("ProductIds"))
+                
+                // Create new appointment
+                var appointment = new Appointment
                 {
-                    ProductIds = form["ProductIds"].Select(int.Parse).ToList();
-                }
-                if (form.ContainsKey("Quantities[]"))
-                {
-                    Quantities = form["Quantities[]"].Select(int.Parse).ToList();
-                }
-                else if (form.ContainsKey("Quantities"))
-                {
-                    Quantities = form["Quantities"].Select(int.Parse).ToList();
-                }
-                if (form.ContainsKey("CompletionNotes"))
-                {
-                    CompletionNotes = form["CompletionNotes"].FirstOrDefault();
-                }
+                    ClientId = client.ClientId,
+                    ServiceId = appointmentDto.ServiceId,
+                    AppointmentDate = appointmentDto.AppointmentDate,
+                    AppointmentTime = appointmentDto.AppointmentTime,
+                    Duration = appointmentDto.Duration,
+                    Cost = appointmentDto.Cost,
+                    Notes = appointmentDto.Notes,
+                    DateCreated = DateTime.Now,
+                    IsActive = true,
+                    Status = "Scheduled"
+                };
+                
+                _context.Add(appointment);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Appointment booked successfully!";
+                return RedirectToAction(nameof(UserAppointments));
             }
             
-            var appointment = await _context.Appointments.FindAsync(id);
+            ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
+            return View(appointmentDto);
+        }
+
+        // GET: Appointment/UserEdit/5
+        public async Task<IActionResult> UserEdit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
+            
+            var appointment = await _context.Appointments
+                .Include(a => a.Client)
+                .FirstOrDefaultAsync(a => a.AppointmentId == id);
+                
             if (appointment == null)
             {
-                TempData["ErrorMessage"] = "Appointment not found.";
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
             
-            try
+            var dto = new AppointmentWithClientDto
             {
-                appointment.Status = "Completed";
-                
-                // Build products used information
-                var productsUsedInfo = "";
-                if (ProductIds != null && Quantities != null)
+                AppointmentId = appointment.AppointmentId,
+                ServiceId = appointment.ServiceId,
+                AppointmentDate = appointment.AppointmentDate,
+                AppointmentTime = appointment.AppointmentTime,
+                Duration = appointment.Duration,
+                Cost = appointment.Cost,
+                Notes = appointment.Notes,
+                ClientFirstName = appointment.Client?.FirstName,
+                ClientLastName = appointment.Client?.LastName,
+                ClientPhoneNumber = appointment.Client?.PhoneNumber,
+                ClientGender = appointment.Client?.Gender
+            };
+            
+            return View(dto);
+        }
+
+        // POST: Appointment/UserEdit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UserEdit(int id, AppointmentWithClientDto appointmentDto)
+        {
+            if (id != appointmentDto.AppointmentId)
+            {
+                return NotFound();
+            }
+
+            // Remove validation for navigation properties that aren't being set
+            ModelState.Remove("Client");
+            ModelState.Remove("Service");
+
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    var productsList = new List<string>();
-                    for (int i = 0; i < ProductIds.Count; i++)
+                    var appointment = await _context.Appointments.FindAsync(id);
+                    if (appointment == null)
                     {
-                        if (ProductIds[i] > 0 && Quantities[i] > 0)
-                        {
-                            var product = await _context.Products.FindAsync(ProductIds[i]);
-                            if (product != null)
-                            {
-                                productsList.Add($"{Quantities[i]}x {product.Name}");
-                            }
-                        }
+                        return NotFound();
                     }
-                    if (productsList.Any())
+
+                    // Update appointment details
+                    appointment.ServiceId = appointmentDto.ServiceId;
+                    appointment.AppointmentDate = appointmentDto.AppointmentDate;
+                    appointment.AppointmentTime = appointmentDto.AppointmentTime;
+                    appointment.Duration = appointmentDto.Duration;
+                    appointment.Cost = appointmentDto.Cost;
+                    appointment.Notes = appointmentDto.Notes;
+                    appointment.DateModified = DateTime.Now;
+                    
+                    _context.Update(appointment);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Appointment updated successfully!";
+                    return RedirectToAction(nameof(UserAppointments));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!AppointmentExists(id))
                     {
-                        productsUsedInfo = $"\n\n[PRODUCTS USED] {string.Join(", ", productsList)}";
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
                     }
                 }
-                
-                // Append completion notes and products used to existing notes
-                var completionInfo = "";
-                if (!string.IsNullOrEmpty(CompletionNotes))
-                {
-                    var timestamp = DateTime.Now.ToString("MMM dd, yyyy HH:mm");
-                    completionInfo = $"\n\n[COMPLETED {timestamp}] {CompletionNotes}";
-                }
-                
-                appointment.Notes = (appointment.Notes ?? "") + productsUsedInfo + completionInfo;
+            }
+            
+            ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
+            return View(appointmentDto);
+        }
+
+        // POST: Appointment/UserCancel/5
+        [HttpPost, ActionName("UserCancel")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UserCancelConfirmed(int id, string cancellationReason)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                appointment.Status = "Cancelled";
+                appointment.CancellationReason = cancellationReason ?? "Cancelled by user";
+                appointment.CancellationDate = DateTime.Now;
+                appointment.CancelledBy = "User";
                 appointment.DateModified = DateTime.Now;
                 await _context.SaveChangesAsync();
-                
-                var totalProducts = ProductIds?.Count(p => p > 0) ?? 0;
-                TempData["SuccessMessage"] = $"Appointment marked as completed! Products used: {totalProducts}";
+                TempData["SuccessMessage"] = "Appointment cancelled successfully!";
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error completing appointment: {ex.Message}");
-                TempData["ErrorMessage"] = "An error occurred while completing the appointment.";
-                return RedirectToAction(nameof(Index));
-            }
-            
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(UserAppointments));
         }
+
+
 
         // GET: Appointment/Calendar
         public async Task<IActionResult> Calendar()
@@ -382,7 +454,6 @@ namespace CAPS.Controllers
             var appointments = await _context.Appointments
                 .Include(a => a.Client)
                 .Include(a => a.Service)
-                .Include(a => a.Staff)
                 .Where(a => a.IsActive && a.AppointmentDate >= DateTime.Today)
                 .OrderBy(a => a.AppointmentDate)
                 .ThenBy(a => a.AppointmentTime)
@@ -397,43 +468,13 @@ namespace CAPS.Controllers
             var appointments = await _context.Appointments
                 .Include(a => a.Client)
                 .Include(a => a.Service)
-                .Include(a => a.Staff)
                 .Where(a => a.IsActive && a.AppointmentDate == today)
                 .OrderBy(a => a.AppointmentTime)
                 .ToListAsync();
             return View(appointments);
         }
 
-        // POST: Appointment/AssignStaff
-        [HttpPost]
-        public async Task<IActionResult> AssignStaff([FromBody] AssignStaffRequest request)
-        {
-            try
-            {
-                var appointment = await _context.Appointments.FindAsync(request.AppointmentId);
-                if (appointment == null)
-                {
-                    return Json(new { success = false, message = "Appointment not found." });
-                }
 
-                var staff = await _context.Staffs.FindAsync(request.StaffId);
-                if (staff == null)
-                {
-                    return Json(new { success = false, message = "Staff member not found." });
-                }
-
-                appointment.StaffId = request.StaffId;
-                appointment.DateModified = DateTime.Now;
-                
-                await _context.SaveChangesAsync();
-                
-                return Json(new { success = true, message = "Staff assigned successfully!" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "An error occurred while assigning staff." });
-            }
-        }
 
         private bool AppointmentExists(int id)
         {
@@ -441,11 +482,7 @@ namespace CAPS.Controllers
         }
     }
 
-    public class AssignStaffRequest
-    {
-        public int AppointmentId { get; set; }
-        public int StaffId { get; set; }
-    }
+
 
     public class AppointmentWithClientDto
     {
@@ -453,7 +490,6 @@ namespace CAPS.Controllers
         
         [Required]
         public int ServiceId { get; set; }
-        public int? StaffId { get; set; }
         
         [Required]
         public DateTime AppointmentDate { get; set; }
@@ -483,8 +519,5 @@ namespace CAPS.Controllers
         [Required]
         [StringLength(20)]
         public string? ClientGender { get; set; }
-        
-        [StringLength(100)]
-        public string? ClientAge { get; set; }
     }
 }

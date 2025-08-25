@@ -1,0 +1,46 @@
+@model List<CAPS.Models.Service>
+@{
+	ViewData["Title"] = "Services Offered";
+}
+
+<div class="container my-4">
+	<h2 class="text-center mb-4">SERVICES OFFERED</h2>
+
+	<!-- Category filter pills -->
+	@if (ViewBag.Categories != null && ((IEnumerable<string>)ViewBag.Categories).Any())
+	{
+		<div class="bg-light p-3 rounded mb-4 d-flex flex-wrap justify-content-center gap-3">
+			<a asp-action="Public" class="btn btn-light border rounded-pill px-4 @(ViewBag.SelectedCategory == null ? "active" : "")">All</a>
+			@foreach (var cat in (IEnumerable<string>)ViewBag.Categories)
+			{
+				<a asp-action="Public" asp-route-category="@cat" class="btn btn-light border rounded-pill px-4 @(ViewBag.SelectedCategory == cat ? "active" : "")">@cat</a>
+			}
+		</div>
+	}
+
+	<!-- Grid of service cards -->
+	<div class="row g-4">
+		@foreach (var s in Model)
+		{
+			<div class="col-12 col-md-6">
+				<div class="card h-100 shadow-sm border-0">
+					<div class="ratio ratio-4x3 bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center rounded-top">
+						<span class="text-muted">Image</span>
+					</div>
+					<div class="card-body">
+						<h5 class="card-title">@s.Name</h5>
+						<p class="card-text text-muted">@s.Description</p>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+<style>
+	.btn.active {
+		background-color: #e5e5e5;
+	}
+</style>
+
+
