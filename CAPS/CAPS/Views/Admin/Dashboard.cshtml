@@ -1,0 +1,311 @@
+@model CAPS.Controllers.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@if (Model == null)
+{
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Dashboard data is not available. Please try refreshing the page.
+    </div>
+    return;
+}
+
+@try
+{
+
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-gradient-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-2">Welcome to CAPS Admin Panel</h2>
+                        <p class="mb-0 opacity-75">Manage your spa operations efficiently</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <i class="bi bi-graph-up-arrow display-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-calendar-event text-primary fs-3"></i>
+                </div>
+                <h3 class="mb-1">@(Model.TotalAppointments)</h3>
+                <p class="text-muted mb-0">Appointments</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-people text-success fs-3"></i>
+                </div>
+                <h3 class="mb-1">@Model.TotalClients</h3>
+                <p class="text-muted mb-0">Clients</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-box text-info fs-3"></i>
+                </div>
+                <h3 class="mb-1">@Model.TotalProducts</h3>
+                <p class="text-muted mb-0">Products</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-concierge-bell text-warning fs-3"></i>
+                </div>
+                <h3 class="mb-1">@Model.TotalServices</h3>
+                <p class="text-muted mb-0">Services</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="d-inline-flex align-items-center justify-content-center bg-secondary bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-person-badge text-secondary fs-3"></i>
+                </div>
+                <h3 class="mb-1">@Model.TotalStaff</h3>
+                <p class="text-muted mb-0">Staff</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-receipt text-danger fs-3"></i>
+                </div>
+                <h3 class="mb-1">@Model.TotalTransactions</h3>
+                <p class="text-muted mb-0">Transactions</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <!-- Recent Appointments -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-event text-primary me-2"></i>Recent Appointments
+                    </h5>
+                    <a asp-controller="Appointment" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentAppointments != null && Model.RecentAppointments.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var appointment in Model.RecentAppointments.Where(a => a != null))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-person text-white small"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@(appointment.Client?.FirstName ?? "Unknown") @(appointment.Client?.LastName ?? "")</div>
+                                                    <small class="text-muted">@(appointment.Client?.PhoneNumber ?? "No phone")</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">@(appointment.Service?.Name ?? "Unknown Service")</span>
+                                        </td>
+                                        <td>
+                                            <small>@(appointment.AppointmentDate != default(DateTime) ? appointment.AppointmentDate.ToString("MMM dd") : "Date not set")</small><br>
+                                            <small class="text-muted">
+                                                @if (appointment.AppointmentTime != default(TimeSpan))
+                                                {
+                                                    @appointment.AppointmentTime.ToString("HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Time not set</span>
+                                                }
+                                            </small>
+                                        </td>
+                                        <td>
+                                            @{
+                                                var statusClass = !string.IsNullOrEmpty(appointment.Status) ? appointment.Status switch
+                                                {
+                                                    "Scheduled" => "bg-warning",
+                                                    "Confirmed" => "bg-info",
+                                                    "Completed" => "bg-success",
+                                                    "Cancelled" => "bg-danger",
+                                                    _ => "bg-secondary"
+                                                } : "bg-secondary";
+                                            }
+                                            <span class="badge @statusClass">@(appointment.Status ?? "Unknown")</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-calendar-x display-4"></i>
+                        <p class="mt-2">No appointments found</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Transactions -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-receipt text-success me-2"></i>Recent Transactions
+                    </h5>
+                    <a asp-controller="Transaction" asp-action="Index" class="btn btn-sm btn-outline-success">
+                        View All
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentTransactions != null && Model.RecentTransactions.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Service</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var transaction in Model.RecentTransactions.Where(t => t != null))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-person text-white small"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@(transaction.Client?.FirstName ?? "Unknown") @(transaction.Client?.LastName ?? "")</div>
+                                                    <small class="text-muted">@(transaction.PaymentMethod ?? "No method")</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">@(transaction.Service?.Name ?? "Unknown Service")</span>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success">@(transaction.Amount.ToString("C"))</span>
+                                        </td>
+                                        <td>
+                                            <small>@(transaction.TransactionDate != default(DateTime) ? transaction.TransactionDate.ToString("MMM dd") : "Date not set")</small><br>
+                                            <small class="text-muted">@(transaction.TransactionDate != default(DateTime) ? transaction.TransactionDate.ToString("HH:mm") : "Time not set")</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-receipt display-4"></i>
+                        <p class="mt-2">No transactions found</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .card {
+        border-radius: 10px;
+        transition: transform 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+</style>
+
+}
+catch (Exception ex)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Error loading dashboard:</strong> @ex.Message
+        <br />
+        <small class="text-muted">Please contact the administrator if this problem persists.</small>
+    </div>
+}
