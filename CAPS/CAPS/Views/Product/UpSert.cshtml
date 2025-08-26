@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = Model.ProductId == 0 ? "Create Product" : "Edit Product";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container my-4">
@@ -40,14 +41,6 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="Price" class="form-label">Price *</label>
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
-                </div>
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
             <div class="col-md-6 mb-3">
                 <label asp-for="StockQuantity" class="form-label">Stock Quantity</label>
                 <input asp-for="StockQuantity" class="form-control" type="number" min="0" placeholder="0" />

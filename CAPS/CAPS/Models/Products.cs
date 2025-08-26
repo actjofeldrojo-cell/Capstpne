@@ -15,10 +15,7 @@ namespace CAPS.Models
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string Description { get; set; }
 
-        [Required]
-        [Range(0, 99999.99, ErrorMessage = "Price must be between 0 and 99999.99.")]
-        [Column(TypeName = "decimal(10, 2)")]
-        public decimal Price { get; set; }
+
 
         [Required]
         [StringLength(50, ErrorMessage = "Category cannot exceed 50 characters.")]

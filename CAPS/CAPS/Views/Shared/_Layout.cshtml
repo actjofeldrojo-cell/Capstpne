@@ -48,9 +48,12 @@
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Contacts</a></li>
                     </ul>
 
-                    <!-- Right: Book Now button -->
-                    <div class="d-flex ms-auto mt-2 mt-sm-0">
+                    <!-- Right: Book Now button and Admin link -->
+                    <div class="d-flex ms-auto mt-2 mt-sm-0 gap-2">
                         <a class="btn btn-outline-secondary" asp-area="" asp-controller="Appointment" asp-action="Book">Book Now!</a>
+                        <a class="btn btn-outline-primary" asp-area="" asp-controller="Admin" asp-action="Login">
+                            <i class="bi bi-shield-check me-1"></i>Admin
+                        </a>
                     </div>
                 </div>
             </div>

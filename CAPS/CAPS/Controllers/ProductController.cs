@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using CAPS.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using CAPS.Attributes;
 
 namespace CAPS.Controllers
 {
@@ -16,16 +17,18 @@ namespace CAPS.Controllers
         }
 
         // GET: Product
+        [AdminAuthorize]
         public async Task<IActionResult> Index()
         {
             var products = await _context.Products
-                .Where(p => p.IsActive)
                 .OrderBy(p => p.Name)
                 .ToListAsync();
+            ViewData["Title"] = "Products Management";
             return View(products);
         }
 
         // GET: Product/UpSert/5 (for combined Create/Edit view)
+        [AdminAuthorize]
         public async Task<IActionResult> UpSert(int? id)
         {
             if (id == null || id == 0)
@@ -48,22 +51,20 @@ namespace CAPS.Controllers
         // POST: Product/UpSert
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpSert([Bind("ProductId,Name,Description,Price,Category,StockQuantity,SKU,Brand,Size,Color,DiscountPercentage,ImageUrl,AdditionalNotes")] Products product)
+        [AdminAuthorize]
+        public async Task<IActionResult> UpSert([Bind("ProductId,Name,Description,Category,StockQuantity")] Products product)
         {
             if (ModelState.IsValid)
             {
                 if (product.ProductId == 0)
                 {
                     // Create new product
-                    product.DateCreated = DateTime.Now;
-                    product.IsActive = true;
                     _context.Add(product);
                     TempData["SuccessMessage"] = "Product created successfully!";
                 }
                 else
                 {
                     // Update existing product
-                    product.DateModified = DateTime.Now;
                     _context.Update(product);
                     TempData["SuccessMessage"] = "Product updated successfully!";
                 }
@@ -73,14 +74,14 @@ namespace CAPS.Controllers
             return View(product);
         }
 
+        [AdminAuthorize]
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product != null)
             {
-                // Soft delete - just mark as inactive
-                product.IsActive = false;
-                product.DateModified = DateTime.Now;
+                // Hard delete
+                _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Product deleted successfully!";
             }

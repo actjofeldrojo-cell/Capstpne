@@ -1,7 +1,8 @@
 ﻿@model List<CAPS.Models.Products>
 
 @{
-	ViewData["Title"] = "Products";
+	ViewData["Title"] = "Products Management";
+	Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container my-4">
@@ -36,7 +37,6 @@
 					<th>Description</th>
 					<th>Category</th>
 					<th>Stock</th>
-					<th>Active</th>
 					<th>Date Created</th>
 					<th class="text-center">Actions</th>
 				</tr>
@@ -66,18 +66,6 @@
 							else
 							{
 								<span class="badge bg-danger">@item.StockQuantity</span>
-							}
-						</td>
-
-
-						<td>
-							@if (item.IsActive)
-							{
-								<span class="badge bg-success">Yes</span>
-							}
-							else
-							{
-								<span class="badge bg-secondary">No</span>
 							}
 						</td>
 						<td>@item.DateCreated.ToString("yyyy-MM-dd")</td>
