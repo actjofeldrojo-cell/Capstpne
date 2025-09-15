@@ -41,19 +41,61 @@ namespace CAPS.Controllers
         }
 
         // GET: Transaction/UpSert
-        public ActionResult UpSert(int? id = null)
+        public ActionResult UpSert(int? id = null, int? clientId = null)
         {
             if (id == null)
             {
                 // Create new transaction
-                return View(new Transaction 
+                var transaction = new Transaction 
                 { 
                     TransactionDate = DateTime.Now,
                     DateCreated = DateTime.Now,
                     IsActive = true,
-                    Status = "Completed",
+                    Status = "Pending", // Changed to Pending for payment processing
                     PaymentMethod = "Cash"
-                });
+                };
+
+                // If clientId is provided, pre-populate the client and get their availed services
+                if (clientId.HasValue)
+                {
+                    var client = db.Clients
+                        .Include(c => c.Appointments)
+                            .ThenInclude(a => a.Service)
+                        .FirstOrDefault(c => c.ClientId == clientId.Value && c.IsActive);
+                    
+                    if (client != null)
+                    {
+                        transaction.ClientId = client.ClientId;
+                        
+                        // Get client's availed services from appointments
+                        var availedServices = client.Appointments
+                            .Where(a => a.IsActive && a.Duration > 0)
+                            .GroupBy(a => a.ServiceId)
+                            .Select(g => new AvailedServiceViewModel { 
+                                Service = g.First().Service, 
+                                TotalDuration = g.Sum(a => a.Duration) 
+                            })
+                            .ToList();
+                        
+                        ViewBag.AvailedServices = availedServices;
+                        
+                        // Auto-select the first availed service if any
+                        if (availedServices.Any())
+                        {
+                            var firstService = availedServices.First();
+                            transaction.ServiceId = firstService.Service.ServiceId;
+                            transaction.Amount = firstService.Service.Price;
+                            transaction.TotalAmount = firstService.Service.Price;
+                        }
+                    }
+                }
+
+                // Load view data
+                ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
+                ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
+                ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
+
+                return View(transaction);
             }
             else
             {
@@ -68,6 +110,11 @@ namespace CAPS.Controllers
                 {
                     return NotFound();
                 }
+
+                // Load view data
+                ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
+                ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
+                ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
 
                 return View(transaction);
             }
@@ -89,12 +136,19 @@ namespace CAPS.Controllers
                         {
                             // New transaction
                             transaction.DateCreated = DateTime.Now;
+                            transaction.TransactionDate = DateTime.Now;
                             
                             // Generate receipt number if not provided
                             if (string.IsNullOrEmpty(transaction.ReceiptNumber))
                             {
                                 transaction.ReceiptNumber = GenerateReceiptNumber();
                             }
+
+                            // Set status to completed for payment processing
+                            transaction.Status = "Completed";
+                            
+                            // Calculate total amount (same as base amount for simplified payment)
+                            transaction.TotalAmount = transaction.Amount;
 
                             db.Transactions.Add(transaction);
                         }
@@ -105,13 +159,12 @@ namespace CAPS.Controllers
                             db.Transactions.Update(transaction);
                         }
 
-                        transaction.CalculateTotal(); // Calculate the total amount
                         db.SaveChanges();
                         
                         dbTransaction.Commit();
                         
                         TempData["SuccessMessage"] = transaction.TransactionId == 0 
-                            ? "Transaction created successfully!" 
+                            ? "Payment completed successfully! Transaction has been added to reports." 
                             : "Transaction updated successfully!";
                         
                         return RedirectToAction(nameof(Index));
@@ -119,8 +172,7 @@ namespace CAPS.Controllers
                     catch (Exception ex)
                     {
                         dbTransaction.Rollback();
-                        ModelState.AddModelError("", "Error saving transaction. Please try again.");
-                        Console.WriteLine($"Error saving transaction: {ex.Message}");
+                        ModelState.AddModelError("", "Error processing payment. Please try again.");
                     }
                 }
             }
@@ -297,6 +349,66 @@ namespace CAPS.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        // POST: Transaction/CompletePayment
+        [HttpPost]
+        public ActionResult CompletePayment(int transactionId, decimal tenderedAmount)
+        {
+            try
+            {
+                using (var dbTransaction = db.Database.BeginTransaction())
+                {
+                    var transaction = db.Transactions
+                        .Include(t => t.Client)
+                        .Include(t => t.Service)
+                        .FirstOrDefault(t => t.TransactionId == transactionId && t.IsActive);
+
+                    if (transaction == null)
+                    {
+                        return Json(new { success = false, message = "Transaction not found." });
+                    }
+
+                    // Validate tendered amount
+                    if (tenderedAmount < transaction.TotalAmount)
+                    {
+                        return Json(new { success = false, message = "Tendered amount must be greater than or equal to the total amount." });
+                    }
+
+                    // Update transaction status to completed
+                    transaction.Status = "Completed";
+                    transaction.PaymentMethod = "Cash"; // Default to cash for now
+                    transaction.DateModified = DateTime.Now;
+
+                    // Add a note about the payment
+                    var change = tenderedAmount - transaction.TotalAmount;
+                    var paymentNote = $"Payment completed. Tendered: ${tenderedAmount:F2}, Change: ${change:F2}";
+                    
+                    if (string.IsNullOrEmpty(transaction.Notes))
+                    {
+                        transaction.Notes = paymentNote;
+                    }
+                    else
+                    {
+                        transaction.Notes += $"\n{paymentNote}";
+                    }
+
+                    db.Transactions.Update(transaction);
+                    db.SaveChanges();
+                    
+                    dbTransaction.Commit();
+
+                    return Json(new { 
+                        success = true, 
+                        message = "Payment completed successfully! Transaction has been added to reports.",
+                        change = change
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error processing payment: " + ex.Message });
+            }
+        }
     }
 
     // Helper class for AJAX requests
@@ -307,5 +419,12 @@ namespace CAPS.Controllers
         public decimal DiscountPercentage { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal TaxPercentage { get; set; }
+    }
+
+    // View model for availed services
+    public class AvailedServiceViewModel
+    {
+        public Service Service { get; set; }
+        public int TotalDuration { get; set; }
     }
 }

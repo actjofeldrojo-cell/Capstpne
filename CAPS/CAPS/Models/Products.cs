@@ -15,8 +15,6 @@ namespace CAPS.Models
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string Description { get; set; }
 
-
-
         [Required]
         [StringLength(50, ErrorMessage = "Category cannot exceed 50 characters.")]
         public string Category { get; set; }

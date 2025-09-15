@@ -113,7 +113,7 @@
 <!-- Recent Activity -->
 <div class="row">
     <!-- Recent Appointments -->
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-4 mb-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-0">
                 <div class="d-flex justify-content-between align-items-center">
@@ -200,7 +200,7 @@
     </div>
     
     <!-- Recent Transactions -->
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-4 mb-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-0">
                 <div class="d-flex justify-content-between align-items-center">
@@ -261,6 +261,73 @@
                     <div class="text-center text-muted py-4">
                         <i class="bi bi-receipt display-4"></i>
                         <p class="mt-2">No transactions found</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Clients -->
+    <div class="col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people text-info me-2"></i>Recent Clients
+                    </h5>
+                    <a asp-controller="Client" asp-action="Index" class="btn btn-sm btn-outline-info">
+                        View All
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentClients != null && Model.RecentClients.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Gender</th>
+                                    <th>Registered</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var client in Model.RecentClients.Where(c => c != null))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-info rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-person text-white small"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@(client.FirstName ?? "Unknown") @(client.LastName ?? "")</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small>@(client.PhoneNumber ?? "No phone")</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">@(client.Gender ?? "Unknown")</span>
+                                        </td>
+                                        <td>
+                                            <small>@(client.DateRegistered != default(DateTime) ? client.DateRegistered.ToString("MMM dd") : "Date not set")</small><br>
+                                            <small class="text-muted">@(client.DateRegistered != default(DateTime) ? client.DateRegistered.ToString("HH:mm") : "Time not set")</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-people display-4"></i>
+                        <p class="mt-2">No clients found</p>
                     </div>
                 }
             </div>

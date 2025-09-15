@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CAPS.Models
 {
@@ -36,5 +37,8 @@ namespace CAPS.Models
 
         [DataType(DataType.Date)]
         public DateTime DateRegistered { get; set; } = DateTime.Now;
+
+        // Navigation Properties
+        public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

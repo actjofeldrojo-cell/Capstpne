@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = Model.TransactionId == 0 ? "New Transaction" : "Edit Transaction";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var isEdit = Model.TransactionId != 0;
 }
 
@@ -13,6 +14,13 @@
                 <i class="fas fa-receipt me-2"></i>@ViewData["Title"]
             </h2>
             <p class="text-muted">@(isEdit ? "Update transaction details" : "Create a new transaction")</p>
+            @if (Model.ClientId > 0 && !isEdit)
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-user me-2"></i>
+                    <strong>Client Pre-selected:</strong> This transaction is for a specific client from the Client management page.
+                </div>
+            }
         </div>
         <div class="col-md-6 text-end">
             <a asp-action="Index" class="btn btn-outline-secondary">
@@ -24,57 +32,92 @@
     <form asp-action="UpSert" method="post" id="transactionForm">
         <input type="hidden" asp-for="TransactionId" />
         <input type="hidden" asp-for="DateCreated" />
-        <input type="hidden" asp-for="IsActive" />
+        <input type="hidden" asp-for="IsActive" value="true" />
+        <input type="hidden" asp-for="ClientId" />
+        <input type="hidden" asp-for="StaffId" value="1" />
+        <input type="hidden" asp-for="Status" value="Completed" />
 
         <div class="row">
-            <!-- Left Column - Main Transaction Details -->
-            <div class="col-md-8">
+            <!-- Client Information Card -->
+            <div class="col-md-6">
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">
-                            <i class="fas fa-info-circle me-2"></i>Transaction Details
+                            <i class="fas fa-user me-2"></i>Client Information
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <!-- Transaction Date -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="TransactionDate" class="form-label">Transaction Date *</label>
-                                <input asp-for="TransactionDate" type="datetime-local" class="form-control" required />
-                                <span asp-validation-for="TransactionDate" class="text-danger"></span>
-                            </div>
-
-                            <!-- Receipt Number -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ReceiptNumber" class="form-label">Receipt Number</label>
-                                <div class="input-group">
-                                    <input asp-for="ReceiptNumber" class="form-control" placeholder="Auto-generated if empty" />
-                                    <button type="button" class="btn btn-outline-secondary" id="generateReceipt">
-                                        <i class="fas fa-magic"></i> Generate
-                                    </button>
+                        @if (Model.ClientId > 0)
+                        {
+                            var client = ViewBag.Clients as List<CAPS.Models.Client>;
+                            var selectedClient = client?.FirstOrDefault(c => c.ClientId == Model.ClientId);
+                            if (selectedClient != null)
+                            {
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Client Name</label>
+                                        <p class="form-control-plaintext">@selectedClient.FirstName @selectedClient.LastName</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Phone Number</label>
+                                        <p class="form-control-plaintext">@selectedClient.PhoneNumber</p>
+                                    </div>
                                 </div>
-                                <span asp-validation-for="ReceiptNumber" class="text-danger"></span>
-                            </div>
-                        </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Gender</label>
+                                        <p class="form-control-plaintext">@selectedClient.Gender</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Registered On</label>
+                                        <p class="form-control-plaintext">@selectedClient.DateRegistered.ToString("yyyy-MM-dd")</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
 
-                        <div class="row">
-                            <!-- Client Selection -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ClientId" class="form-label">Client *</label>
-                                <select asp-for="ClientId" class="form-select" required>
-                                    <option value="">Select Client</option>
-                                    @foreach (var client in ViewBag.Clients)
+            <!-- Service Selection -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-concierge-bell me-2"></i>Availed Services
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.AvailedServices != null)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-success">Client's Availed Services</label>
+                                <div class="availed-services-list">
+                                    @foreach (CAPS.Controllers.AvailedServiceViewModel availedService in ViewBag.AvailedServices)
                                     {
-                                        <option value="@client.ClientId">
-                                            @client.FirstName @client.LastName - @client.PhoneNumber
-                                        </option>
+                                        <div class="service-item mb-2 p-3 border rounded @(availedService.Service.ServiceId == Model.ServiceId ? "bg-success text-white" : "bg-light")">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="fw-bold">@availedService.Service.Name</span>
+                                                    <small class="@(availedService.Service.ServiceId == Model.ServiceId ? "text-white-50" : "text-muted") d-block">
+                                                        @availedService.TotalDuration min - $@availedService.Service.Price
+                                                    </small>
+                                                </div>
+                                                @if (availedService.Service.ServiceId == Model.ServiceId)
+                                                {
+                                                    <span class="badge bg-white text-success">
+                                                        <i class="fas fa-check me-1"></i>Selected
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
                                     }
-                                </select>
-                                <span asp-validation-for="ClientId" class="text-danger"></span>
+                                </div>
                             </div>
-
-                            <!-- Service Selection -->
-                            <div class="col-md-6 mb-3">
+                        }
+                        else
+                        {
+                            <div class="mb-3">
                                 <label asp-for="ServiceId" class="form-label">Service *</label>
                                 <select asp-for="ServiceId" class="form-select" required id="serviceSelect">
                                     <option value="">Select Service</option>
@@ -82,143 +125,74 @@
                                     {
                                         <option value="@service.ServiceId" 
                                                 data-price="@service.Price" 
-                                                data-duration="@service.Duration"
-                                                >
+                                                data-duration="@service.Duration">
                                             @service.Name - $@service.Price (@service.Duration min)
                                         </option>
                                     }
                                 </select>
                                 <span asp-validation-for="ServiceId" class="text-danger"></span>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Staff Selection -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="StaffId" class="form-label">Staff Member</label>
-                                <select asp-for="StaffId" class="form-select">
-                                    <option value="">Select Staff (Optional)</option>
-                                    @foreach (var staff in ViewBag.Staff)
-                                    {
-                                        <option value="@staff.StaffId">
-                                            @staff.FullName
-                                        </option>
-                                    }
-                                </select>
-                                <span asp-validation-for="StaffId" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Status -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Status" class="form-label">Status *</label>
-                                <select asp-for="Status" class="form-select" required>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                    <option value="Refunded">Refunded</option>
-                                </select>
-                                <span asp-validation-for="Status" class="text-danger"></span>
-                            </div>
-
-                            <!-- Invoice Number -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="InvoiceNumber" class="form-label">Invoice Number</label>
-                                <input asp-for="InvoiceNumber" class="form-control" placeholder="Optional invoice number" />
-                                <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <!-- Notes -->
-                        <div class="mb-3">
-                            <label asp-for="Notes" class="form-label">Notes</label>
-                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Additional notes about this transaction..."></textarea>
-                            <span asp-validation-for="Notes" class="text-danger"></span>
-                        </div>
+                        }
+                        
+                        <!-- Hidden field to ensure ServiceId is always set when availed services are shown -->
+                        @if (ViewBag.AvailedServices != null)
+                        {
+                            <input type="hidden" asp-for="ServiceId" id="hiddenServiceId" />
+                        }
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Right Column - Pricing & Calculations -->
-            <div class="col-md-4">
+        <!-- Payment Information -->
+        <div class="row">
+            <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header bg-success text-white">
                         <h5 class="mb-0">
-                            <i class="fas fa-calculator me-2"></i>Pricing & Calculations
+                            <i class="fas fa-credit-card me-2"></i>Payment Information
                         </h5>
                     </div>
                     <div class="card-body">
-                        <!-- Base Amount -->
-                        <div class="mb-3">
-                            <label asp-for="Amount" class="form-label">Base Amount *</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input asp-for="Amount" type="number" step="0.01" min="0" class="form-control" required id="baseAmount" />
-                            </div>
-                            <span asp-validation-for="Amount" class="text-danger"></span>
-                        </div>
-
-                        <!-- Discount Section -->
-                        <div class="card mb-3" style="background-color: #f8f9fa;">
-                            <div class="card-body">
-                                <h6 class="card-title text-muted">Discount</h6>
-                                
-                                <div class="mb-2">
-                                    <label asp-for="DiscountPercentage" class="form-label small">Discount %</label>
-                                    <div class="input-group">
-                                        <input asp-for="DiscountPercentage" type="number" step="0.01" min="0" max="100" class="form-control" id="discountPercentage" />
-                                        <span class="input-group-text">%</span>
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Amount to Pay</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="Amount" type="number" step="0.01" min="0" class="form-control" required id="amountToPay" />
                                 </div>
-
-                                <div class="mb-2">
-                                    <label asp-for="DiscountAmount" class="form-label small">Discount Amount</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input asp-for="DiscountAmount" type="number" step="0.01" min="0" class="form-control" id="discountAmount" />
-                                    </div>
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Tendered Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="tenderedAmount" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Change</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control" id="changeAmount" readonly />
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Tax Section -->
-                        <div class="card mb-3" style="background-color: #f8f9fa;">
-                            <div class="card-body">
-                                <h6 class="card-title text-muted">Tax</h6>
-                                
-                                <div class="mb-2">
-                                    <label asp-for="TaxPercentage" class="form-label small">Tax %</label>
-                                    <div class="input-group">
-                                        <input asp-for="TaxPercentage" type="number" step="0.01" min="0" max="100" class="form-control" id="taxPercentage" />
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label asp-for="TaxAmount" class="form-label small">Tax Amount</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input asp-for="TaxAmount" type="number" step="0.01" min="0" class="form-control" id="taxAmount" />
-                                    </div>
-                                </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label asp-for="PaymentMethod" class="form-label fw-bold">Payment Method</label>
+                                <select asp-for="PaymentMethod" class="form-select">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Debit Card">Debit Card</option>
+                                    <option value="Online Payment">Online Payment</option>
+                                </select>
                             </div>
-                        </div>
-
-                        <!-- Total Amount Display -->
-                        <div class="card bg-primary text-white">
-                            <div class="card-body text-center">
-                                <h6 class="card-title">Total Amount</h6>
-                                <h3 class="mb-0" id="totalAmountDisplay">$0.00</h3>
-                                <input type="hidden" asp-for="TotalAmount" id="totalAmount" />
+                            <div class="col-md-6">
+                                <label asp-for="Notes" class="form-label fw-bold">Notes</label>
+                                <textarea asp-for="Notes" class="form-control" rows="2" placeholder="Additional notes..."></textarea>
                             </div>
-                        </div>
-
-                        <!-- Calculate Button -->
-                        <div class="mt-3">
-                            <button type="button" class="btn btn-outline-primary w-100" id="calculateTotal">
-                                <i class="fas fa-calculator me-2"></i>Recalculate Total
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -230,8 +204,8 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body text-center">
-                        <button type="submit" class="btn btn-primary btn-lg me-3">
-                            <i class="fas fa-save me-2"></i>@(isEdit ? "Update Transaction" : "Create Transaction")
+                        <button type="button" class="btn btn-success btn-lg me-3" id="completePayment">
+                            <i class="fas fa-check-circle me-2"></i>Completed
                         </button>
                         <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
                             <i class="fas fa-times me-2"></i>Cancel
@@ -246,113 +220,80 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // Initialize form with current date/time if creating new transaction
-            if (@Model.TransactionId == 0) {
-                var now = new Date();
-                var localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                $('#TransactionDate').val(localDateTime);
-            }
-
-            // Auto-fill service price when service is selected
+            // Auto-fill service price when service is selected from dropdown
             $('#serviceSelect').on('change', function() {
                 var selectedOption = $(this).find('option:selected');
                 var price = selectedOption.data('price');
-                var duration = selectedOption.data('duration');
                 
                 if (price) {
-                    $('#baseAmount').val(price);
-                    calculateTotal();
+                    $('#amountToPay').val(price);
+                    calculateChange();
                 }
             });
 
-            // Calculate total when any pricing field changes
-            $('#baseAmount, #discountPercentage, #discountAmount, #taxPercentage, #taxAmount').on('input', function() {
-                calculateTotal();
+            // Calculate change when tendered amount changes
+            $('#tenderedAmount').on('input', function() {
+                calculateChange();
             });
 
-            // Generate receipt number
-            $('#generateReceipt').on('click', function() {
-                var today = new Date();
-                var dateStr = today.getFullYear().toString() + 
-                             (today.getMonth() + 1).toString().padStart(2, '0') + 
-                             today.getDate().toString().padStart(2, '0');
-                
-                // Generate a random 4-digit number
-                var randomNum = Math.floor(Math.random() * 9000) + 1000;
-                var receiptNumber = 'RCP' + dateStr + '-' + randomNum;
-                
-                $('#ReceiptNumber').val(receiptNumber);
-            });
-
-            // Calculate total function
-            function calculateTotal() {
-                var baseAmount = parseFloat($('#baseAmount').val()) || 0;
-                var discountPercentage = parseFloat($('#discountPercentage').val()) || 0;
-                var discountAmount = parseFloat($('#discountAmount').val()) || 0;
-                var taxPercentage = parseFloat($('#taxPercentage').val()) || 0;
-                var taxAmount = parseFloat($('#taxAmount').val()) || 0;
-
-                var subtotal = baseAmount;
-
-                // Apply discount
-                if (discountPercentage > 0) {
-                    discountAmount = subtotal * (discountPercentage / 100);
-                    $('#discountAmount').val(discountAmount.toFixed(2));
-                }
-                
-                if (discountAmount > 0) {
-                    subtotal -= discountAmount;
-                }
-
-                // Apply tax
-                if (taxPercentage > 0) {
-                    taxAmount = subtotal * (taxPercentage / 100);
-                    $('#taxAmount').val(taxAmount.toFixed(2));
-                }
-                
-                if (taxAmount > 0) {
-                    subtotal += taxAmount;
-                }
-
-                var total = subtotal;
-                
-                // Update display and hidden field
-                $('#totalAmountDisplay').text('$' + total.toFixed(2));
-                $('#totalAmount').val(total.toFixed(2));
+            // Auto-fill amount if service is pre-selected
+            @if (Model.ServiceId > 0)
+            {
+                <text>
+                var preSelectedPrice = @Model.Amount;
+                $('#amountToPay').val(preSelectedPrice);
+                calculateChange();
+                </text>
             }
 
-            // Manual calculate button
-            $('#calculateTotal').on('click', function() {
-                calculateTotal();
-            });
-
-            // Form validation
-            $('#transactionForm').on('submit', function(e) {
-                var isValid = true;
+            // Calculate change function
+            function calculateChange() {
+                var amountToPay = parseFloat($('#amountToPay').val()) || 0;
+                var tenderedAmount = parseFloat($('#tenderedAmount').val()) || 0;
+                var change = tenderedAmount - amountToPay;
                 
-                // Check required fields
-                if (!$('#ClientId').val()) {
-                    alert('Please select a client.');
-                    isValid = false;
+                $('#changeAmount').val(change.toFixed(2));
+                
+                // Enable/disable Complete Payment button
+                if (tenderedAmount >= amountToPay && tenderedAmount > 0) {
+                    $('#completePayment').prop('disabled', false);
+                } else {
+                    $('#completePayment').prop('disabled', true);
                 }
+            }
+
+            // Complete Payment button click
+            $('#completePayment').on('click', function() {
+                var amountToPay = parseFloat($('#amountToPay').val()) || 0;
+                var tenderedAmount = parseFloat($('#tenderedAmount').val()) || 0;
+                var serviceId = $('#serviceSelect').val() || $('#hiddenServiceId').val();
+                var hasAvailedServices = @(ViewBag.AvailedServices != null ? "true" : "false");
                 
-                if (!$('#ServiceId').val()) {
+                // Validation - only check service if no availed services are pre-selected
+                if (!hasAvailedServices && !serviceId) {
                     alert('Please select a service.');
-                    isValid = false;
+                    return;
                 }
                 
-                if (!$('#Amount').val() || parseFloat($('#Amount').val()) <= 0) {
-                    alert('Please enter a valid base amount.');
-                    isValid = false;
+                if (amountToPay <= 0) {
+                    alert('Please enter a valid amount to pay.');
+                    return;
                 }
                 
-                if (!isValid) {
-                    e.preventDefault();
+                if (tenderedAmount < amountToPay) {
+                    alert('Tendered amount must be greater than or equal to amount to pay.');
+                    return;
                 }
+                
+                // Show loading state
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Processing...');
+                
+                // Submit the form
+                $('#transactionForm').submit();
             });
 
-            // Auto-calculate on page load
-            calculateTotal();
+            // Initialize change calculation
+            calculateChange();
         });
     </script>
 }

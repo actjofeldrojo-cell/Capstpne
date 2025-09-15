@@ -4,6 +4,7 @@ using CAPS.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CAPS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250911014420_IsCompleted")]
+    partial class IsCompleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,9 +73,6 @@ namespace CAPS.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int?>("RoomId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
@@ -87,8 +87,6 @@ namespace CAPS.Migrations
                     b.HasKey("AppointmentId");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("RoomId");
 
                     b.HasIndex("ServiceId");
 
@@ -123,6 +121,9 @@ namespace CAPS.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
@@ -178,42 +179,6 @@ namespace CAPS.Migrations
                     b.HasKey("ProductId");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("CAPS.Models.Room", b =>
-                {
-                    b.Property<int>("RoomId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomId"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RoomNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("RoomType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("RoomId");
-
-                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("CAPS.Models.Service", b =>
@@ -389,10 +354,6 @@ namespace CAPS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CAPS.Models.Room", null)
-                        .WithMany("Appointments")
-                        .HasForeignKey("RoomId");
-
                     b.HasOne("CAPS.Models.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -438,11 +399,6 @@ namespace CAPS.Migrations
                 });
 
             modelBuilder.Entity("CAPS.Models.Client", b =>
-                {
-                    b.Navigation("Appointments");
-                });
-
-            modelBuilder.Entity("CAPS.Models.Room", b =>
                 {
                     b.Navigation("Appointments");
                 });

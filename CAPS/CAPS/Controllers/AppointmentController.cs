@@ -273,7 +273,6 @@ namespace CAPS.Controllers
         // GET: Appointment/Book
         public async Task<IActionResult> Book()
         {
-            ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
             return View(new AppointmentWithClientDto());
         }
 
@@ -285,19 +284,23 @@ namespace CAPS.Controllers
             // Remove validation for navigation properties that aren't being set
             ModelState.Remove("Client");
             ModelState.Remove("Service");
+            ModelState.Remove("ServiceId");
+            ModelState.Remove("AppointmentDate");
+            ModelState.Remove("AppointmentTime");
+            ModelState.Remove("Duration");
+            ModelState.Remove("Cost");
+            ModelState.Remove("Notes");
 
             if (ModelState.IsValid)
             {
-                Client client;
-                
                 // Check if client exists by phone number
-                client = await _context.Clients
+                var existingClient = await _context.Clients
                     .FirstOrDefaultAsync(c => c.PhoneNumber == appointmentDto.ClientPhoneNumber && c.IsActive);
                 
-                if (client == null)
+                if (existingClient == null)
                 {
                     // Create new client
-                    client = new Client
+                    var client = new Client
                     {
                         FirstName = appointmentDto.ClientFirstName,
                         LastName = appointmentDto.ClientLastName,
@@ -308,30 +311,16 @@ namespace CAPS.Controllers
                     };
                     _context.Clients.Add(client);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Client registered successfully!";
+                }
+                else
+                {
+                    TempData["InfoMessage"] = "Client with this phone number already exists.";
                 }
                 
-                // Create new appointment
-                var appointment = new Appointment
-                {
-                    ClientId = client.ClientId,
-                    ServiceId = appointmentDto.ServiceId,
-                    AppointmentDate = appointmentDto.AppointmentDate,
-                    AppointmentTime = appointmentDto.AppointmentTime,
-                    Duration = appointmentDto.Duration,
-                    Cost = appointmentDto.Cost,
-                    Notes = appointmentDto.Notes,
-                    DateCreated = DateTime.Now,
-                    IsActive = true,
-                    Status = "Scheduled"
-                };
-                
-                _context.Add(appointment);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Appointment booked successfully!";
-                return RedirectToAction(nameof(UserAppointments));
+                return RedirectToAction("Index", "Home");
             }
             
-            ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
             return View(appointmentDto);
         }
 
@@ -446,6 +435,38 @@ namespace CAPS.Controllers
             return RedirectToAction(nameof(UserAppointments));
         }
 
+        // POST: Appointment/Confirm/5
+        [HttpPost, ActionName("Confirm")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmAppointment(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                appointment.Status = "Confirmed";
+                appointment.DateModified = DateTime.Now;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Appointment confirmed successfully!";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Appointment/Complete/5
+        [HttpPost, ActionName("Complete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteAppointment(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                appointment.Status = "Completed";
+                appointment.DateModified = DateTime.Now;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Appointment marked as completed!";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
 
 
         // GET: Appointment/Calendar
@@ -488,20 +509,6 @@ namespace CAPS.Controllers
     {
         public int AppointmentId { get; set; }
         
-        [Required]
-        public int ServiceId { get; set; }
-        
-        [Required]
-        public DateTime AppointmentDate { get; set; }
-        
-        [Required]
-        public TimeSpan AppointmentTime { get; set; }
-        
-        [Required]
-        public int Duration { get; set; }
-        public decimal? Cost { get; set; }
-        public string? Notes { get; set; }
-        
         // Client Information
         [Required]
         [StringLength(100)]
@@ -519,5 +526,11 @@ namespace CAPS.Controllers
         [Required]
         [StringLength(20)]
         public string? ClientGender { get; set; }
+        public int ServiceId { get; internal set; }
+        public DateTime AppointmentDate { get; internal set; }
+        public TimeSpan AppointmentTime { get; internal set; }
+        public int Duration { get; internal set; }
+        public decimal? Cost { get; internal set; }
+        public string Notes { get; internal set; }
     }
 }
