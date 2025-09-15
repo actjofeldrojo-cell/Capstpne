@@ -1,7 +1,7 @@
 @model CAPS.Controllers.AppointmentWithClientDto
 
 @{
-    ViewData["Title"] = "Book Appointment";
+    ViewData["Title"] = "Client Registration";
 }
 
 <div class="container my-5">
@@ -18,11 +18,10 @@
                     </a>
                 </div>
                 <h2 class="h3 mb-2">@ViewData["Title"]</h2>
-                <p class="text-muted">Schedule your appointment with us</p>
+                <p class="text-muted">Register as a new client with us</p>
             </div>
 
             <form asp-action="Book" method="post" class="needs-validation" novalidate>
-                @Html.HiddenFor(m => m.AppointmentId)
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
                 <!-- Personal Information -->
@@ -59,80 +58,11 @@
                     </div>
                 </div>
 
-                <!-- Service Selection -->
-                <div class="form-section mb-4">
-                    <h5 class="mb-3">Service Selection</h5>
-                    <div class="mb-3">
-                        <label asp-for="ServiceId" class="form-label">Choose Your Service *</label>
-                        <select asp-for="ServiceId" id="ServiceId" class="form-select" required>
-                            <option value="">Select a Service</option>
-                        </select>
-                        <span asp-validation-for="ServiceId" class="text-danger small"></span>
-                    </div>
-
-                    <!-- Simple Service Details -->
-                    <div id="serviceDetails" class="service-info p-3 bg-light rounded" style="display: none;">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <div class="text-muted small">Duration</div>
-                                <div id="serviceDuration" class="fw-bold"></div>
-                            </div>
-                            <div class="col-4">
-                                <div class="text-muted small">Price</div>
-                                <div id="servicePrice" class="fw-bold text-success"></div>
-                            </div>
-                            <div class="col-4">
-                                <div class="text-muted small">Category</div>
-                                <div id="serviceCategory" class="fw-bold"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Appointment Details -->
-                <div class="form-section mb-4">
-                    <h5 class="mb-3">Appointment Details</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="AppointmentDate" class="form-label">Preferred Date *</label>
-                            <input asp-for="AppointmentDate" class="form-control" type="date" required />
-                            <span asp-validation-for="AppointmentDate" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="AppointmentTime" class="form-label">Preferred Time *</label>
-                            <input asp-for="AppointmentTime" class="form-control" type="time" required />
-                            <span asp-validation-for="AppointmentTime" class="text-danger small"></span>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Duration" class="form-label">Duration (minutes)</label>
-                            <input asp-for="Duration" class="form-control" type="number" readonly />
-                            <span asp-validation-for="Duration" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Cost" class="form-label">Cost</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input asp-for="Cost" class="form-control" type="number" step="0.01" min="0" readonly />
-                            </div>
-                            <span asp-validation-for="Cost" class="text-danger small"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Notes" class="form-label">Special Instructions or Notes</label>
-                        <textarea asp-for="Notes" class="form-control" rows="3" 
-                                  placeholder="Any special requirements, allergies, or notes..."></textarea>
-                        <span asp-validation-for="Notes" class="text-danger small"></span>
-                    </div>
-                </div>
 
                 <!-- Submit Buttons -->
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary btn-lg px-5 me-3">
-                        <i class="bi bi-calendar-check"></i> Book Appointment
+                        <i class="bi bi-person-plus"></i> Register Client
                     </button>
                     <a asp-action="UserAppointments" class="btn btn-outline-secondary btn-lg px-5">
                         Cancel
@@ -147,48 +77,6 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
-        // Populate services dropdown
-        var services = @Html.Raw(Json.Serialize(ViewBag.Services));
-        var serviceSelect = document.getElementById('ServiceId');
-        
-        services.forEach(function(service) {
-            var option = document.createElement('option');
-            option.value = service.serviceId;
-            option.textContent = service.name;
-            serviceSelect.appendChild(option);
-        });
-
-        // Auto-populate duration and cost when service is selected
-        document.getElementById('ServiceId').addEventListener('change', function() {
-            var serviceId = this.value;
-            var durationField = document.getElementById('Duration');
-            var costField = document.getElementById('Cost');
-            var serviceDetails = document.getElementById('serviceDetails');
-            
-            if (serviceId) {
-                var selectedService = services.find(s => s.serviceId == serviceId);
-                
-                if (selectedService) {
-                    durationField.value = selectedService.duration;
-                    costField.value = selectedService.price.toFixed(2);
-                    
-                    // Show and populate service details
-                    serviceDetails.style.display = 'block';
-                    document.getElementById('serviceCategory').textContent = selectedService.category;
-                    document.getElementById('serviceDuration').textContent = selectedService.duration + ' min';
-                    document.getElementById('servicePrice').textContent = '$' + selectedService.price.toFixed(2);
-                }
-            } else {
-                durationField.value = '';
-                costField.value = '';
-                serviceDetails.style.display = 'none';
-            }
-        });
-
-        // Set minimum date to today
-        var today = new Date().toISOString().split('T')[0];
-        document.getElementById('AppointmentDate').min = today;
-
         // Phone number formatting
         document.getElementById('ClientPhoneNumber').addEventListener('input', function(e) {
             var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);

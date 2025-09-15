@@ -40,7 +40,7 @@ namespace CAPS.Controllers
         public async Task<IActionResult> Login(string username, string password)
         {
             // Simple admin authentication (you can enhance this later)
-            if (username == "admin" && password == "admin123")
+            if (username == "admin" && password == "admin111")
             {
                 // Set admin session
                 HttpContext.Session.SetString("IsAdmin", "true");
@@ -83,6 +83,12 @@ namespace CAPS.Controllers
                         .Include(t => t.Service)
                         .OrderByDescending(t => t.TransactionDate)
                         .Take(5)
+                        .ToListAsync(),
+                    
+                    RecentClients = await _context.Clients
+                        .Where(c => c.IsActive)
+                        .OrderByDescending(c => c.DateRegistered)
+                        .Take(5)
                         .ToListAsync()
                 };
 
@@ -123,5 +129,6 @@ namespace CAPS.Controllers
         
         public List<Appointment> RecentAppointments { get; set; }
         public List<Transaction> RecentTransactions { get; set; }
+        public List<Client> RecentClients { get; set; }
     }
 }

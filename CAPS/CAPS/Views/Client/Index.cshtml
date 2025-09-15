@@ -1,11 +1,27 @@
 ﻿@model IEnumerable<CAPS.Models.Client>
 
 @{
-    ViewBag.Title = "Manage Clients";
+    ViewBag.Title = "Ready to be Served";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Manage Clients</h2>
+<h2>Ready to be Served</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <p>
     @Html.ActionLink("Register New Client", "UpSert", null, new { @class = "btn btn-success" })
@@ -17,8 +33,8 @@
             <th>Name</th>
             <th>Gender</th>
             <th>Phone</th>
-            <th>Email</th>
             <th>Registered On</th>
+            <th>Availed Services</th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
@@ -29,11 +45,45 @@
             <tr>
                 <td>@client.FirstName @client.LastName</td>
                 <td>@client.Gender</td>
-                <td>@client.Age</td>
                 <td>@client.PhoneNumber</td>
                 <td>@client.DateRegistered.ToString("yyyy-MM-dd")</td>
                 <td>
-                    @if (client.IsActive)
+                    @if (client.Appointments != null && client.Appointments.Any(a => a.IsActive && a.Duration > 0))
+                    {
+                        var activeServices = client.Appointments
+                            .Where(a => a.IsActive && a.Duration > 0)
+                            .GroupBy(a => a.ServiceId)
+                            .Select(g => new { 
+                                Service = g.First().Service, 
+                                TotalDuration = g.Sum(a => a.Duration) 
+                            })
+                            .ToList();
+                        
+                        <div class="services-list">
+                            @foreach (var service in activeServices)
+                            {
+                                <div class="service-item mb-1">
+                                    <span class="badge bg-primary me-1">@(service.Service?.Name ?? "Unknown")</span>
+                                    <small class="text-muted">(@service.TotalDuration min)</small>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No services availed</span>
+                    }
+                </td>
+                <td>
+                    @{
+                        var completedClientIds = Context.Session.GetString("CompletedClients")?.Split(',').Select(int.Parse).ToList() ?? new List<int>();
+                        var isCompleted = completedClientIds.Contains(client.ClientId);
+                    }
+                    @if (isCompleted)
+                    {
+                        <span class="text-primary">Completed</span>
+                    }
+                    else if (client.IsActive)
                     {
                         <span class="text-success">Active</span>
                     }
@@ -43,11 +93,247 @@
                     }
                 </td>
                 <td>
-                    @Html.ActionLink("Details", "Details", new { id = client.ClientId }, new { @class = "btn btn-info btn-sm" }) |
-                    @Html.ActionLink("Edit", "UpSert", new { id = client.ClientId }, new { @class = "btn btn-primary btn-sm" }) |
-                    @Html.ActionLink("Deactivate", "Delete", new { id = client.ClientId }, new { @class = "btn btn-warning btn-sm" })
+                    @if (!isCompleted)
+                    {
+                        @Html.ActionLink("Service Extend", "ServiceExtend", new { id = client.ClientId }, new { @class = "btn btn-success btn-sm" })
+                        <span class="mx-2">|</span>
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#inServiceModal" 
+                                onclick="setClientForInService(@client.ClientId, '@client.FirstName', '@client.LastName')">
+                            In-Service
+                        </button>
+                        <span class="mx-2">|</span>
+                        @Html.ActionLink("For Payment", "UpSert", "Transaction", new { clientId = client.ClientId }, new { @class = "btn btn-primary btn-sm" })
+                        <span class="mx-2">|</span>
+                        @using (Html.BeginForm("Cancel", "Client", new { id = client.ClientId }, FormMethod.Post, true, new { @class = "d-inline" }))
+                        {
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this client?')">Cancel</button>
+                        }
+                    }
+                    else
+                    {
+                        @Html.ActionLink("For Payment", "UpSert", "Transaction", new { clientId = client.ClientId }, new { @class = "btn btn-primary btn-sm" })
+                        <span class="mx-2">|</span>
+                        <span class="text-muted">Service Completed</span>
+                    }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- In-Service Modal -->
+<div class="modal fade" id="inServiceModal" tabindex="-1" aria-labelledby="inServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="inServiceModalLabel">
+                    <i class="bi bi-person-check me-2"></i>Put Client In-Service
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="inServiceForm">
+                    <input type="hidden" id="clientId" name="clientId" />
+                    
+                    <div class="mb-3">
+                        <h6 class="text-muted">Client: <span id="clientName" class="fw-bold text-primary"></span></h6>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="selectedServices" class="form-label fw-semibold">Select Services *</label>
+                            <select id="selectedServices" name="selectedServices" class="form-select" multiple size="6" required>
+                                <!-- Services will be loaded via AJAX -->
+                            </select>
+                            <small class="text-muted">Hold Ctrl to select multiple services</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="selectedRoom" class="form-label fw-semibold">Select Room *</label>
+                            <select id="selectedRoom" name="selectedRoom" class="form-select" required>
+                                <option value="">-- Select Room --</option>
+                                <!-- Rooms will be loaded via AJAX -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="selectedStaff" class="form-label fw-semibold">Select Staff *</label>
+                            <select id="selectedStaff" name="selectedStaff" class="form-select" required>
+                                <option value="">-- Select Staff --</option>
+                                <!-- Staff will be loaded via AJAX -->
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="serviceNotes" class="form-label fw-semibold">Service Notes</label>
+                            <textarea id="serviceNotes" name="serviceNotes" class="form-control" rows="3" placeholder="Add any special notes for this service session"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Note:</strong> This will mark the client as currently being served and assign them to the selected room and staff member.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" onclick="submitInService()">
+                    <i class="bi bi-person-check me-2"></i>Put In-Service
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .services-list {
+        max-width: 300px;
+    }
+    
+    .service-item {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .service-item .badge {
+        font-size: 0.75em;
+        margin-bottom: 2px;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    /* Style for pre-selected services in the modal */
+    #selectedServices option:checked {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        font-weight: 600;
+    }
+    
+    #selectedServices option:checked::before {
+        content: "✓ ";
+        color: #28a745;
+        font-weight: bold;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let currentClientId = null;
+
+        function setClientForInService(clientId, firstName, lastName) {
+            currentClientId = clientId;
+            document.getElementById('clientId').value = clientId;
+            document.getElementById('clientName').textContent = firstName + ' ' + lastName;
+            
+            // Load data for the modal
+            loadServices();
+            loadRooms();
+            loadStaff();
+        }
+
+        function loadServices() {
+            fetch('/Client/GetServices')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('selectedServices');
+                    select.innerHTML = '';
+                    data.forEach(service => {
+                        const option = document.createElement('option');
+                        option.value = service.serviceId;
+                        option.textContent = `${service.name} - $${service.price} (${service.duration} min)`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading services:', error));
+        }
+
+        function loadRooms() {
+            fetch('/Client/GetRooms')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('selectedRoom');
+                    select.innerHTML = '<option value="">-- Select Room --</option>';
+                    data.forEach(room => {
+                        const option = document.createElement('option');
+                        option.value = room.roomId;
+                        option.textContent = `${room.roomNumber} - ${room.roomType}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading rooms:', error));
+        }
+
+        function loadStaff() {
+            fetch('/Client/GetStaff')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('selectedStaff');
+                    select.innerHTML = '<option value="">-- Select Staff --</option>';
+                    data.forEach(staff => {
+                        const option = document.createElement('option');
+                        option.value = staff.staffId;
+                        option.textContent = `${staff.fullName} - ${staff.expertise}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading staff:', error));
+        }
+
+        function submitInService() {
+            const form = document.getElementById('inServiceForm');
+            const formData = new FormData(form);
+            
+            // Get selected services
+            const selectedServices = Array.from(document.getElementById('selectedServices').selectedOptions)
+                .map(option => option.value);
+            
+            if (selectedServices.length === 0) {
+                alert('Please select at least one service.');
+                return;
+            }
+
+            if (!formData.get('selectedRoom')) {
+                alert('Please select a room.');
+                return;
+            }
+
+            if (!formData.get('selectedStaff')) {
+                alert('Please select a staff member.');
+                return;
+            }
+
+            // Add selected services to form data
+            formData.delete('selectedServices');
+            selectedServices.forEach(serviceId => {
+                formData.append('selectedServices', serviceId);
+            });
+
+            fetch('/Client/InService', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Client has been put in-service successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing the request.');
+            });
+        }
+    </script>
+}

@@ -1,0 +1,284 @@
+@model List<CAPS.Models.Room>
+
+@{
+    ViewData["Title"] = "Rooms";
+}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-mint fw-bold">@ViewData["Title"]</h2>
+        <a asp-action="UpSert" class="btn btn-mint">
+            <i class="bi bi-plus-lg me-2"></i>Add New Room
+        </a>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-door-open text-muted" style="font-size: 4rem;"></i>
+            <h4 class="text-muted mt-3">No rooms available</h4>
+            <p class="text-muted">Add your first spa room to get started.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Room Types Summary -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-mint mb-3"><i class="bi bi-tags me-2"></i>Room Types Overview</h6>
+                        <div class="row">
+                            @{
+                                var roomTypes = Model.GroupBy(r => r.RoomType).ToList();
+                                foreach (var roomType in roomTypes.Take(4))
+                                {
+                                    <div class="col-md-3 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-mint-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-door-open text-mint"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-mint">@roomType.Key</div>
+                                                <small class="text-muted">@roomType.Count() rooms</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover room-table">
+                <thead class="table-mint">
+                    <tr>
+                        <th class="text-white">Room Number</th>
+                        <th class="text-white">Room Type</th>
+                        <th class="text-white text-center">Status</th>
+                        <th class="text-white text-center">Date Created</th>
+                        <th class="text-white text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="room-row" data-room-id="@item.RoomId">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="room-icon me-2">
+                                        @if (item.RoomType == "Massage Room")
+                                        {
+                                            <i class="bi bi-hand-index text-primary"></i>
+                                        }
+                                        else if (item.RoomType == "Facial Room")
+                                        {
+                                            <i class="bi bi-emoji-smile text-warning"></i>
+                                        }
+                                        else if (item.RoomType == "VIP Suite")
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        }
+                                        else if (item.RoomType == "Couples Room")
+                                        {
+                                            <i class="bi bi-heart text-danger"></i>
+                                        }
+                                        else if (item.RoomType == "Treatment Room")
+                                        {
+                                            <i class="bi bi-droplet text-info"></i>
+                                        }
+                                        else if (item.RoomType == "Relaxation Room")
+                                        {
+                                            <i class="bi bi-moon text-secondary"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-door-open text-success"></i>
+                                        }
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-mint">@item.RoomNumber</div>
+                                        <small class="text-muted">ID: @item.RoomId</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-mint-light text-mint">@item.RoomType</span>
+                            </td>
+                            <td class="text-center">
+                                @if (item.IsAvailable)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Available
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-x-circle me-1"></i>Unavailable
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="small text-muted">@item.DateCreated.ToString("MMM dd, yyyy")</div>
+                                <div class="small text-muted">@item.DateCreated.ToString("h:mm tt")</div>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a asp-action="UpSert" asp-route-id="@item.RoomId" class="btn btn-outline-mint btn-sm" title="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-info btn-sm" title="View Details" 
+                                            onclick="showRoomDetails(@item.RoomId, '@item.RoomNumber', '@item.RoomType', '@item.IsAvailable')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <form asp-action="Delete" asp-route-id="@item.RoomId" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete"
+                                                onclick="return confirm('Are you sure you want to delete this room?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- Room Details Modal -->
+<div class="modal fade" id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-mint text-white">
+                <h5 class="modal-title" id="roomDetailsModalLabel">
+                    <i class="bi bi-info-circle me-2"></i>Room Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="text-mint">Room Information</h6>
+                        <p><strong>Room Number:</strong> <span id="modalRoomNumber"></span></p>
+                        <p><strong>Room Type:</strong> <span id="modalRoomType"></span></p>
+                        <p><strong>Status:</strong> <span id="modalRoomStatus"></span></p>
+                        <p><strong>Date Created:</strong> <span id="modalRoomDateCreated"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="modalEditLink" class="btn btn-mint">Edit Room</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showRoomDetails(roomId, roomNumber, roomType, isAvailable) {
+            document.getElementById('modalRoomNumber').textContent = roomNumber;
+            document.getElementById('modalRoomType').textContent = roomType;
+            document.getElementById('modalRoomStatus').textContent = isAvailable === 'True' ? 'Available' : 'Unavailable';
+            document.getElementById('modalEditLink').href = '/Room/UpSert/' + roomId;
+            
+            var modal = new bootstrap.Modal(document.getElementById('roomDetailsModal'));
+            modal.show();
+        }
+    </script>
+}
+
+<style>
+    .text-mint {
+        color: #2D5A4A !important;
+    }
+    
+    .btn-mint {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-mint:hover {
+        background-color: #1a3a2e;
+        border-color: #1a3a2e;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-mint {
+        color: #2D5A4A;
+        border-color: #2D5A4A;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-mint:hover {
+        background-color: #2D5A4A;
+        border-color: #2D5A4A;
+        color: white;
+    }
+    
+    .table-mint {
+        background-color: #2D5A4A !important;
+    }
+    
+    .room-table {
+        border: 1px solid #98D8C8;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .room-row {
+        transition: all 0.3s ease;
+    }
+    
+    .room-row:hover {
+        background-color: #f8fffe !important;
+        transform: scale(1.01);
+    }
+    
+    .bg-mint-light {
+        background-color: #98D8C8 !important;
+    }
+    
+    .table th {
+        border-bottom: 2px solid #98D8C8;
+        font-weight: 600;
+    }
+    
+    .table td {
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .room-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 50%;
+        font-size: 1.2rem;
+    }
+    
+    .modal-header.bg-mint {
+        background-color: #2D5A4A !important;
+    }
+    
+    .btn-close-white {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+</style>
