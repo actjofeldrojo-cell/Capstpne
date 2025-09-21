@@ -7,7 +7,7 @@ using CAPS.Attributes;
 
 namespace CAPS.Controllers
 {
-    public class ProductController : Controller
+    public class ProductController : GenericController
     {
         private readonly AppDbContext _context;
 

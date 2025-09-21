@@ -73,6 +73,30 @@
                                         <p class="form-control-plaintext">@selectedClient.DateRegistered.ToString("yyyy-MM-dd")</p>
                                     </div>
                                 </div>
+                                
+                                @if (ViewBag.ClientTransactionCount != null)
+                                {
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Transaction History:</strong> This client has completed @ViewBag.ClientTransactionCount transaction(s).
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    @if (ViewBag.IsEligibleForDiscount == true)
+                                    {
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="alert alert-success">
+                                                    <i class="fas fa-gift me-2"></i>
+                                                    <strong>🎉 Loyalty Discount Available!</strong> This client has reached 5+ transactions and is eligible for a discount.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
                             }
                         }
                     </div>
@@ -167,7 +191,7 @@
                                 <label class="form-label fw-bold">Tendered Amount</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    <input type="number" step="0.01" min="0" class="form-control" id="tenderedAmount" />
+                                    <input type="number" step="0.01" min="0" class="form-control" id="tenderedAmount" name="tenderedAmount" />
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -178,6 +202,57 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        @if (ViewBag.IsEligibleForDiscount == true)
+                        {
+                            <div class="row mt-3" id="discountSection">
+                                <div class="col-12">
+                                    <div class="card border-warning">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-percentage me-2"></i>Loyalty Discount (5+ Transactions)
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label class="form-label fw-bold">Discount Percentage (%)</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="0.01" min="0" max="100" class="form-control" id="discountPercentage" name="discountPercentage" placeholder="0.00" />
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                    <small class="text-muted">Enter a percentage discount (0-100%)</small>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-12">
+                                                    <div class="alert alert-info">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <strong>Note:</strong> Enter a percentage discount to apply to the total transaction amount.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Final Amount After Discount</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">$</span>
+                                                        <input type="text" class="form-control" id="finalAmount" readonly />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Total Discount Applied</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">$</span>
+                                                        <input type="text" class="form-control" id="totalDiscount" readonly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                         
                         <div class="row mt-3">
                             <div class="col-md-6">
@@ -250,22 +325,50 @@
             function calculateChange() {
                 var amountToPay = parseFloat($('#amountToPay').val()) || 0;
                 var tenderedAmount = parseFloat($('#tenderedAmount').val()) || 0;
-                var change = tenderedAmount - amountToPay;
+                var finalAmount = calculateFinalAmount();
+                var change = tenderedAmount - finalAmount;
                 
                 $('#changeAmount').val(change.toFixed(2));
                 
                 // Enable/disable Complete Payment button
-                if (tenderedAmount >= amountToPay && tenderedAmount > 0) {
+                if (tenderedAmount >= finalAmount && tenderedAmount > 0) {
                     $('#completePayment').prop('disabled', false);
                 } else {
                     $('#completePayment').prop('disabled', true);
                 }
             }
 
+            // Calculate final amount after discount
+            function calculateFinalAmount() {
+                var originalAmount = parseFloat($('#amountToPay').val()) || 0;
+                var discountPercentage = parseFloat($('#discountPercentage').val()) || 0;
+                
+                var totalDiscount = 0;
+                
+                if (discountPercentage > 0) {
+                    totalDiscount = originalAmount * (discountPercentage / 100);
+                }
+                
+                var finalAmount = originalAmount - totalDiscount;
+                if (finalAmount < 0) finalAmount = 0;
+                
+                $('#finalAmount').val(finalAmount.toFixed(2));
+                $('#totalDiscount').val(totalDiscount.toFixed(2));
+                
+                return finalAmount;
+            }
+
+            // Discount calculation event handler
+            $('#discountPercentage').on('input', function() {
+                calculateFinalAmount();
+                calculateChange();
+            });
+
             // Complete Payment button click
             $('#completePayment').on('click', function() {
                 var amountToPay = parseFloat($('#amountToPay').val()) || 0;
                 var tenderedAmount = parseFloat($('#tenderedAmount').val()) || 0;
+                var finalAmount = calculateFinalAmount();
                 var serviceId = $('#serviceSelect').val() || $('#hiddenServiceId').val();
                 var hasAvailedServices = @(ViewBag.AvailedServices != null ? "true" : "false");
                 
@@ -280,8 +383,8 @@
                     return;
                 }
                 
-                if (tenderedAmount < amountToPay) {
-                    alert('Tendered amount must be greater than or equal to amount to pay.');
+                if (tenderedAmount < finalAmount) {
+                    alert('Tendered amount must be greater than or equal to final amount after discount.');
                     return;
                 }
                 
