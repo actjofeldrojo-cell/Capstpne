@@ -1,10 +1,11 @@
-﻿using CAPS.Models;
+using CAPS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace CAPS.Controllers
 {
-    public class TransactionController : Controller
+    public class TransactionController : GenericController
     {
         readonly AppDbContext db;
         public TransactionController(AppDbContext db) { this.db = db; }
@@ -31,12 +32,12 @@ namespace CAPS.Controllers
                 .Include(t => t.Service)
                 .Include(t => t.Staff)
                 .FirstOrDefault(t => t.TransactionId == id && t.IsActive);
-
+            
             if (transaction == null)
             {
                 return NotFound();
             }
-
+            
             return View(transaction);
         }
 
@@ -45,17 +46,15 @@ namespace CAPS.Controllers
         {
             if (id == null)
             {
-                // Create new transaction
                 var transaction = new Transaction 
                 { 
                     TransactionDate = DateTime.Now,
                     DateCreated = DateTime.Now,
                     IsActive = true,
-                    Status = "Pending", // Changed to Pending for payment processing
+                    Status = "Completed", 
                     PaymentMethod = "Cash"
                 };
 
-                // If clientId is provided, pre-populate the client and get their availed services
                 if (clientId.HasValue)
                 {
                     var client = db.Clients
@@ -67,7 +66,14 @@ namespace CAPS.Controllers
                     {
                         transaction.ClientId = client.ClientId;
                         
-                        // Get client's availed services from appointments
+                        // Check client's transaction count
+                        var transactionCount = db.Transactions
+                            .Where(t => t.ClientId == client.ClientId && t.IsActive)
+                            .Count();
+                        
+                        ViewBag.ClientTransactionCount = transactionCount;
+                        ViewBag.IsEligibleForDiscount = transactionCount >= 5;
+                        
                         var availedServices = client.Appointments
                             .Where(a => a.IsActive && a.Duration > 0)
                             .GroupBy(a => a.ServiceId)
@@ -79,18 +85,16 @@ namespace CAPS.Controllers
                         
                         ViewBag.AvailedServices = availedServices;
                         
-                        // Auto-select the first availed service if any
-                        if (availedServices.Any())
-                        {
-                            var firstService = availedServices.First();
-                            transaction.ServiceId = firstService.Service.ServiceId;
-                            transaction.Amount = firstService.Service.Price;
-                            transaction.TotalAmount = firstService.Service.Price;
-                        }
+                        // Calculate total amount for all services
+                        decimal totalAmount = availedServices.Sum(s => s.Service.Price);
+                        transaction.Amount = totalAmount;
+                        transaction.TotalAmount = totalAmount;
+                        
+                        transaction.PaymentMethod = "Cash";
+                        transaction.Status = "Pending";
                     }
                 }
 
-                // Load view data
                 ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
                 ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
                 ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
@@ -99,19 +103,17 @@ namespace CAPS.Controllers
             }
             else
             {
-                // Edit existing transaction
                 var transaction = db.Transactions
                     .Include(t => t.Client)
                     .Include(t => t.Service)
                     .Include(t => t.Staff)
                     .FirstOrDefault(t => t.TransactionId == id && t.IsActive);
-
+                
                 if (transaction == null)
                 {
                     return NotFound();
                 }
 
-                // Load view data
                 ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
                 ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
                 ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
@@ -123,61 +125,149 @@ namespace CAPS.Controllers
         // POST: Transaction/UpSert
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult UpSert(Transaction transaction)
+        public ActionResult UpSert(Transaction transaction, decimal? tenderedAmount = null, decimal? discountPercentage = null)
         {
+            ModelState.Remove("Staff");
+            ModelState.Remove("Client");
+            ModelState.Remove("Service");
+
             if (ModelState.IsValid)
             {
                 using (var dbTransaction = db.Database.BeginTransaction())
                 {
                     try
                     {
-                        // Check if this is a new transaction (TransactionId == 0) or existing one
                         if (transaction.TransactionId == 0)
                         {
-                            // New transaction
-                            transaction.DateCreated = DateTime.Now;
-                            transaction.TransactionDate = DateTime.Now;
+                            var client = db.Clients
+                                .Include(c => c.Appointments)
+                                    .ThenInclude(a => a.Service)
+                                .FirstOrDefault(c => c.ClientId == transaction.ClientId && c.IsActive);
                             
-                            // Generate receipt number if not provided
-                            if (string.IsNullOrEmpty(transaction.ReceiptNumber))
+                            if (client != null)
                             {
-                                transaction.ReceiptNumber = GenerateReceiptNumber();
+                                var availedServices = client.Appointments
+                                    .Where(a => a.IsActive && a.Duration > 0)
+                                    .GroupBy(a => a.ServiceId)
+                                    .Select(g => new { 
+                                        Service = g.First().Service, 
+                                        TotalDuration = g.Sum(a => a.Duration),
+                                        TotalCost = g.Sum(a => a.Cost) ?? 0m
+                                    })
+                                    .ToList();
+
+                                if (availedServices.Any())
+                                {
+                                    string receiptNumber = GenerateReceiptNumber();
+                                    
+                                    decimal totalAmount = availedServices.Sum(s => s.TotalCost);
+                                    
+                                    // Apply discount if provided
+                                    decimal finalAmount = totalAmount;
+                                    if (discountPercentage.HasValue && discountPercentage.Value > 0)
+                                    {
+                                        decimal discount = totalAmount * (discountPercentage.Value / 100);
+                                        finalAmount = totalAmount - discount;
+                                        if (finalAmount < 0) finalAmount = 0;
+                                    }
+                                    
+                                    foreach (var availedService in availedServices)
+                                    {
+                                        // Calculate proportional discount for this service
+                                        decimal serviceAmount = availedService.TotalCost;
+                                        decimal serviceDiscount = 0;
+                                        
+                                        if (discountPercentage.HasValue && discountPercentage.Value > 0)
+                                        {
+                                            serviceDiscount = availedService.TotalCost * (discountPercentage.Value / 100);
+                                        }
+                                        
+                                        decimal finalServiceAmount = serviceAmount - serviceDiscount;
+                                        if (finalServiceAmount < 0) finalServiceAmount = 0;
+                                        
+                                        var serviceTransaction = new Transaction
+                                        {
+                                            ClientId = transaction.ClientId,
+                                            ServiceId = availedService.Service.ServiceId,
+                                            StaffId = transaction.StaffId,
+                                            TransactionDate = DateTime.Now,
+                                            Amount = serviceAmount,
+                                            PaymentMethod = transaction.PaymentMethod,
+                                            Status = "Completed",
+                                            Notes = transaction.Notes,
+                                            DateCreated = DateTime.Now,
+                                            IsActive = true,
+                                            ReceiptNumber = receiptNumber,
+                                            TotalAmount = finalServiceAmount,
+                                            DiscountAmount = serviceDiscount,
+                                            DiscountPercentage = discountPercentage ?? 0
+                                        };
+                                        
+                                        db.Transactions.Add(serviceTransaction);
+                                    }
+                                    
+                                    decimal changeAmount = 0;
+                                    if (tenderedAmount.HasValue && tenderedAmount.Value > 0)
+                                    {
+                                        changeAmount = tenderedAmount.Value - finalAmount;
+                                        if (changeAmount < 0)
+                                        {
+                                            ModelState.AddModelError("", $"Insufficient payment. Amount due: {finalAmount:C}, Tendered: {tenderedAmount:C}");
+                                            dbTransaction.Rollback();
+                                            ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
+                                            ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
+                                            ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
+                                            return View(transaction);
+                                        }
+                                        
+                                        var firstTransaction = db.Transactions
+                                            .Where(t => t.ReceiptNumber == receiptNumber)
+                                            .OrderBy(t => t.TransactionId)
+                                            .FirstOrDefault();
+                                        
+                                        if (firstTransaction != null)
+                                        {
+                                            firstTransaction.Notes = $"{firstTransaction.Notes}\nPayment: {tenderedAmount:C}, Change: {changeAmount:C}";
+                                        }
+                                    }
+
+                                    db.SaveChanges();
+                                    dbTransaction.Commit();
+                                    
+                                    TempData["SuccessMessage"] = $"Payment completed successfully! {availedServices.Count} service(s) processed. Receipt: {receiptNumber}";
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError("", "No availed services found for this client.");
+                                    dbTransaction.Rollback();
+                                }
                             }
-
-                            // Set status to completed for payment processing
-                            transaction.Status = "Completed";
-                            
-                            // Calculate total amount (same as base amount for simplified payment)
-                            transaction.TotalAmount = transaction.Amount;
-
-                            db.Transactions.Add(transaction);
+                            else
+                            {
+                                ModelState.AddModelError("", "Client not found.");
+                                dbTransaction.Rollback();
+                            }
                         }
                         else
                         {
-                            // Existing transaction
                             transaction.DateModified = DateTime.Now;
                             db.Transactions.Update(transaction);
+                            db.SaveChanges();
+                            dbTransaction.Commit();
+                            
+                            TempData["SuccessMessage"] = "Transaction updated successfully!";
                         }
-
-                        db.SaveChanges();
-                        
-                        dbTransaction.Commit();
-                        
-                        TempData["SuccessMessage"] = transaction.TransactionId == 0 
-                            ? "Payment completed successfully! Transaction has been added to reports." 
-                            : "Transaction updated successfully!";
                         
                         return RedirectToAction(nameof(Index));
                     }
                     catch (Exception ex)
                     {
                         dbTransaction.Rollback();
-                        ModelState.AddModelError("", "Error processing payment. Please try again.");
+                        ModelState.AddModelError("", $"Error processing payment: {ex.Message}");
                     }
                 }
             }
 
-            // Reload view data if validation fails
             ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
             ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
             ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
@@ -193,12 +283,12 @@ namespace CAPS.Controllers
                 .Include(t => t.Service)
                 .Include(t => t.Staff)
                 .FirstOrDefault(t => t.TransactionId == id && t.IsActive);
-
+            
             if (transaction == null)
             {
                 return NotFound();
             }
-
+            
             return View(transaction);
         }
 
@@ -207,93 +297,21 @@ namespace CAPS.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            using (var dbTransaction = db.Database.BeginTransaction())
+            var transaction = db.Transactions.Find(id);
+            if (transaction != null)
             {
-                try
-                {
-                    var transaction = db.Transactions.Find(id);
-                    if (transaction != null)
-                    {
-                        transaction.IsActive = false;
-                        transaction.DateModified = DateTime.Now;
-                        
-                        db.Transactions.Update(transaction);
-                        db.SaveChanges();
-                        
-                        dbTransaction.Commit();
-                        
-                        TempData["SuccessMessage"] = "Transaction deleted successfully!";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    dbTransaction.Rollback();
-                    TempData["ErrorMessage"] = "Error deleting transaction. Please try again.";
-                    Console.WriteLine($"Error deleting transaction: {ex.Message}");
-                }
+                transaction.IsActive = false;
+                transaction.DateModified = DateTime.Now;
+                db.Transactions.Update(transaction);
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Transaction deleted successfully.";
             }
-
+            else
+            {
+                TempData["ErrorMessage"] = "Transaction not found.";
+            }
+            
             return RedirectToAction(nameof(Index));
-        }
-
-        // GET: Transaction/Receipt/5
-        public ActionResult Receipt(int id)
-        {
-            var transaction = db.Transactions
-                .Include(t => t.Client)
-                .Include(t => t.Service)
-                .Include(t => t.Staff)
-                .FirstOrDefault(t => t.TransactionId == id && t.IsActive);
-
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-
-            return View(transaction);
-        }
-
-        // GET: Transaction/Report
-        public ActionResult Report(DateTime? startDate = null, DateTime? endDate = null)
-        {
-            var query = db.Transactions
-                .Include(t => t.Client)
-                .Include(t => t.Service)
-                .Include(t => t.Staff)
-                .Where(t => t.IsActive);
-
-            if (startDate.HasValue)
-            {
-                query = query.Where(t => t.TransactionDate.Date >= startDate.Value.Date);
-            }
-
-            if (endDate.HasValue)
-            {
-                query = query.Where(t => t.TransactionDate.Date <= endDate.Value.Date);
-            }
-
-            var transactions = query.OrderByDescending(t => t.TransactionDate).ToList();
-
-            var reportSummary = new
-            {
-                TotalTransactions = transactions.Count,
-                TotalRevenue = transactions.Sum(t => t.TotalAmount),
-                TotalDiscounts = transactions.Sum(t => t.DiscountAmount),
-                TotalTaxes = transactions.Sum(t => t.TaxAmount),
-                AverageTransactionValue = transactions.Any() ? transactions.Average(t => t.TotalAmount) : 0,
-                TopServices = transactions
-                    .GroupBy(t => t.Service.Name)
-                    .Select(g => new { ServiceName = g.Key, Count = g.Count(), Revenue = g.Sum(t => t.TotalAmount) })
-                    .OrderByDescending(x => x.Revenue)
-                    .Take(5)
-                    .ToList()
-            };
-
-            ViewBag.ReportSummary = reportSummary;
-            ViewBag.StartDate = startDate;
-            ViewBag.EndDate = endDate;
-
-            return View(transactions);
         }
 
         // Helper method to generate receipt number
@@ -312,116 +330,66 @@ namespace CAPS.Controllers
         [HttpGet]
         public ActionResult GetServicePrice(int serviceId)
         {
-            var service = db.Services.FirstOrDefault(s => s.ServiceId == serviceId && s.isActive);
+            var service = db.Services.FirstOrDefault(s => s.ServiceId == serviceId);
             if (service != null)
             {
-                return Json(new { success = true, price = service.Price, duration = service.Duration });
+                return Json(new { price = service.Price });
             }
-            return Json(new { success = false, message = "Service not found" });
+            return Json(new { price = 0 });
         }
 
-        // AJAX method to calculate total
-        [HttpPost]
-        public ActionResult CalculateTotal([FromBody] TransactionCalculationRequest request)
+        // AJAX method to get service duration
+        [HttpGet]
+        public ActionResult GetServiceDuration(int serviceId)
         {
-            try
+            var service = db.Services.FirstOrDefault(s => s.ServiceId == serviceId);
+            if (service != null)
             {
-                var transaction = new Transaction
-                {
-                    Amount = request.Amount,
-                    DiscountAmount = request.DiscountAmount,
-                    DiscountPercentage = request.DiscountPercentage,
-                    TaxAmount = request.TaxAmount,
-                    TaxPercentage = request.TaxPercentage
-                };
-
-                transaction.CalculateTotal();
-
-                return Json(new { 
-                    success = true, 
-                    totalAmount = transaction.TotalAmount,
-                    discountAmount = transaction.DiscountAmount,
-                    taxAmount = transaction.TaxAmount
-                });
+                return Json(new { duration = service.Duration });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+            return Json(new { duration = 0 });
         }
 
-        // POST: Transaction/CompletePayment
-        [HttpPost]
-        public ActionResult CompletePayment(int transactionId, decimal tenderedAmount)
+        // GET: Transaction/Report
+        public ActionResult Report(DateTime? fromDate = null, DateTime? toDate = null)
         {
-            try
+            var query = db.Transactions
+                .Include(t => t.Client)
+                .Include(t => t.Service)
+                .Include(t => t.Staff)
+                .Where(t => t.IsActive);
+
+            // Apply date filters if provided
+            if (fromDate.HasValue)
             {
-                using (var dbTransaction = db.Database.BeginTransaction())
-                {
-                    var transaction = db.Transactions
-                        .Include(t => t.Client)
-                        .Include(t => t.Service)
-                        .FirstOrDefault(t => t.TransactionId == transactionId && t.IsActive);
-
-                    if (transaction == null)
-                    {
-                        return Json(new { success = false, message = "Transaction not found." });
-                    }
-
-                    // Validate tendered amount
-                    if (tenderedAmount < transaction.TotalAmount)
-                    {
-                        return Json(new { success = false, message = "Tendered amount must be greater than or equal to the total amount." });
-                    }
-
-                    // Update transaction status to completed
-                    transaction.Status = "Completed";
-                    transaction.PaymentMethod = "Cash"; // Default to cash for now
-                    transaction.DateModified = DateTime.Now;
-
-                    // Add a note about the payment
-                    var change = tenderedAmount - transaction.TotalAmount;
-                    var paymentNote = $"Payment completed. Tendered: ${tenderedAmount:F2}, Change: ${change:F2}";
-                    
-                    if (string.IsNullOrEmpty(transaction.Notes))
-                    {
-                        transaction.Notes = paymentNote;
-                    }
-                    else
-                    {
-                        transaction.Notes += $"\n{paymentNote}";
-                    }
-
-                    db.Transactions.Update(transaction);
-                    db.SaveChanges();
-                    
-                    dbTransaction.Commit();
-
-                    return Json(new { 
-                        success = true, 
-                        message = "Payment completed successfully! Transaction has been added to reports.",
-                        change = change
-                    });
-                }
+                query = query.Where(t => t.TransactionDate.Date >= fromDate.Value.Date);
             }
-            catch (Exception ex)
+
+            if (toDate.HasValue)
             {
-                return Json(new { success = false, message = "Error processing payment: " + ex.Message });
+                query = query.Where(t => t.TransactionDate.Date <= toDate.Value.Date);
             }
+
+            var transactions = query.OrderByDescending(t => t.TransactionDate).ToList();
+
+            // Calculate summary statistics
+            var totalTransactions = transactions.Count;
+            var totalRevenue = transactions.Sum(t => t.TotalAmount);
+            var averageValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+            var todayTransactions = transactions.Count(t => t.TransactionDate.Date == DateTime.Today);
+
+            ViewBag.FromDate = fromDate;
+            ViewBag.ToDate = toDate;
+            ViewBag.TotalTransactions = totalTransactions;
+            ViewBag.TotalRevenue = totalRevenue;
+            ViewBag.AverageValue = averageValue;
+            ViewBag.TodayTransactions = todayTransactions;
+
+            return View(transactions);
         }
     }
 
-    // Helper class for AJAX requests
-    public class TransactionCalculationRequest
-    {
-        public decimal Amount { get; set; }
-        public decimal DiscountAmount { get; set; }
-        public decimal DiscountPercentage { get; set; }
-        public decimal TaxAmount { get; set; }
-        public decimal TaxPercentage { get; set; }
-    }
-
-    // View model for availed services
+    // ViewModel for availed services
     public class AvailedServiceViewModel
     {
         public Service Service { get; set; }

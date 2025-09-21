@@ -1,0 +1,294 @@
+@model IEnumerable<CAPS.Models.Transaction>
+
+@{
+    ViewData["Title"] = "Transaction Reports";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2 class="text-primary">
+                <i class="fas fa-chart-bar me-2"></i>Transaction Reports
+            </h2>
+            <p class="text-muted">View and analyze transaction data by date range</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Back to Transactions
+            </a>
+        </div>
+    </div>
+
+    <!-- Date Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter me-2"></i>Filter by Date Range
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Report" class="row g-3">
+                <div class="col-md-4">
+                    <label for="fromDate" class="form-label">From Date</label>
+                    <input type="date" id="fromDate" name="fromDate" class="form-control" 
+                           value="@(ViewBag.FromDate?.ToString("yyyy-MM-dd"))">
+                </div>
+                <div class="col-md-4">
+                    <label for="toDate" class="form-label">To Date</label>
+                    <input type="date" id="toDate" name="toDate" class="form-control" 
+                           value="@(ViewBag.ToDate?.ToString("yyyy-MM-dd"))">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="btn-group w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Filter
+                        </button>
+                        <a asp-action="Report" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Revenue Summary Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-dollar-sign me-2"></i>Revenue Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h2 class="text-success mb-1">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</h2>
+                            <p class="text-muted mb-0">Total Revenue</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h2 class="text-primary mb-1">@ViewBag.TotalTransactions</h2>
+                            <p class="text-muted mb-0">Total Transactions</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h2 class="text-warning mb-1">$@(((decimal)ViewBag.AverageValue).ToString("N2"))</h2>
+                            <p class="text-muted mb-0">Average per Transaction</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Range Display -->
+    @if (ViewBag.FromDate != null || ViewBag.ToDate != null)
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Filtered Results:</strong>
+            @if (ViewBag.FromDate != null && ViewBag.ToDate != null)
+            {
+                <text>Showing transactions from @(((DateTime)ViewBag.FromDate).ToString("MMM dd, yyyy")) to @(((DateTime)ViewBag.ToDate).ToString("MMM dd, yyyy"))</text>
+            }
+            else if (ViewBag.FromDate != null)
+            {
+                <text>Showing transactions from @(((DateTime)ViewBag.FromDate).ToString("MMM dd, yyyy")) onwards</text>
+            }
+            else if (ViewBag.ToDate != null)
+            {
+                <text>Showing transactions up to @(((DateTime)ViewBag.ToDate).ToString("MMM dd, yyyy"))</text>
+            }
+            <div class="mt-2">
+                <strong>Total Revenue for Selected Period: <span class="text-primary">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</span></strong>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-chart-line me-2"></i>
+            <strong>All Time Revenue: <span class="text-primary">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</span></strong>
+            <small class="d-block text-muted">Select a date range to filter results</small>
+        </div>
+    }
+
+    <!-- Transactions Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-table me-2"></i>Transaction Details
+            </h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="reportTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Client Name</th>
+                                <th>Service</th>
+                                <th>Staff</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th>Receipt #</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var transaction in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold">@transaction.TransactionDate.ToString("MMM dd, yyyy")</span>
+                                            <small class="text-muted">@transaction.TransactionDate.ToString("hh:mm tt")</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                @(transaction.Client?.FirstName?.Substring(0, 1) ?? "?")
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">@(transaction.Client?.FirstName + " " + transaction.Client?.LastName)</div>
+                                                <small class="text-muted">@transaction.Client?.PhoneNumber</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold">@transaction.Service?.Name</span>
+                                            <small class="text-muted">@transaction.Service?.Duration min</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">@(transaction.Staff?.FullName)</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold text-success">$@transaction.TotalAmount.ToString("N2")</span>
+                                            @if (transaction.DiscountAmount > 0)
+                                            {
+                                                <small class="text-danger">-$@transaction.DiscountAmount.ToString("N2")</small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@transaction.PaymentMethod</span>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var statusClass = transaction.Status switch
+                                            {
+                                                "Completed" => "bg-success",
+                                                "Pending" => "bg-warning",
+                                                "Cancelled" => "bg-danger",
+                                                "Refunded" => "bg-secondary",
+                                                _ => "bg-secondary"
+                                            };
+                                        }
+                                        <span class="badge @statusClass">@transaction.Status</span>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(transaction.ReceiptNumber))
+                                        {
+                                            <code>@transaction.ReceiptNumber</code>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="4" class="text-end">Total for Filtered Results:</th>
+                                <th class="text-success fw-bold">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</th>
+                                <th colspan="3"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No transactions found</h5>
+                    <p class="text-muted">Try adjusting your date range or check back later.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#reportTable').DataTable({
+                order: [[0, 'desc']], // Sort by date descending
+                pageLength: 25,
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+                columnDefs: [
+                    { targets: [0], type: 'date' }
+                ]
+            });
+
+            // Set default date range if not provided
+            if (!$('#fromDate').val() && !$('#toDate').val()) {
+                var today = new Date();
+                var firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                $('#fromDate').val(firstDay.toISOString().split('T')[0]);
+                $('#toDate').val(today.toISOString().split('T')[0]);
+            }
+        });
+    </script>
+}
+
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+    
+    .summary-card {
+        transition: transform 0.2s;
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .alert {
+        border-left: 4px solid #17a2b8;
+    }
+</style>

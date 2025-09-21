@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CAPS.Controllers
 {
-    public class AppointmentController : Controller
+    public class AppointmentController : GenericController
     {
         private readonly AppDbContext _context;
 

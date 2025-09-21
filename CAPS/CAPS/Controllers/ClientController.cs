@@ -5,7 +5,7 @@ using System.Net;
 
 namespace CAPS.Controllers
 {
-    public class ClientController : Controller
+    public class ClientController : GenericController
     {
         readonly AppDbContext db;
         public ClientController(AppDbContext db) { this.db = db; }
@@ -46,8 +46,23 @@ namespace CAPS.Controllers
             if (!ModelState.IsValid) { return View(client); }
             if (client.ClientId == 0)
             {
+                // Check if client with same phone number already exists
+                var existingClient = db.Clients
+                    .FirstOrDefault(c => c.PhoneNumber == client.PhoneNumber && c.IsActive);
+                
+                if (existingClient != null)
+                {
+                    // Client already exists - this is a duplicate registration
+                    // Set flag to show retention modal
+                    ViewBag.ShowRetentionModal = true;
+                    ViewBag.ExistingClient = existingClient;
+                    ViewBag.IsDuplicateRegistration = true;
+                    return View(client);
+                }
+                
                 // Create Client from bound data
                 client.IsActive = true;
+                client.DateRegistered = DateTime.Now;
                 db.Clients.Add(client);
             }
             else
@@ -56,7 +71,47 @@ namespace CAPS.Controllers
             }
 
             db.SaveChanges();
+            
+            if (client.ClientId == 0)
+            {
+                TempData["SuccessMessage"] = "Client registered successfully!";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Client updated successfully!";
+            }
+            
             return RedirectToAction("Index", "Client");
+        }
+
+        // Handle retention survey submission
+        [HttpPost]
+        public ActionResult SubmitRetentionSurvey(int clientId, int satisfactionRating, string feedback, string improvementSuggestions)
+        {
+            try
+            {
+                // Here you could save the retention survey data to a database table
+                // For now, we'll just log it and show a success message
+                
+                // You could create a ClientRetentionSurvey model and save it:
+                // var survey = new ClientRetentionSurvey
+                // {
+                //     ClientId = clientId,
+                //     SatisfactionRating = satisfactionRating,
+                //     Feedback = feedback,
+                //     ImprovementSuggestions = improvementSuggestions,
+                //     SurveyDate = DateTime.Now
+                // };
+                // db.ClientRetentionSurveys.Add(survey);
+                // db.SaveChanges();
+                
+                TempData["SuccessMessage"] = "Thank you for your feedback! We appreciate your input and will use it to improve our services.";
+                return Json(new { success = true, message = "Survey submitted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error submitting survey: {ex.Message}" });
+            }
         }
 
         [HttpPost]
@@ -241,6 +296,120 @@ namespace CAPS.Controllers
             }
 
             return RedirectToAction("ServiceExtend", new { id = clientId });
+        }
+
+        // Get Services for In-Service modal
+        [HttpGet]
+        public async Task<IActionResult> GetServices()
+        {
+            var services = await db.Services
+                .Where(s => s.isActive)
+                .Select(s => new { 
+                    serviceId = s.ServiceId, 
+                    name = s.Name, 
+                    price = s.Price, 
+                    duration = s.Duration 
+                })
+                .ToListAsync();
+            
+            return Json(services);
+        }
+
+        // Get Rooms for In-Service modal
+        [HttpGet]
+        public async Task<IActionResult> GetRooms()
+        {
+            var rooms = await db.Rooms
+                .Where(r => r.IsAvailable)
+                .Select(r => new { 
+                    roomId = r.RoomId, 
+                    roomNumber = r.RoomNumber, 
+                    roomType = r.RoomType 
+                })
+                .ToListAsync();
+            
+            return Json(rooms);
+        }
+
+        // Get Staff for In-Service modal
+        [HttpGet]
+        public async Task<IActionResult> GetStaff()
+        {
+            var staff = await db.Staffs
+                .Where(s => s.IsActive)
+                .Select(s => new { 
+                    staffId = s.StaffId, 
+                    fullName = s.FullName, 
+                    expertise = s.Expertise 
+                })
+                .ToListAsync();
+            
+            return Json(staff);
+        }
+
+        // Put Client In-Service
+        [HttpPost]
+        public async Task<IActionResult> InService(int clientId, int[] selectedServices, int selectedRoom, int selectedStaff, string serviceNotes = "")
+        {
+            try
+            {
+                var client = await db.Clients.FirstOrDefaultAsync(c => c.ClientId == clientId);
+                if (client == null)
+                {
+                    return Json(new { success = false, message = "Client not found." });
+                }
+
+                var room = await db.Rooms.FirstOrDefaultAsync(r => r.RoomId == selectedRoom);
+                if (room == null)
+                {
+                    return Json(new { success = false, message = "Room not found." });
+                }
+
+                var staff = await db.Staffs.FirstOrDefaultAsync(s => s.StaffId == selectedStaff);
+                if (staff == null)
+                {
+                    return Json(new { success = false, message = "Staff member not found." });
+                }
+
+                if (selectedServices == null || selectedServices.Length == 0)
+                {
+                    return Json(new { success = false, message = "Please select at least one service." });
+                }
+
+                // Create appointments for each selected service
+                foreach (var serviceId in selectedServices)
+                {
+                    var service = await db.Services.FirstOrDefaultAsync(s => s.ServiceId == serviceId);
+                    if (service != null)
+                    {
+                        var appointment = new Appointment
+                        {
+                            ClientId = clientId,
+                            ServiceId = serviceId,
+                            Duration = service.Duration,
+                            Cost = service.Price,
+                            AppointmentDate = DateTime.Today,
+                            AppointmentTime = DateTime.Now.TimeOfDay,
+                            Status = "In-Service",
+                            Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}",
+                            IsActive = true,
+                            DateCreated = DateTime.Now
+                        };
+                        
+                        db.Appointments.Add(appointment);
+                    }
+                }
+
+                await db.SaveChangesAsync();
+                
+                TempData["SuccessMessage"] = $"Client {client.FirstName} {client.LastName} has been put in-service successfully!";
+                
+                return Json(new { success = true, message = "Client put in-service successfully." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error putting client in-service: {ex.Message}" });
+            }
         }
     }
 }

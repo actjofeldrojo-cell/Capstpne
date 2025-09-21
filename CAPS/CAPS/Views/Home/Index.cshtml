@@ -1,43 +1,154 @@
 ﻿@{
-    ViewData["Title"] = "Tenderbody Therapeutic Massage";
+    ViewData["Title"] = "Tenderbody Therapeutic Spa & Massage";
 }
 
-<!-- Hero Section -->
-<div class="hero-section text-center py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="hero-content">
-                    <h1 class="display-3 fw-bold text-mint mb-4">PicNiSaMassage</h1>
-                    <div class="brand-info d-flex align-items-center justify-content-center mb-4">
-                        <div class="brand-logo me-3">
-                            <div class="logo-placeholder">
-                                <i class="bi bi-heart-pulse"></i>
-                            </div>
-                        </div>
-                        <h2 class="text-mint mb-0">TENDERBODY THERAPEUTIC MASSAGE</h2>
-                    </div>
-                    <div class="hero-description">
-                        <p class="lead text-muted">
-                            Experience the art of therapeutic massage through our innovative video graphics and 
-                            professional techniques. Discover relaxation and healing in every session.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="hero-graphics">
-                    <div class="graphics-placeholder">
-                        <i class="bi bi-play-circle"></i>
-                        <span>MASSAGE GRAPHICS</span>
-                    </div>
+<!-- Hero Section with Massage Background -->
+<div class="hero-section">
+    <div class="hero-overlay">
+        <div class="container">
+            <div class="hero-content text-center">
+                <div class="hero-tagline">
+                    <h1 class="display-4 fw-bold text-dark mb-4">Step into comfort, Leave with Bliss</h1>
+                    <a href="@Url.Action("UpSert", "Client")" class="btn btn-hero btn-lg">
+                        Start Your Healing Journey
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Massage Video Graphics Section -->
+<!-- Spa Name & Logo Section -->
+<div class="spa-logo-section py-5 bg-beige">
+    <div class="container text-center">
+        <div class="lotus-logo mb-4">
+            <i class="fas fa-seedling fa-5x text-mint"></i>
+        </div>
+        <h2 class="spa-name text-mint">TENDERBODY THERAPEUTIC SPA & MASSAGE</h2>
+    </div>
+</div>
+
+<!-- Feel Welcome Section -->
+<div class="feel-welcome-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="section-image">
+                    <img src="/images/massage-hands.jpg" alt="Hands performing shoulder massage" class="img-fluid rounded">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-panel bg-dark-green text-white p-5 rounded">
+                    <h3 class="section-title script-font mb-4">Feel Welcome</h3>
+                    <p class="section-text">
+                        At Tenderbody Therapeutic Spa & Massage, we believe that every client deserves a personalized and relaxing experience. 
+                        Our welcoming atmosphere and professional staff ensure that you feel comfortable and cared for from the moment you walk through our doors. 
+                        We are committed to providing exceptional service that promotes your well-being and leaves you feeling refreshed and rejuvenated.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Tenderbody Section -->
+<div class="about-section py-5 bg-beige">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="text-panel bg-white p-5 rounded">
+                    <h3 class="section-title script-font text-mint mb-4">About Tenderbody</h3>
+                    <p class="section-text text-muted">
+                        Tenderbody Therapeutic Spa & Massage is dedicated to providing high-quality wellness services that cater to your individual needs. 
+                        Our experienced therapists use proven techniques and premium products to deliver exceptional results. 
+                        We take pride in our personalized approach, ensuring that each treatment is tailored to help you achieve your wellness goals 
+                        and build lasting relationships with our valued clients.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="section-image">
+                    <img src="/images/chest-massage.jpg" alt="Person receiving chest and shoulder massage" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Exceptional Service Section -->
+<div class="exceptional-service-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="section-image">
+                    <img src="/images/spa-bath.jpg" alt="Person relaxing in spa bath" class="img-fluid rounded">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-panel bg-dark-green text-white p-5 rounded">
+                    <h3 class="section-title script-font mb-4">Exceptional Service</h3>
+                    <p class="section-text">
+                        Experience the difference with our exceptional service that combines skilled therapists, calming atmosphere, and personalized care. 
+                        From the moment you arrive, our team ensures you receive a soothing and rejuvenating experience that addresses your specific needs. 
+                        Our commitment to excellence means every treatment is designed to help you relax, unwind, and leave feeling completely refreshed.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Testimonials Section -->
+<div class="testimonials-section py-5 bg-beige">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="testimonials-title text-mint">Customer Testimonials</h2>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card bg-white p-4 rounded border">
+                    <div class="testimonial-header d-flex align-items-center mb-3">
+                        <img src="/images/testimonial1.jpg" alt="Customer 1" class="testimonial-photo rounded-circle me-3">
+                        <div class="testimonial-info">
+                            <h6 class="mb-0 text-mint">John Smith</h6>
+                        </div>
+                    </div>
+                    <p class="testimonial-text text-muted">
+                        "Amazing Massage! The atmosphere was so calming, and I felt completely relaxed. Can't wait to be back again."
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card bg-white p-4 rounded border">
+                    <div class="testimonial-header d-flex align-items-center mb-3">
+                        <img src="/images/testimonial2.jpg" alt="Customer 2" class="testimonial-photo rounded-circle me-3">
+                        <div class="testimonial-info">
+                            <h6 class="mb-0 text-mint">Mike Johnson</h6>
+                        </div>
+                    </div>
+                    <p class="testimonial-text text-muted">
+                        "The staff were so welcoming, and I left with the smoothest skin ever because of their quality facial massage."
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card bg-white p-4 rounded border">
+                    <div class="testimonial-header d-flex align-items-center mb-3">
+                        <img src="/images/testimonial3.jpg" alt="Customer 3" class="testimonial-photo rounded-circle me-3">
+                        <div class="testimonial-info">
+                            <h6 class="mb-0 text-mint">Sarah Lee</h6>
+                        </div>
+                    </div>
+                    <p class="testimonial-text text-muted">
+                        "I love the paraffin treatment! My hands feel so soft and the service was exceptional!"
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <!-- Massage Video Graphics Section -->
 <div class="massage-graphics-section py-5">
     <div class="container">
         <div class="row mb-5">
@@ -149,8 +260,75 @@
         </div>
     </div>
 </div>
-
+ *@
 <style>
+    /* Hero Section with Massage Background */
+    .hero-section {
+        background-image: url('/images/HomepageBackground.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        padding: 2rem;
+        text-align: center;
+        margin: 0 auto;
+    }
+    
+    .hero-tagline {
+        background: rgba(255, 255, 255, 0.5);
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(5px);
+        text-align: center;
+    }
+    
+    .btn-hero {
+        background-color: #2D5A4A !important;
+        border-color: #2D5A4A !important;
+        color: white !important;
+        border-radius: 30px;
+        padding: 1rem 2.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-hero:hover {
+        background-color: #1a3a2e !important;
+        border-color: #1a3a2e !important;
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(45, 90, 74, 0.4);
+        text-decoration: none;
+    }
+    
     .text-mint {
         color: #2D5A4A !important;
     }
@@ -160,30 +338,82 @@
         border-width: 2px;
     }
     
-    /* Hero Section */
-    .hero-section {
-        background: linear-gradient(135deg, #f8fffe 0%, #ffffff 100%);
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
+    /* New Section Styles */
+    .bg-beige {
+        background-color: #F5F5DC !important;
     }
     
-    .brand-logo {
-        width: 80px;
-        height: 80px;
+    .bg-dark-green {
+        background-color: #2D5A4A !important;
     }
     
-    .logo-placeholder {
-        width: 100%;
+    .spa-logo-section {
+        padding: 4rem 0;
+    }
+    
+    .lotus-logo {
+        margin-bottom: 2rem;
+    }
+    
+    .spa-name {
+        font-size: 2.5rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 1.5rem;
+    }
+    
+    .script-font {
+        font-family: 'Dancing Script', cursive;
+    }
+    
+    .section-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+    
+    .text-panel {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+    }
+    
+    .section-image img {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+    }
+    
+    .testimonials-title {
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 3rem;
+    }
+    
+    .testimonial-card {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef !important;
+        transition: transform 0.3s ease;
         height: 100%;
-        background: linear-gradient(135deg, #98D8C8 0%, #2D5A4A 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 2rem;
-        box-shadow: 0 4px 15px rgba(45, 90, 74, 0.2);
+    }
+    
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .testimonial-photo {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+    }
+    
+    .testimonial-text {
+        font-style: italic;
+        line-height: 1.6;
     }
     
     /* Graphics Placeholders */
@@ -290,16 +520,32 @@
     /* Responsive Design */
     @@media (max-width: 768px) {
         .hero-section {
-            min-height: 60vh;
-            padding: 2rem 0;
+            height: 80vh;
         }
         
-        .display-3 {
-            font-size: 2.5rem;
+        .hero-tagline {
+            padding: 2rem;
         }
         
         .display-4 {
+            font-size: 2.5rem;
+        }
+        
+        .btn-hero {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+        }
+        
+        .spa-name {
             font-size: 2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .text-panel {
+            padding: 3rem !important;
         }
         
         .graphics-placeholder.large {
@@ -310,29 +556,45 @@
         .graphics-placeholder.large i {
             font-size: 2.5rem;
         }
-        
-        .brand-logo {
-            width: 60px;
-            height: 60px;
-        }
-        
-        .logo-placeholder {
-            font-size: 1.5rem;
-        }
     }
     
     @@media (max-width: 576px) {
+        .hero-section {
+            height: 70vh;
+        }
+        
+        .hero-tagline {
+            padding: 1.5rem;
+        }
+        
+        .display-4 {
+            font-size: 2rem;
+        }
+        
+        .btn-hero {
+            padding: 0.7rem 1.5rem;
+            font-size: 0.9rem;
+        }
+        
         .hero-content {
-            text-align: center;
+            padding: 1rem;
         }
         
-        .brand-info {
-            flex-direction: column;
-            text-align: center;
+        .spa-name {
+            font-size: 1.5rem;
+            letter-spacing: 1px;
         }
         
-        .brand-logo {
-            margin-bottom: 1rem;
+        .section-title {
+            font-size: 1.8rem;
+        }
+        
+        .text-panel {
+            padding: 2rem !important;
+        }
+        
+        .testimonials-title {
+            font-size: 2rem;
         }
     }
 </style>

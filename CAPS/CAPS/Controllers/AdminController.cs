@@ -45,7 +45,7 @@ namespace CAPS.Controllers
                 // Set admin session
                 HttpContext.Session.SetString("IsAdmin", "true");
                 HttpContext.Session.SetString("AdminUsername", username);
-                
+
                 TempData["SuccessMessage"] = "Welcome, Admin!";
                 return RedirectToAction("Dashboard");
             }
