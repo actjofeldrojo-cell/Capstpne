@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace CAPS.Controllers
 {
-    public class TransactionController : GenericController
+    public class TransactionController : Controller
     {
         readonly AppDbContext db;
         public TransactionController(AppDbContext db) { this.db = db; }

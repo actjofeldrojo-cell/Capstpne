@@ -108,7 +108,7 @@ namespace CAPS.Controllers
         {
             HttpContext.Session.Clear();
             TempData["SuccessMessage"] = "You have been logged out successfully.";
-            return RedirectToAction("Login");
+            return RedirectToAction("Index","Home");
         }
 
         // Helper method to check if user is admin

@@ -5,7 +5,7 @@ using System.Net;
 
 namespace CAPS.Controllers
 {
-    public class ClientController : GenericController
+    public class ClientController : Controller
     {
         readonly AppDbContext db;
         public ClientController(AppDbContext db) { this.db = db; }

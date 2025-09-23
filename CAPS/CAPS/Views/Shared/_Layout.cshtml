@@ -55,10 +55,17 @@
                     </ul>
 
                     <!-- Right: Guest Registration button -->
-                    <div class="d-flex ms-auto mt-2 mt-lg-0">
-                        <a class="btn btn-dark-green" asp-area="" asp-controller="Client" asp-action="UpSert">
-                            Guest Registration
-                        </a>
+                    <div class="guest-login">
+                        <div class="d-flex ms-auto mt-2 mt-lg-0">
+                            <a class="btn btn-dark-green" asp-area="" asp-controller="Client" asp-action="UpSert">
+                                Guest Registration
+                            </a>
+                        </div>
+                        <div class="d-flex ms-auto mt-2 mt-lg-0">
+                            <a class="btn btn-dark-green" asp-area="" asp-controller="Admin" asp-action="Login">
+                                Login
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,6 +114,18 @@
                             <span>Transactions</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -130,6 +149,10 @@
 
 <style>
     /* Navigation Styles */
+    .guest-login{
+        display: flex;
+        gap: 1rem;
+    }
     .bg-beige {
         background-color: #F5F5DC !important;
     }
