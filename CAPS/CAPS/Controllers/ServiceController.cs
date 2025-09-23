@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CAPS.Controllers
 {
-    public class ServiceController : GenericController
+    public class ServiceController : Controller
     {
         readonly AppDbContext db;
         public ServiceController(AppDbContext db) { this.db = db; }
