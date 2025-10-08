@@ -140,6 +140,54 @@ namespace CAPS.Migrations
                     b.ToTable("Clients");
                 });
 
+            modelBuilder.Entity("CAPS.Models.ProductUsed", b =>
+                {
+                    b.Property<int>("ProductUsedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductUsedId"));
+
+                    b.Property<int?>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateUsed")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductUsedId");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("ProductUsed");
+                });
+
             modelBuilder.Entity("CAPS.Models.Products", b =>
                 {
                     b.Property<int>("ProductId")
@@ -377,111 +425,6 @@ namespace CAPS.Migrations
                     b.ToTable("Transactions");
                 });
 
-            modelBuilder.Entity("CAPS.Models.TransactionHistory", b =>
-                {
-                    b.Property<int>("TransactionHistoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionHistoryId"));
-
-                    b.Property<string>("AvailedServices")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("ChangeAmount")
-                        .HasColumnType("decimal(10, 2)");
-
-                    b.Property<string>("ClientAge")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("ClientDateRegistered")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ClientGender")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClientName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ClientPhone")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ReceiptNumber")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RoomNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("RoomType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("StaffExpertise")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("StaffId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StaffName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("TenderedAmount")
-                        .HasColumnType("decimal(10, 2)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(10, 2)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("TransactionHistoryId");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("RoomId");
-
-                    b.HasIndex("StaffId");
-
-                    b.ToTable("TransactionHistories");
-                });
-
             modelBuilder.Entity("CAPS.Models.Appointment", b =>
                 {
                     b.HasOne("CAPS.Models.Client", "Client")
@@ -511,6 +454,39 @@ namespace CAPS.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("CAPS.Models.ProductUsed", b =>
+                {
+                    b.HasOne("CAPS.Models.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId");
+
+                    b.HasOne("CAPS.Models.Products", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CAPS.Models.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CAPS.Models.Transaction", "Transaction")
+                        .WithMany("ProductsUsed")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Service");
+
+                    b.Navigation("Transaction");
+                });
+
             modelBuilder.Entity("CAPS.Models.Transaction", b =>
                 {
                     b.HasOne("CAPS.Models.Client", "Client")
@@ -538,29 +514,6 @@ namespace CAPS.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("CAPS.Models.TransactionHistory", b =>
-                {
-                    b.HasOne("CAPS.Models.Client", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CAPS.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId");
-
-                    b.HasOne("CAPS.Models.Staff", "Staff")
-                        .WithMany()
-                        .HasForeignKey("StaffId");
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Room");
-
-                    b.Navigation("Staff");
-                });
-
             modelBuilder.Entity("CAPS.Models.Client", b =>
                 {
                     b.Navigation("Appointments");
@@ -569,6 +522,11 @@ namespace CAPS.Migrations
             modelBuilder.Entity("CAPS.Models.Room", b =>
                 {
                     b.Navigation("Appointments");
+                });
+
+            modelBuilder.Entity("CAPS.Models.Transaction", b =>
+                {
+                    b.Navigation("ProductsUsed");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,110 +10,159 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
+        body {
+            background-color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+
         .admin-container {
             display: flex;
             min-height: 100vh;
         }
-        
+
         .sidebar {
-            width: 250px;
-            background: linear-gradient(135deg, #2D5A4A 0%, #1a3d2f 100%);
-            color: white;
+            width: 280px;
+            background-color: #ffffff;
+            border-right: 2px solid #EAF1E7;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
             z-index: 1000;
         }
-        
+
         .sidebar-header {
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 2px solid #EAF1E7;
         }
-        
+
+        .lotus-logo {
+            margin-bottom: 15px;
+        }
+
         .sidebar-brand {
-            font-size: 1.5rem;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
             font-weight: bold;
-            color: #98D8C8;
+            color: #2d5016;
+            line-height: 1.3;
         }
-        
+
         .sidebar-nav {
             padding: 20px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
-        
+
         .nav-item {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            padding: 0 20px;
         }
-        
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 20px 20px 40px 20px;
+            border-top: 2px solid #EAF1E7;
+        }
+
+        .logout-nav-item {
+            padding: 0;
+        }
+
         .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 12px 20px;
+            color: #2d5016;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             text-decoration: none;
+            border: 2px solid #EAF1E7;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            font-weight: 500;
+            font-family: 'Arial', sans-serif;
         }
-        
-        .nav-link:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-            transform: translateX(5px);
-        }
-        
-        .nav-link.active {
-            color: white;
-            background-color: rgba(152, 216, 200, 0.2);
-            border-left: 4px solid #98D8C8;
-        }
-        
-        .nav-link i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-        }
-        
+
+            .nav-link:hover {
+                background-color: #EAF1E7;
+                border-color: #2d5016;
+            }
+
+            .nav-link.active {
+                background-color: #EAF1E7;
+                border-color: #2d5016;
+                font-weight: bold;
+            }
+
+            .nav-link i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+                font-size: 18px;
+            }
+
         .main-content {
             flex: 1;
-            margin-left: 250px;
-            background-color: #f8f9fa;
+            margin-left: 280px;
+            background-color: #ffffff;
             min-height: 100vh;
         }
-        
+
         .top-navbar {
             background: white;
-            border-bottom: 1px solid #dee2e6;
-            padding: 15px 30px;
+            border-bottom: 2px solid #EAF1E7;
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .content-area {
             padding: 30px;
+            background-color: #ffffff;
         }
-        
+
         .sidebar-toggle {
             display: none;
             background: none;
             border: none;
-            color: #2D5A4A;
+            color: #2d5016;
             font-size: 1.5rem;
         }
-        
+
+        .welcome-text {
+            font-family: 'Arial', sans-serif;
+            color: #2d5016;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #EAF1E7;
+            border: 2px solid #2d5016;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2d5016;
+        }
+
         @@media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
             }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
+
+                .sidebar.show {
+                    transform: translateX(0);
+                }
+
             .main-content {
                 margin-left: 0;
             }
-            
+
             .sidebar-toggle {
                 display: block;
             }
@@ -125,63 +174,67 @@
         <!-- Sidebar -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
+                <div class="lotus-logo">
+                    <img src="~/images/newlogo.png" alt="Lotus Logo" width="60" height="60" />
+                </div>
                 <div class="sidebar-brand">
-                    <i class="bi bi-shield-check"></i> CAPS Admin
+                    Tenderbody Therapeutic Spa & Massage
                 </div>
             </div>
 
             <div class="sidebar-nav">
-
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">
-                        <i class="bi bi-house"></i>
+                        <i class="bi bi-grid-3x3-gap"></i>
                         <span>Dashboard</span>
                     </a>
                 </div>
 
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Appointment" asp-action="Index">
-                        <i class="bi bi-calendar-event"></i>
+                        <i class="bi bi-calendar-check"></i>
                         <span>Appointments</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Client" asp-action="Index">
                         <i class="bi bi-people"></i>
                         <span>Clients</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Product" asp-action="Index">
                         <i class="bi bi-box"></i>
                         <span>Products</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Service" asp-action="Index">
-                        <i class="bi bi-concierge-bell"></i>
+                        <i class="bi bi-hand-index"></i>
                         <span>Services</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Staff" asp-action="Index">
-                        <i class="bi bi-person-badge"></i>
+                        <i class="bi bi-person"></i>
                         <span>Staff</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Transaction" asp-action="Index">
-                        <i class="bi bi-receipt"></i>
-                        <span>Transactions</span>
+                        <i class="bi bi-arrow-repeat"></i>
+                        <span>Transaction</span>
                     </a>
                 </div>
-                
-                <div class="nav-item">
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="logout-nav-item">
                     <a class="nav-link" asp-controller="Admin" asp-action="Logout">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Logout</span>
@@ -189,7 +242,7 @@
                 </div>
             </div>
         </nav>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Navbar -->
@@ -198,17 +251,16 @@
                     <button class="sidebar-toggle" id="sidebarToggle">
                         <i class="bi bi-list"></i>
                     </button>
-                    <h4 class="mb-0 ms-3">@ViewData["Title"]</h4>
+                    <span class="welcome-text ms-3">Welcome Admin!</span>
                 </div>
-                
+
                 <div class="d-flex align-items-center">
-                    <span class="text-muted me-3">Welcome, Admin</span>
-                    <div class="avatar bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                        <i class="bi bi-person text-white"></i>
+                    <div class="user-avatar">
+                        <i class="bi bi-person"></i>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Content Area -->
             <div class="content-area">
                 @RenderBody()
@@ -219,18 +271,18 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    
+
     <script>
         // Sidebar toggle for mobile
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('show');
         });
-        
+
         // Set active nav item based on current controller
         document.addEventListener('DOMContentLoaded', function() {
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.nav-link');
-            
+
             navLinks.forEach(link => {
                 if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
                     link.classList.add('active');
@@ -238,7 +290,7 @@
             });
         });
     </script>
-    
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,5 +1,6 @@
 ﻿using CAPS.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CAPS.Controllers
 {
@@ -11,12 +12,14 @@ namespace CAPS.Controllers
         public ActionResult Index()
         {
             var staffWithAppointments = db.Staffs
+                .Include(s => s.Appointments.Where(a => a.IsActive))
                 .Where(s => s.IsActive)
                 .Select(s => new StaffWithAppointmentCount
                 {
                     Staff = s,
                     TotalAppointments = db.Appointments.Count(a => a.StaffId == s.StaffId && a.IsActive),
-                    UpcomingAppointments = db.Appointments.Count(a => a.StaffId == s.StaffId && a.IsActive && a.AppointmentDate >= DateTime.Today)
+                    UpcomingAppointments = db.Appointments.Count(a => a.StaffId == s.StaffId && a.IsActive && a.AppointmentDate >= DateTime.Today),
+                    IsCurrentlyInService = s.IsCurrentlyInService()
                 })
                 .ToList();
                 
@@ -66,16 +69,52 @@ namespace CAPS.Controllers
         public JsonResult GetActiveStaff()
         {
             var activeStaff = db.Staffs
+                .Include(s => s.Appointments.Where(a => a.IsActive))
                 .Where(s => s.IsActive)
                 .Select(s => new
                 {
                     staffId = s.StaffId,
                     fullName = s.FullName,
-                    expertise = s.Expertise
+                    expertise = s.Expertise,
+                    isCurrentlyInService = s.IsCurrentlyInService(),
+                    availabilityStatus = s.AvailabilityStatus
                 })
                 .ToList();
 
             return Json(activeStaff);
+        }
+
+        // GET: Staff/CheckStaffAvailability (AJAX endpoint)
+        [HttpGet]
+        public JsonResult CheckStaffAvailability(int staffId, DateTime? appointmentDate = null, TimeSpan? appointmentTime = null, int? duration = null)
+        {
+            var staff = db.Staffs
+                .Include(s => s.Appointments.Where(a => a.IsActive))
+                .FirstOrDefault(s => s.StaffId == staffId && s.IsActive);
+
+            if (staff == null)
+            {
+                return Json(new { available = false, message = "Staff not found", status = "Not Found" });
+            }
+
+            var isCurrentlyInService = staff.IsCurrentlyInService();
+            var status = staff.AvailabilityStatus;
+            var message = isCurrentlyInService ? "Staff is currently in service" : "Staff is available";
+
+            // If specific time slot is provided, check for conflicts
+            if (appointmentDate.HasValue && appointmentTime.HasValue && duration.HasValue)
+            {
+                var isAvailableForSlot = staff.IsAvailableForTimeSlot(appointmentDate.Value, appointmentTime.Value, duration.Value);
+                message = isAvailableForSlot ? "Staff is available for this time slot" : "Staff is not available for this time slot";
+                status = isAvailableForSlot ? "Available" : "Not Available";
+            }
+
+            return Json(new { 
+                available = !isCurrentlyInService, 
+                message = message, 
+                status = status,
+                isCurrentlyInService = isCurrentlyInService
+            });
         }
     }
 
@@ -84,5 +123,6 @@ namespace CAPS.Controllers
         public Staff Staff { get; set; }
         public int TotalAppointments { get; set; }
         public int UpcomingAppointments { get; set; }
+        public bool IsCurrentlyInService { get; set; }
     }
 }

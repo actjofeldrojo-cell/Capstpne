@@ -6,76 +6,452 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-<div class="container my-3">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h4 class="mb-0">@ViewData["Title"]</h4>
-        <a asp-action="UpSert" class="btn btn-sm btn-primary">
-            <i class="bi bi-plus-lg"></i> Add
+<div class="staff-container">
+    <!-- Page Title Banner -->
+    <div class="page-title-container">
+        <h1 class="page-title">STAFF</h1>
+    </div>
+
+    <!-- Add Staff Button -->
+    <div class="add-staff-container">
+        <a asp-action="UpSert" class="add-staff-btn">
+            <i class="bi bi-plus"></i> Add Staff
         </a>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered table-striped align-middle mb-0">
-            <thead class="table-dark small">
-                <tr>
-                    <th>Name</th>
-                    <th>Gender</th>
-                    <th>Expertise</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Hired</th>
-                    <th>Appointments</th>
-                    <th>Active</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr class="small">
-                        <td>@item.Staff.FullName</td>
-                        <td>@item.Staff.Gender</td>
-                        <td>@item.Staff.Expertise</td>
-                        <td class="text-truncate" style="max-width: 150px;">@item.Staff.Email</td>
-                        <td>@item.Staff.PhoneNumber</td>
-                        <td>@item.Staff.DateHired.ToString("yyyy-MM-dd")</td>
-                        <td>
-                            <div class="d-flex flex-column align-items-start">
-                                <span class="badge bg-primary mb-1" title="Total appointments">
-                                    <i class="bi bi-calendar-event"></i> @item.TotalAppointments
-                                </span>
-                                <span class="badge bg-success" title="Upcoming appointments">
-                                    <i class="bi bi-clock"></i> @item.UpcomingAppointments
-                                </span>
+    <!-- Staff List Panel -->
+    <div class="staff-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Staff</h2>
+        </div>
+        <div class="panel-content">
+            @if (Model.Count > 0)
+            {
+                <div class="staff-table-container">
+                    <div class="table-header">
+                        <div class="table-header-row">
+                            <div class="table-header-cell">Name</div>
+                            <div class="table-header-cell">Gender</div>
+                            <div class="table-header-cell">Phone</div>
+                            <div class="table-header-cell">Appointments</div>
+                            <div class="table-header-cell">Status</div>
+                            <div class="table-header-cell">Actions</div>
+                        </div>
+                    </div>
+                    <div class="table-body">
+                        @foreach (var item in Model)
+                        {
+                            <div class="table-row">
+                                <div class="table-cell">
+                                    <div class="staff-name">@item.Staff.FullName</div>
+                                </div>
+                                <div class="table-cell">
+                                    <div class="staff-gender">@item.Staff.Gender</div>
+                                </div>
+                                <div class="table-cell">
+                                    <div class="staff-phone">@item.Staff.PhoneNumber</div>
+                                </div>
+                                <div class="table-cell">
+                                    <div class="staff-appointments">
+                                        <div class="appointment-count">
+                                            <span class="count-label">Total:</span>
+                                            <span class="count-value">@item.TotalAppointments</span>
+                                        </div>
+                                        <div class="appointment-count">
+                                            <span class="count-label">Upcoming:</span>
+                                            <span class="count-value">@item.UpcomingAppointments</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-cell">
+                                    <div class="staff-status">
+                                        <span class="status-badge @((item.IsCurrentlyInService ? "in-service" : "available"))">
+                                            @(item.IsCurrentlyInService ? "In Service" : "Available")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="table-cell">
+                                    <div class="action-buttons">
+                                        <a asp-action="UpSert" asp-route-id="@item.Staff.StaffId" class="action-btn edit-btn" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-controller="Appointment" asp-action="Index" asp-route-staffId="@item.Staff.StaffId" class="action-btn view-btn" title="View Appointments">
+                                            <i class="bi bi-calendar2-event"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@item.Staff.StaffId" method="post" class="d-inline">
+                                            <button type="submit" class="action-btn delete-btn" title="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this staff?');">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                        </td>
-                        <td>
-                            <span class="badge @((item.Staff.IsActive ? "bg-success" : "bg-secondary"))">
-                                @(item.Staff.IsActive ? "Yes" : "No")
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <a asp-action="UpSert" asp-route-id="@item.Staff.StaffId" class="btn btn-sm btn-outline-warning" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a asp-controller="Appointment" asp-action="Index" asp-route-staffId="@item.Staff.StaffId" class="btn btn-sm btn-outline-info" title="View Appointments">
-                                <i class="bi bi-calendar2-event"></i>
-                            </a>
-                            <form asp-action="Delete" asp-route-id="@item.Staff.StaffId" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"
-                                        onclick="return confirm('Are you sure you want to delete this staff?');">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-staff">
+                    <div class="empty-icon">
+                        <i class="bi bi-person-x"></i>
+                    </div>
+                    <div class="empty-message">No staff found</div>
+                    <div class="empty-description">Add your first staff member to get started</div>
+                </div>
+            }
+        </div>
     </div>
-
-    @if (Model.Count == 0)
-    {
-        <div class="text-center text-muted small mt-3">No staff found.</div>
-    }
 </div>
+
+@section Scripts {
+    <script>
+        // Auto-refresh the page every 30 seconds to update availability status
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+
+        // Add visual indicator for auto-refresh
+        $(document).ready(function() {
+            // Add a small indicator that the page will auto-refresh
+            // $('.page-title').append(' <small class="text-muted">(Auto-refresh: 30s)</small>');
+        });
+    </script>
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .staff-container {
+        padding: 30px;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    .page-title-container {
+        background-color: #e8f5e8;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 32px;
+        font-weight: bold;
+        color: #2d5016;
+        margin: 0;
+        letter-spacing: 2px;
+    }
+
+    .add-staff-container {
+        margin-bottom: 20px;
+    }
+
+    .add-staff-btn {
+        background-color: #f8f9fa;
+        border: 2px solid #6c757d;
+        border-radius: 8px;
+        padding: 12px 24px;
+        color: #6c757d;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .add-staff-btn:hover {
+        background-color: #6c757d;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    .staff-panel {
+        background-color: #ffffff;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .panel-header {
+        background-color: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .panel-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 24px;
+        font-weight: bold;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .panel-content {
+        padding: 30px;
+        background-color: #ffffff;
+    }
+
+    .staff-table-container {
+        width: 100%;
+    }
+
+    .table-header {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 0;
+    }
+
+    .table-header-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.5fr 1.5fr 1fr 1fr;
+        gap: 20px;
+        padding: 15px 0;
+    }
+
+    .table-header-cell {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 16px;
+        font-weight: bold;
+        color: #6c757d;
+        text-align: left;
+        padding: 0 10px;
+    }
+
+    .table-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .table-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.5fr 1.5fr 1fr 1fr;
+        gap: 20px;
+        padding: 15px 0;
+        border-bottom: 1px solid #e9ecef;
+        align-items: center;
+    }
+
+    .table-row:last-child {
+        border-bottom: none;
+    }
+
+    .table-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .table-cell {
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .staff-name {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 16px;
+        font-weight: bold;
+        color: #2d5016;
+    }
+
+    .staff-gender {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 16px;
+        color: #6c757d;
+    }
+
+    .staff-phone {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 16px;
+        color: #6c757d;
+    }
+
+    .staff-appointments {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .appointment-count {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .count-label {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .count-value {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 14px;
+        font-weight: bold;
+        color: #2d5016;
+    }
+
+    .staff-status {
+        display: flex;
+        align-items: center;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .status-badge.available {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-badge.in-service {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .action-btn.edit-btn {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    .action-btn.edit-btn:hover {
+        background-color: #856404;
+        color: #ffffff;
+    }
+
+    .action-btn.view-btn {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .action-btn.view-btn:hover {
+        background-color: #0c5460;
+        color: #ffffff;
+    }
+
+    .action-btn.delete-btn {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .action-btn.delete-btn:hover {
+        background-color: #721c24;
+        color: #ffffff;
+    }
+
+    .empty-staff {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: #dee2e6;
+    }
+
+    .empty-message {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 20px;
+        font-weight: bold;
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+
+    .empty-description {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 16px;
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .staff-container {
+            padding: 15px;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .table-header-row,
+        .table-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .table-header-cell {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2d5016;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .table-cell {
+            padding: 5px 0;
+        }
+
+        .staff-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2d5016;
+        }
+
+        .staff-gender,
+        .staff-phone {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .action-buttons {
+            justify-content: flex-start;
+            margin-top: 10px;
+        }
+    }
+</style>

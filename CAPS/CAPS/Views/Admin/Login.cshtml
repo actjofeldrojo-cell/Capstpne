@@ -6,15 +6,18 @@
 <div class="container-fluid">
     <div class="row justify-content-center align-items-center min-vh-100">
         <div class="col-md-6 col-lg-4">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-4">
-                    <h3 class="mb-0">
-                        <i class="bi bi-shield-check me-2"></i>Admin Access
-                    </h3>
-                    <p class="mb-0 text-white-50">CAPS Management System</p>
+            <div class="login-panel">
+                <!-- Logo Section -->
+                <div class="logo-section">
+                    <div class="lotus-logo">
+                        <img src="~/images/newlogo.png" alt="Lotus Logo" width="250" height="200" />
+                    </div>
+                    <h1 class="spa-title">Tenderbody Therapeutic Spa & Massage</h1>
+                    <h2 class="admin-login-title">Admin Login</h2>
                 </div>
-                
-                <div class="card-body p-4">
+
+                <!-- Form Section -->
+                <div class="form-section">
                     @if (TempData["SuccessMessage"] != null)
                     {
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -34,47 +37,32 @@
                     <form asp-action="Login" method="post">
                         @Html.AntiForgeryToken()
                         
-                        <div class="mb-3">
+                        <div class="form-group">
                             <label for="username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-person"></i>
-                                </span>
-                                <input type="text" class="form-control" id="username" name="username" 
-                                       placeholder="Enter username" required autofocus>
-                            </div>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   placeholder="Enter username" required autofocus>
                         </div>
                         
-                        <div class="mb-4">
+                        <div class="form-group">
                             <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-lock"></i>
-                                </span>
+                            <div class="password-input-container">
                                 <input type="password" class="form-control" id="password" name="password" 
                                        placeholder="Enter password" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                         
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                            </button>
-                        </div>
+                        <button type="submit" class="login-btn">LOGIN</button>
                     </form>
                     
-                    <div class="text-center mt-4">
-                        <a asp-controller="Home" asp-action="Index" class="text-decoration-none">
-                            <i class="bi bi-arrow-left me-1"></i>Back to Home
-                        </a>
+                    <div class="back-link">
+            @*             <a asp-controller="Home" asp-action="Index">← Back to Home</a> *@
                     </div>
-                </div>
-                
-                <div class="card-footer bg-light text-center py-3">
-                    <small class="text-muted">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Default credentials: admin / admin123
-                    </small>
                 </div>
             </div>
         </div>
@@ -82,27 +70,211 @@
 </div>
 
 <style>
-    .card {
-        border-radius: 15px;
+    body {
+        background-color: #ffffff;
+        font-family: 'Georgia', 'Times New Roman', serif;
     }
-    
-    .card-header {
-        border-radius: 15px 15px 0 0 !important;
+
+    .login-panel {
+        background-color: #EAF1E7;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 40px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 0 auto;
     }
-    
-    .form-control:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+
+    .logo-section {
+        text-align: center;
+        margin-bottom: 10px;
     }
-    
-    .btn-primary {
-        border-radius: 10px;
+
+    .lotus-logo {
+        margin-bottom: 10px;
+    }
+
+    .spa-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 24px;
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+
+    .admin-login-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 18px;
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 30px;
+    }
+
+    .form-section {
+        margin-top: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
         padding: 12px;
+        border: 1px solid #2d5016;
+        border-radius: 4px;
+        background-color: #ffffff;
+        font-size: 16px;
+        box-sizing: border-box;
     }
-    
-    .input-group-text {
-        background-color: #f8f9fa;
-        border-color: #ced4da;
+
+    .form-control:focus {
+        outline: none;
+        border-color: #2d5016;
+        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.2);
+    }
+
+    .password-input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-input-container .form-control {
+        padding-right: 50px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #2d5016;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .password-toggle:hover {
+        color: #1a3a0e;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 12px 24px;
+        background-color: #ffffff;
+        border: 2px solid #2d5016;
+        border-radius: 6px;
+        color: #2d5016;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+
+    .login-btn:hover {
+        background-color: #2d5016;
+        color: #ffffff;
+    }
+
+    .login-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.3);
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .back-link a {
+        color: #2d5016;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        margin-bottom: 20px;
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid transparent;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        float: right;
+        margin-top: -2px;
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .login-panel {
+            padding: 30px 20px;
+            margin: 20px;
+        }
+
+        .spa-title {
+            font-size: 20px;
+        }
+
+        .admin-login-title {
+            font-size: 16px;
+        }
     }
 </style>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.querySelector('.password-toggle');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleButton.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+            `;
+        } else {
+            passwordInput.type = 'password';
+            toggleButton.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            `;
+        }
+    }
+</script>
 

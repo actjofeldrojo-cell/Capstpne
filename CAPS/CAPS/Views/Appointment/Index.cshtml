@@ -4,29 +4,32 @@
     ViewData["Title"] = "Appointments";
 }
 
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h2>@ViewData["Title"]</h2>
-        </div>
-        <div class="d-flex gap-2">
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-primary active" onclick="filterAppointments('all')">
-                    All
-                </button>
-                <button type="button" class="btn btn-outline-warning" onclick="filterAppointments('scheduled')">
-                    Scheduled
-                </button>
-                <button type="button" class="btn btn-outline-success" onclick="filterAppointments('confirmed')">
-                    <i class="bi bi-check-circle"></i> Confirmed
-                </button>
-                <button type="button" class="btn btn-outline-info" onclick="filterAppointments('completed')">
-                    <i class="bi bi-check2-all"></i> Completed
-                </button>
+<div class="appointments-container">
+    <!-- Page Title Banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-title-container">
+                <h1 class="page-title">APPOINTMENTS</h1>
             </div>
-            <a asp-action="UpSert" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> New Appointment
-            </a>
+        </div>
+    </div>
+
+    <!-- Status Filter Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="status-filter-container">
+                <div class="status-filter-tabs">
+                    <button type="button" class="status-tab" onclick="filterAppointments('scheduled')" id="scheduledTab">
+                        Schedule
+                    </button>
+                    <button type="button" class="status-tab active" onclick="filterAppointments('confirmed')" id="confirmedTab">
+                        Confirmed
+                    </button>
+                    <button type="button" class="status-tab" onclick="filterAppointments('completed')" id="completedTab">
+                        Completed
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -38,139 +41,145 @@
         </div>
     }
 
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Date & Time</th>
-                    <th>Client</th>
-                    <th>Service</th>
-                    <th>Duration</th>
-                    <th>Status</th>
-                    <th>Cost</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
+    <!-- Appointments Table -->
+    <div class="appointments-table-container">
+        <div class="table-header">
+            <div class="table-header-row">
+                <div class="table-header-cell">Date&Time</div>
+                <div class="table-header-cell">Client</div>
+                <div class="table-header-cell">Services</div>
+                <div class="table-header-cell">Duration</div>
+                <div class="table-header-cell">Status</div>
+                <div class="table-header-cell">Cost</div>
+                <div class="table-header-cell">Actions</div>
+            </div>
+        </div>
+        <div class="table-body">
+            @if (Model != null && Model.Any())
+            {
                 @foreach (var item in Model)
                 {
-                    <tr>
-                        <td>
-                            <div class="fw-bold">@item.AppointmentDate.ToString("MMM dd, yyyy")</div>
-                            <small class="text-muted">@item.AppointmentTime.ToString()</small>
-                        </td>
-                        <td>
-                            <div class="fw-bold">@item.Client?.FirstName @item.Client?.LastName</div>
-                            <small class="text-muted">@item.Client?.PhoneNumber</small>
-                        </td>
-                        <td>
-                            <div class="fw-bold">@item.Service?.Name</div>
-                            <small class="text-muted">@item.Service?.Category</small>
-                        </td>
-                        <td>
-                            <span class="badge bg-info">@item.Duration min</span>
-                        </td>
-                        <td>
+                    <div class="table-row">
+                        <div class="table-cell">
+                            <div class="date-time-info">
+                                <div class="date">@item.AppointmentDate.ToString("MMM dd, yyyy")</div>
+                                <div class="time">@item.AppointmentTime.ToString(@"hh\:mm")</div>
+                            </div>
+                        </div>
+                        <div class="table-cell">
+                            <div class="client-info">
+                                <div class="client-name">@item.Client?.FirstName @item.Client?.LastName</div>
+                                <div class="client-phone">@item.Client?.PhoneNumber</div>
+                            </div>
+                        </div>
+                        <div class="table-cell">
+                            <div class="service-info">
+                                <div class="service-name">@item.Service?.Name</div>
+                                <div class="service-category">@item.Service?.Category</div>
+                            </div>
+                        </div>
+                        <div class="table-cell">
+                            <div class="duration-badge">@item.Duration min</div>
+                        </div>
+                        <div class="table-cell">
                             @switch (item.Status?.ToLower())
                             {
                                 case "scheduled":
-                                    <span class="badge bg-primary">Scheduled</span>
+                                    <div class="status-badge scheduled">Scheduled</div>
                                     break;
                                 case "confirmed":
-                                    <span class="badge bg-success">
-                                        <i class="bi bi-check-circle"></i> Confirmed
-                                    </span>
+                                    <div class="status-badge confirmed">Confirmed</div>
                                     @if (item.DateModified.HasValue)
                                     {
-                                        <br><small class="text-muted">@item.DateModified.Value.ToString("MMM dd, yyyy HH:mm")</small>
+                                        <div class="status-date">@item.DateModified.Value.ToString("MMM dd, yyyy HH:mm")</div>
                                     }
                                     break;
                                 case "completed":
-                                    <span class="badge bg-info">
-                                        <i class="bi bi-check2-all"></i> Completed
-                                    </span>
+                                    <div class="status-badge completed">Completed</div>
                                     @if (item.DateModified.HasValue)
                                     {
-                                        <br><small class="text-muted">@item.DateModified.Value.ToString("MMM dd, yyyy HH:mm")</small>
+                                        <div class="status-date">@item.DateModified.Value.ToString("MMM dd, yyyy HH:mm")</div>
                                     }
                                     break;
                                 case "cancelled":
-                                    <span class="badge bg-danger">Cancelled</span>
+                                    <div class="status-badge cancelled">Cancelled</div>
                                     break;
                                 case "no-show":
-                                    <span class="badge bg-warning">No-Show</span>
+                                    <div class="status-badge no-show">No-Show</div>
                                     break;
                                 default:
-                                    <span class="badge bg-secondary">@item.Status</span>
+                                    <div class="status-badge default">@item.Status</div>
                                     break;
                             }
-                        </td>
-                        <td>
+                        </div>
+                        <div class="table-cell">
                             @if (item.Cost.HasValue)
                             {
-                                <span class="fw-bold">₱@item.Cost.Value.ToString("N2")</span>
+                                <div class="cost-amount">₱@item.Cost.Value.ToString("N2")</div>
                             }
                             else
                             {
-                                <span class="text-muted">-</span>
+                                <div class="cost-empty">-</div>
                             }
-                        </td>
-                        <td class="text-center">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-info" title="View Details" 
+                        </div>
+                        <div class="table-cell">
+                            <div class="action-buttons">
+                                <button type="button" class="action-btn view-btn" title="View Details" 
                                         onclick="showDetailsModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@item.Duration', '@Html.Raw(item.Status)', '@Html.Raw(item.Cost?.ToString("N2") ?? "Not set")', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Client?.PhoneNumber)', '@Html.Raw(item.Client?.Gender)', '@Html.Raw(item.Service?.Name)', '@Html.Raw(item.Service?.Category)', '@Html.Raw(item.Notes ?? "")')">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                <a asp-action="UpSert" asp-route-id="@item.AppointmentId" class="btn btn-sm btn-warning" title="Edit">
+                                <a asp-action="UpSert" asp-route-id="@item.AppointmentId" class="action-btn edit-btn" title="Edit">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                                 @if (item.Status?.ToLower() == "scheduled")
                                 {
-                                    <button type="button" class="btn btn-sm btn-success" title="Confirm" 
+                                    <button type="button" class="action-btn confirm-btn" title="Confirm" 
                                             onclick="showConfirmModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Service?.Name)')">
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                 }
                                 @if (item.Status?.ToLower() == "confirmed")
                                 {
-                                    <button type="button" class="btn btn-sm btn-info" title="Complete" 
+                                    <button type="button" class="action-btn complete-btn" title="Complete" 
                                             onclick="showCompleteModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Service?.Name)')">
                                         <i class="bi bi-check2-all"></i>
                                     </button>
                                 }
                                 @if (item.Status?.ToLower() == "scheduled" || item.Status?.ToLower() == "confirmed")
                                 {
-                                    <button type="button" class="btn btn-sm btn-danger" title="Cancel" 
+                                    <button type="button" class="action-btn cancel-btn" title="Cancel" 
                                             onclick="showCancelModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Service?.Name)')">
                                         <i class="bi bi-x-circle"></i>
                                     </button>
                                 }
                                 else
                                 {
-                                    <button type="button" class="btn btn-sm btn-danger" title="Delete" 
+                                    <button type="button" class="action-btn delete-btn" title="Delete" 
                                             onclick="showDeleteModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Service?.Name)')">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                 }
-            </tbody>
-        </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <div class="empty-message">No appointments found</div>
+                    <div class="empty-description">Start by scheduling your first appointment</div>
+                    <a asp-action="UpSert" class="empty-action-btn">
+                        <i class="bi bi-plus-lg"></i> Schedule First Appointment
+                    </a>
+                </div>
+            }
+        </div>
     </div>
 
-    @if (Model.Count == 0)
-    {
-        <div class="text-center my-5">
-            <i class="bi bi-calendar-x h1 text-muted"></i>
-            <h4 class="text-muted mt-3">No appointments found.</h4>
-            <p class="text-muted">Start by scheduling your first appointment.</p>
-            <a asp-action="UpSert" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Schedule First Appointment
-            </a>
-        </div>
-    }
 </div>
 
 <!-- Details Modal -->
@@ -328,66 +337,419 @@
 </form>
 
 <style>
-    .table th {
-        white-space: nowrap;
-        vertical-align: middle;
+    .appointments-container {
+        padding: 30px;
+        background-color: #ffffff;
+        font-family: 'Georgia', 'Times New Roman', serif;
     }
-    
-    .table td {
-        vertical-align: middle;
-    }
-    
-    .text-truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-         .btn-group .btn {
-         margin: 0 1px;
-     }
-     
-     .badge {
-         font-size: 0.75rem;
-         padding: 0.5rem 0.75rem;
-     }
-     
-     /* Modal styling */
-     .modal-header {
-         background-color: #f8f9fa;
-         border-bottom: 1px solid #dee2e6;
-     }
-     
-     .modal-footer {
-         background-color: #f8f9fa;
-         border-top: 1px solid #dee2e6;
-     }
-     
-     /* Completion modal specific styling */
-     .modal-header.bg-success {
-         background-color: #198754 !important;
-     }
-     
-     .btn-close-white {
-         filter: invert(1) grayscale(100%) brightness(200%);
-     }
-     
-     .modal-lg .modal-body {
-         padding: 1.5rem;
-     }
-     
-     .form-label.fw-bold {
-         color: #495057;
-         margin-bottom: 0.5rem;
-     }
-     
-     .form-text {
-         font-size: 0.875rem;
-         color: #6c757d;
-         margin-top: 0.25rem;
-     }
-     
 
+    .page-title-container {
+        background-color: #e8f5e8;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .page-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 32px;
+        font-weight: bold;
+        color: #2d5016;
+        margin: 0;
+        letter-spacing: 2px;
+    }
+
+    .status-filter-container {
+        margin-bottom: 30px;
+    }
+
+    .status-filter-tabs {
+        display: flex;
+        gap: 10px;
+    }
+
+    .status-tab {
+        background-color: #ffffff;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        padding: 12px 24px;
+        color: #2d5016;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 120px;
+        text-align: center;
+    }
+
+    .status-tab:hover {
+        background-color: #e8f5e8;
+        border-color: #2d5016;
+    }
+
+    .status-tab.active {
+        background-color: #e8f5e8;
+        border-color: #2d5016;
+    }
+
+    .appointments-table-container {
+        background-color: #ffffff;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        background-color: #e8f5e8;
+        border-bottom: 2px solid #2d5016;
+    }
+
+    .table-header-row {
+        display: grid;
+        grid-template-columns: 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr;
+        gap: 1px;
+        background-color: #2d5016;
+    }
+
+    .table-header-cell {
+        background-color: #e8f5e8;
+        padding: 15px 10px;
+        color: #2d5016;
+        font-weight: bold;
+        font-size: 16px;
+        text-align: center;
+        font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .table-body {
+        min-height: 200px;
+    }
+
+    .table-row {
+        display: grid;
+        grid-template-columns: 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr;
+        gap: 1px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e8f5e8;
+    }
+
+    .table-row:hover {
+        background-color: #f0f8f0;
+    }
+
+    .table-cell {
+        background-color: #ffffff;
+        padding: 15px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2d5016;
+        font-size: 14px;
+    }
+
+    .date-time-info {
+        text-align: center;
+    }
+
+    .date {
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 4px;
+    }
+
+    .time {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .client-info {
+        text-align: center;
+    }
+
+    .client-name {
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 4px;
+    }
+
+    .client-phone {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .service-info {
+        text-align: center;
+    }
+
+    .service-name {
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 4px;
+    }
+
+    .service-category {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .duration-badge {
+        background-color: #e8f5e8;
+        border: 1px solid #2d5016;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 12px;
+        font-weight: bold;
+        color: #2d5016;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 4px;
+    }
+
+    .status-badge.scheduled {
+        background-color: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+    }
+
+    .status-badge.confirmed {
+        background-color: #d1ecf1;
+        border: 1px solid #17a2b8;
+        color: #0c5460;
+    }
+
+    .status-badge.completed {
+        background-color: #d4edda;
+        border: 1px solid #28a745;
+        color: #155724;
+    }
+
+    .status-badge.cancelled {
+        background-color: #f8d7da;
+        border: 1px solid #dc3545;
+        color: #721c24;
+    }
+
+    .status-badge.no-show {
+        background-color: #ffeaa7;
+        border: 1px solid #fd7e14;
+        color: #856404;
+    }
+
+    .status-date {
+        font-size: 10px;
+        color: #666;
+        text-align: center;
+    }
+
+    .cost-amount {
+        font-weight: bold;
+        color: #2d5016;
+    }
+
+    .cost-empty {
+        color: #999;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+    }
+
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .view-btn {
+        background-color: #e8f5e8;
+        color: #2d5016;
+        border: 1px solid #2d5016;
+    }
+
+    .edit-btn {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffc107;
+    }
+
+    .confirm-btn {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #17a2b8;
+    }
+
+    .complete-btn {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #28a745;
+    }
+
+    .cancel-btn, .delete-btn {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #dc3545;
+    }
+
+    .action-btn:hover {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+
+    .empty-message {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 10px;
+    }
+
+    .empty-description {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .empty-action-btn {
+        background-color: #e8f5e8;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 12px 24px;
+        color: #2d5016;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .empty-action-btn:hover {
+        background-color: #2d5016;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: 2px solid #e8f5e8;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    /* Modal styling */
+    .modal-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .modal-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .modal-header.bg-success {
+        background-color: #198754 !important;
+    }
+    
+    .btn-close-white {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    
+    .modal-lg .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .form-label.fw-bold {
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .appointments-container {
+            padding: 20px;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .status-filter-tabs {
+            flex-direction: column;
+        }
+
+        .status-tab {
+            min-width: auto;
+        }
+
+        .table-header-row,
+        .table-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .table-header-cell,
+        .table-cell {
+            display: none;
+        }
+
+        .table-header-cell:first-child,
+        .table-header-cell:nth-child(2),
+        .table-header-cell:last-child,
+        .table-cell:first-child,
+        .table-cell:nth-child(2),
+        .table-cell:last-child {
+            display: flex;
+        }
+
+        .table-header-cell:first-child::before {
+            content: "Date & Client";
+        }
+
+        .table-header-cell:last-child::before {
+            content: "Actions";
+        }
+    }
 </style>
 
 <script>
@@ -556,19 +918,19 @@
     }
 
     function filterAppointments(status) {
-        const rows = document.querySelectorAll('tbody tr');
-        const buttons = document.querySelectorAll('.btn-group .btn');
+        const rows = document.querySelectorAll('.table-row');
+        const tabs = document.querySelectorAll('.status-tab');
         
-        // Update button states
-        buttons.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        // Update tab states
+        tabs.forEach(tab => tab.classList.remove('active'));
+        document.getElementById(status + 'Tab').classList.add('active');
         
         rows.forEach(row => {
-            const statusCell = row.querySelector('td:nth-child(5)');
-            const statusText = statusCell.textContent.trim().toLowerCase();
+            const statusElement = row.querySelector('.status-badge');
+            const statusText = statusElement ? statusElement.textContent.trim().toLowerCase() : '';
             
             if (status === 'all' || statusText.includes(status)) {
-                row.style.display = '';
+                row.style.display = 'grid';
             } else {
                 row.style.display = 'none';
             }

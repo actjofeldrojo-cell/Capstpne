@@ -15,271 +15,91 @@
 @try
 {
 
-<!-- Welcome Section -->
+<!-- Dashboard Title -->
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card bg-gradient-primary text-white">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h2 class="mb-2">Welcome to CAPS Admin Panel</h2>
-                        <p class="mb-0 opacity-75">Manage your spa operations efficiently</p>
-                    </div>
-                    <div class="col-md-4 text-end">
-                        <i class="bi bi-graph-up-arrow display-1 opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+        <div class="dashboard-title-container">
+            <h1 class="dashboard-title">DASHBOARD</h1>
         </div>
     </div>
 </div>
 
 <!-- Statistics Cards -->
 <div class="row mb-4">
-    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center">
-                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-calendar-event text-primary fs-3"></i>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="dashboard-card">
+            <a asp-controller="Client" asp-action="Index" class="card-link">
+                <div class="card-icon">
+                    <i class="bi bi-people"></i>
                 </div>
-                <h3 class="mb-1">@(Model.TotalAppointments)</h3>
-                <p class="text-muted mb-0">Appointments</p>
-            </div>
+                <div class="card-content">
+                    <span class="card-title">Clients</span>
+                </div>
+            </a>
         </div>
     </div>
     
-    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center">
-                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-people text-success fs-3"></i>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="dashboard-card">
+            <a asp-controller="Product" asp-action="Index" class="card-link">
+                <div class="card-icon">
+                    <i class="bi bi-box"></i>
                 </div>
-                <h3 class="mb-1">@Model.TotalClients</h3>
-                <p class="text-muted mb-0">Clients</p>
-            </div>
+                <div class="card-content">
+                    <span class="card-title">Products</span>
+                </div>
+            </a>
         </div>
     </div>
     
-    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center">
-                <div class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-box text-info fs-3"></i>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="dashboard-card">
+            <a asp-controller="Service" asp-action="Index" class="card-link">
+                <div class="card-icon">
+                    <i class="bi bi-hand-index"></i>
                 </div>
-                <h3 class="mb-1">@Model.TotalProducts</h3>
-                <p class="text-muted mb-0">Products</p>
-            </div>
+                <div class="card-content">
+                    <span class="card-title">Services</span>
+                </div>
+            </a>
         </div>
     </div>
     
-    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center">
-                <div class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-concierge-bell text-warning fs-3"></i>
+    <div class="col-lg-6 col-md-6 mb-3">
+        <div class="dashboard-card">
+            <a asp-controller="Staff" asp-action="Index" class="card-link">
+                <div class="card-icon">
+                    <i class="bi bi-person"></i>
                 </div>
-                <h3 class="mb-1">@Model.TotalServices</h3>
-                <p class="text-muted mb-0">Services</p>
-            </div>
+                <div class="card-content">
+                    <span class="card-title">Staff</span>
+                </div>
+            </a>
         </div>
     </div>
     
-    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center">
-                <div class="d-inline-flex align-items-center justify-content-center bg-secondary bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-person-badge text-secondary fs-3"></i>
+    <div class="col-lg-6 col-md-6 mb-3">
+        <div class="dashboard-card">
+            <a asp-controller="Transaction" asp-action="Index" class="card-link">
+                <div class="card-icon">
+                    <i class="bi bi-arrow-repeat"></i>
                 </div>
-                <h3 class="mb-1">@Model.TotalStaff</h3>
-                <p class="text-muted mb-0">Staff</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center">
-                <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-receipt text-danger fs-3"></i>
+                <div class="card-content">
+                    <span class="card-title">Transaction</span>
                 </div>
-                <h3 class="mb-1">@Model.TotalTransactions</h3>
-                <p class="text-muted mb-0">Transactions</p>
-            </div>
+            </a>
         </div>
     </div>
 </div>
 
-<!-- Recent Activity -->
+<!-- Recent Clients Section -->
 <div class="row">
-    <!-- Recent Appointments -->
-    <div class="col-lg-4 mb-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white border-0">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-calendar-event text-primary me-2"></i>Recent Appointments
-                    </h5>
-                    <a asp-controller="Appointment" asp-action="Index" class="btn btn-sm btn-outline-primary">
-                        View All
-                    </a>
-                </div>
+    <div class="col-12">
+        <div class="recent-clients-container">
+            <div class="recent-clients-header">
+                <h2 class="recent-clients-title">Recent Clients</h2>
             </div>
-            <div class="card-body">
-                @if (Model.RecentAppointments != null && Model.RecentAppointments.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Client</th>
-                                    <th>Service</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var appointment in Model.RecentAppointments.Where(a => a != null))
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
-                                                    <i class="bi bi-person text-white small"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">@(appointment.Client?.FirstName ?? "Unknown") @(appointment.Client?.LastName ?? "")</div>
-                                                    <small class="text-muted">@(appointment.Client?.PhoneNumber ?? "No phone")</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">@(appointment.Service?.Name ?? "Unknown Service")</span>
-                                        </td>
-                                        <td>
-                                            <small>@(appointment.AppointmentDate != default(DateTime) ? appointment.AppointmentDate.ToString("MMM dd") : "Date not set")</small><br>
-                                            <small class="text-muted">
-                                                @if (appointment.AppointmentTime != default(TimeSpan))
-                                                {
-                                                    @appointment.AppointmentTime.ToString("HH:mm")
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">Time not set</span>
-                                                }
-                                            </small>
-                                        </td>
-                                        <td>
-                                            @{
-                                                var statusClass = !string.IsNullOrEmpty(appointment.Status) ? appointment.Status switch
-                                                {
-                                                    "Scheduled" => "bg-warning",
-                                                    "Confirmed" => "bg-info",
-                                                    "Completed" => "bg-success",
-                                                    "Cancelled" => "bg-danger",
-                                                    _ => "bg-secondary"
-                                                } : "bg-secondary";
-                                            }
-                                            <span class="badge @statusClass">@(appointment.Status ?? "Unknown")</span>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-calendar-x display-4"></i>
-                        <p class="mt-2">No appointments found</p>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    
-    <!-- Recent Transactions -->
-    <div class="col-lg-4 mb-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white border-0">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-receipt text-success me-2"></i>Recent Transactions
-                    </h5>
-                    <a asp-controller="Transaction" asp-action="Index" class="btn btn-sm btn-outline-success">
-                        View All
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                @if (Model.RecentTransactions != null && Model.RecentTransactions.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Client</th>
-                                    <th>Service</th>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var transaction in Model.RecentTransactions.Where(t => t != null))
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
-                                                    <i class="bi bi-person text-white small"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">@(transaction.Client?.FirstName ?? "Unknown") @(transaction.Client?.LastName ?? "")</div>
-                                                    <small class="text-muted">@(transaction.PaymentMethod ?? "No method")</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">@(transaction.Service?.Name ?? "Unknown Service")</span>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold text-success">@(transaction.Amount.ToString("C"))</span>
-                                        </td>
-                                        <td>
-                                            <small>@(transaction.TransactionDate != default(DateTime) ? transaction.TransactionDate.ToString("MMM dd") : "Date not set")</small><br>
-                                            <small class="text-muted">@(transaction.TransactionDate != default(DateTime) ? transaction.TransactionDate.ToString("HH:mm") : "Time not set")</small>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-receipt display-4"></i>
-                        <p class="mt-2">No transactions found</p>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    
-    <!-- Recent Clients -->
-    <div class="col-lg-4 mb-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white border-0">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-people text-info me-2"></i>Recent Clients
-                    </h5>
-                    <a asp-controller="Client" asp-action="Index" class="btn btn-sm btn-outline-info">
-                        View All
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
+            <div class="recent-clients-content">
                 @if (Model.RecentClients != null && Model.RecentClients.Any())
                 {
                     <div class="table-responsive">
@@ -324,9 +144,9 @@
                 }
                 else
                 {
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-people display-4"></i>
-                        <p class="mt-2">No clients found</p>
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-people display-4 text-muted"></i>
+                        <p class="mt-3">No recent clients found</p>
                     </div>
                 }
             </div>
@@ -335,33 +155,169 @@
 </div>
 
 <style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    .dashboard-title-container {
+        background-color: #e8f5e8;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 30px;
     }
-    
-    .card {
-        border-radius: 10px;
-        transition: transform 0.2s ease;
+
+    .dashboard-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 32px;
+        font-weight: bold;
+        color: #2d5016;
+        margin: 0;
+        letter-spacing: 2px;
     }
-    
-    .card:hover {
+
+    .dashboard-card {
+        background-color: #ffffff;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dashboard-card:hover {
+        border-color: #2d5016;
+        background-color: #e8f5e8;
         transform: translateY(-2px);
     }
-    
+
+    .card-link {
+        text-decoration: none;
+        color: #2d5016;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-link:hover {
+        text-decoration: none;
+        color: #2d5016;
+    }
+
+    .card-icon {
+        font-size: 36px;
+        margin-bottom: 15px;
+        color: #2d5016;
+    }
+
+    .card-content {
+        font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2d5016;
+    }
+
+    .recent-clients-container {
+        background-color: #ffffff;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        margin-top: 30px;
+    }
+
+    .recent-clients-header {
+        background-color: #e8f5e8;
+        border-bottom: 2px solid #2d5016;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .recent-clients-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 24px;
+        font-weight: bold;
+        color: #2d5016;
+        margin: 0;
+    }
+
+    .recent-clients-content {
+        padding: 30px;
+        min-height: 300px;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #2d5016;
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e8f5e8;
+    }
+
+    .table td {
+        border-bottom: 1px solid #e8f5e8;
+        vertical-align: middle;
+    }
+
     .avatar {
         display: flex;
         align-items: center;
         justify-content: center;
     }
     
-    .table th {
-        border-top: none;
-        font-weight: 600;
-        color: #6c757d;
-    }
-    
     .badge {
         font-size: 0.75em;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: 2px solid #e8f5e8;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+        color: #856404;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 24px;
+        }
+
+        .dashboard-card {
+            height: 100px;
+            padding: 20px;
+        }
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+        }
+
+        .recent-clients-title {
+            font-size: 20px;
+        }
+
+        .recent-clients-content {
+            padding: 20px;
+        }
     }
 </style>
 
