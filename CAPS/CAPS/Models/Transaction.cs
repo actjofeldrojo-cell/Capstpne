@@ -76,6 +76,9 @@ namespace CAPS.Models
         [ForeignKey("StaffId")]
         public virtual Staff Staff { get; set; }
 
+        // Navigation property for products used in this transaction
+        public virtual ICollection<ProductUsed> ProductsUsed { get; set; } = new List<ProductUsed>();
+
         // Computed property for total amount
         public void CalculateTotal()
         {

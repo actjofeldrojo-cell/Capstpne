@@ -4,172 +4,152 @@
     ViewData["Title"] = "Services";
 }
 
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-mint fw-bold">@ViewData["Title"]</h2>
-        <a asp-action="UpSert" class="btn btn-mint">
-            <i class="bi bi-plus-lg me-2"></i>Add New Service
+<div class="services-container">
+    <!-- Page Title Banner -->
+    <div class="page-title-container">
+        <h1 class="page-title">SERVICES</h1>
+    </div>
+
+    <!-- New Services Button -->
+    <div class="new-services-container">
+        <a asp-action="UpSert" class="new-services-btn">
+            <i class="bi bi-plus"></i> New Services
         </a>
     </div>
 
-    @if (Model.Count == 0)
-    {
-        <div class="text-center py-5">
-            <i class="bi bi-list-ul text-muted" style="font-size: 4rem;"></i>
-            <h4 class="text-muted mt-3">No services available</h4>
-            <p class="text-muted">Add your first spa service to get started.</p>
+    <!-- Services Categories Overview Panel -->
+    <div class="categories-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Services Categories Overview</h2>
         </div>
-    }
-    else
-    {
-        <!-- Service Categories Summary -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body">
-                        <h6 class="text-mint mb-3"><i class="bi bi-tags me-2"></i>Service Categories Overview</h6>
-                        <div class="row">
-                            @{
-                                var categories = Model.GroupBy(s => s.Category).ToList();
-                                foreach (var category in categories.Take(4))
-                                {
-                                    <div class="col-md-3 mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-mint-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
-                                                <i class="bi bi-star-fill text-mint"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold text-mint">@category.Key</div>
-                                                <small class="text-muted">@category.Count() services</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            }
-                        </div>
+        <div class="panel-content">
+            @if (Model.Count > 0)
+            {
+                var categories = Model.GroupBy(s => s.Category).ToList();
+                @if (categories.Any())
+                {
+                    <div class="categories-grid">
+                        @foreach (var category in categories.Take(4))
+                        {
+                            <div class="category-item">
+                                <div class="category-info">
+                                    <span class="category-name">@category.Key</span>
+                                    <span class="category-count">@category.Count() services</span>
+                                </div>
+                            </div>
+                        }
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="empty-categories">No categories available</div>
+                }
+            }
+            else
+            {
+                <div class="empty-categories">No services available</div>
+            }
+        </div>
+    </div>
+
+    <!-- Service Details Panels -->
+    <div class="services-details-grid">
+        <div class="service-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Service Details</h2>
+            </div>
+            <div class="panel-content">
+                @if (Model.Count > 0)
+                {
+                    <div class="services-list">
+                        @{
+                            var firstHalfServices = Model.Take((Model.Count + 1) / 2);
+                        }
+                        @foreach (var item in firstHalfServices)
+                        {
+                            <div class="service-item">
+                                <div class="service-info">
+                                    <div class="service-name">@item.Name</div>
+                                    <div class="service-category">@item.Category</div>
+                                    <div class="service-price">₱@item.Price.ToString("N2")</div>
+                                    <div class="service-duration">@item.Duration min</div>
+                                </div>
+                                <div class="service-actions">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="UpSert" asp-route-id="@item.ServiceId" class="btn btn-outline-mint btn-sm" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-info btn-sm" title="View Details" 
+                                                onclick="showServiceDetails(@item.ServiceId, '@item.Name', '@item.Category', '@item.Description', @item.Price, @item.Duration)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <form asp-action="Delete" asp-route-id="@item.ServiceId" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this service?');">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-services">No services available</div>
+                }
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover service-table">
-                <thead class="table-mint">
-                    <tr>
-                        <th class="text-white">Service Name</th>
-                        <th class="text-white">Category</th>
-                        <th class="text-white">Description</th>
-                        <th class="text-white text-center">Price</th>
-                        <th class="text-white text-center">Duration</th>
-                        <th class="text-white text-center">Status</th>
-                        <th class="text-white text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr class="service-row" data-service-id="@item.ServiceId">
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="service-icon me-2">
-                                        @if (item.Category == "Massage")
-                                        {
-                                            <i class="bi bi-hand-index text-primary"></i>
-                                        }
-                                        else if (item.Category == "Facial")
-                                        {
-                                            <i class="bi bi-emoji-smile text-warning"></i>
-                                        }
-                                        else if (item.Category == "Body Treatment")
-                                        {
-                                            <i class="bi bi-droplet text-info"></i>
-                                        }
-                                        else if (item.Category == "Nail Care")
-                                        {
-                                            <i class="bi bi-hand-index-thumb text-danger"></i>
-                                        }
-                                        else if (item.Category == "Hair Treatment")
-                                        {
-                                            <i class="bi bi-scissors text-secondary"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-heart text-success"></i>
-                                        }
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-mint">@item.Name</div>
-                                        <small class="text-muted">ID: @item.ServiceId</small>
-                                    </div>
+        <div class="service-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Additional Services</h2>
+            </div>
+            <div class="panel-content">
+                @if (Model.Count > 1)
+                {
+                    <div class="services-list">
+                        @{
+                            var secondHalfServices = Model.Skip((Model.Count + 1) / 2);
+                        }
+                        @foreach (var item in secondHalfServices)
+                        {
+                            <div class="service-item">
+                                <div class="service-info">
+                                    <div class="service-name">@item.Name</div>
+                                    <div class="service-category">@item.Category</div>
+                                    <div class="service-price">₱@item.Price.ToString("N2")</div>
+                                    <div class="service-duration">@item.Duration min</div>
                                 </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-mint-light text-mint">@item.Category</span>
-                            </td>
-                            <td class="text-muted">
-                                @if (string.IsNullOrEmpty(item.Description))
-                                {
-                                    <span class="text-muted fst-italic">No description</span>
-                                }
-                                else if (item.Description.Length > 60)
-                                {
-                                    <span title="@item.Description">@item.Description.Substring(0, 60)...</span>
-                                }
-                                else
-                                {
-                                    @item.Description
-                                }
-                            </td>
-                            <td class="text-center">
-                                <div class="fw-bold text-success">₱@item.Price.ToString("N2")</div>
-                                <small class="text-muted">per session</small>
-                            </td>
-                            <td class="text-center">
-                                <div class="badge bg-info text-white">
-                                    <i class="bi bi-clock me-1"></i>@item.Duration min
-                                </div>
-                                @if (item.Duration >= 90)
-                                {
-                                    <div class="small text-muted mt-1">Extended session</div>
-                                }
-                            </td>
-                            <td class="text-center">
-                                @if (item.isActive)
-                                {
-                                    <span class="badge bg-success">
-                                        <i class="bi bi-check-circle me-1"></i>Active
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        <i class="bi bi-x-circle me-1"></i>Inactive
-                                    </span>
-                                }
-                            </td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <a asp-action="UpSert" asp-route-id="@item.ServiceId" class="btn btn-outline-mint btn-sm" title="Edit">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-outline-info btn-sm" title="View Details" 
-                                            onclick="showServiceDetails(@item.ServiceId, '@item.Name', '@item.Category', '@item.Description', @item.Price, @item.Duration)">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <form asp-action="Delete" asp-route-id="@item.ServiceId" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete"
-                                                onclick="return confirm('Are you sure you want to delete this service?');">
-                                            <i class="bi bi-trash"></i>
+                                <div class="service-actions">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="UpSert" asp-route-id="@item.ServiceId" class="btn btn-outline-mint btn-sm" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-info btn-sm" title="View Details" 
+                                                onclick="showServiceDetails(@item.ServiceId, '@item.Name', '@item.Category', '@item.Description', @item.Price, @item.Duration)">
+                                            <i class="bi bi-eye"></i>
                                         </button>
-                                    </form>
+                                        <form asp-action="Delete" asp-route-id="@item.ServiceId" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this service?');">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-services">No additional services</div>
+                }
+            </div>
         </div>
-    }
+    </div>
 </div>
 
 <!-- Service Details Modal -->
@@ -222,6 +202,197 @@
 }
 
 <style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .services-container {
+        padding: 30px;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    .page-title-container {
+        background-color: #e8f5e8;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 32px;
+        font-weight: bold;
+        color: #2d5016;
+        margin: 0;
+        letter-spacing: 2px;
+    }
+
+    .new-services-container {
+        margin-bottom: 20px;
+    }
+
+    .new-services-btn {
+        background-color: #e8f5e8;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 12px 24px;
+        color: #2d5016;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .new-services-btn:hover {
+        background-color: #2d5016;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    .categories-panel {
+        background-color: #ffffff;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .panel-header {
+        background-color: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .panel-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 20px;
+        font-weight: bold;
+        color: #2d5016;
+        margin: 0;
+    }
+
+    .panel-content {
+        padding: 30px;
+        background-color: #ffffff;
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .category-item {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+    }
+
+    .category-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .category-name {
+        font-weight: bold;
+        color: #2d5016;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .category-count {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .empty-categories {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        padding: 20px;
+    }
+
+    .services-details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .service-panel {
+        background-color: #ffffff;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .services-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .service-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+    }
+
+    .service-info {
+        flex: 1;
+    }
+
+    .service-name {
+        font-weight: bold;
+        color: #2d5016;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .service-category {
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .service-price {
+        color: #28a745;
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .service-duration {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .service-actions {
+        margin-left: 15px;
+    }
+
+    .empty-services {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        padding: 20px;
+    }
+
+    /* Preserve existing button styles */
     .text-mint {
         color: #2D5A4A !important;
     }
@@ -251,61 +422,42 @@
         border-color: #2D5A4A;
         color: white;
     }
-    
-    .table-mint {
-        background-color: #2D5A4A !important;
-    }
-    
-    .service-table {
-        border: 1px solid #98D8C8;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    .service-row {
-        transition: all 0.3s ease;
-    }
-    
-    .service-row:hover {
-        background-color: #f8fffe !important;
-        transform: scale(1.01);
-    }
-    
-    .bg-mint-light {
-        background-color: #98D8C8 !important;
-    }
-    
-    .table th {
-        border-bottom: 2px solid #98D8C8;
-        font-weight: 600;
-    }
-    
-    .table td {
-        border-bottom: 1px solid #e9ecef;
-        vertical-align: middle;
-    }
-    
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.5rem 0.75rem;
-    }
-    
-    .service-icon {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #f8f9fa;
-        border-radius: 50%;
-        font-size: 1.2rem;
-    }
-    
+
     .modal-header.bg-mint {
         background-color: #2D5A4A !important;
     }
     
     .btn-close-white {
         filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .services-container {
+            padding: 15px;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .services-details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .service-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .service-actions {
+            margin-left: 0;
+            align-self: flex-end;
+        }
     }
 </style>

@@ -1,69 +1,90 @@
 ﻿@model CAPS.Models.Client
 
 @{
-    ViewBag.Title = "Register Client";
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Change if you're not using a layout
+    ViewBag.Title = "Guest Registration";
+    ViewData["Title"] = "Guest Registration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Register Client</h2>
-
-@using (Html.BeginForm("UpSert", "Client", FormMethod.Post, new { @class = "form-horizontal" }))
-{
-    @Html.AntiForgeryToken()
-    @Html.HiddenFor(m => m.DateRegistered)
-    @Html.HiddenFor(m => m.ClientId)
-    @Html.HiddenFor(m => m.IsActive)
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", required = "required" })
-            @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
-        </div>
+<div class="guest-registration-container">
+    <!-- Back Button -->
+    <div class="back-button-container">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
     </div>
 
-    <div class="form-group">
-        @Html.LabelFor(m => m.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", required = "required" })
-            @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
+    <!-- Main Registration Panel -->
+    <div class="registration-panel">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="lotus-logo">
+                <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Lotus Flower Design -->
+                    <circle cx="50" cy="50" r="45" fill="#2d5016" opacity="0.1"/>
+                    <circle cx="50" cy="50" r="35" fill="#2d5016" opacity="0.2"/>
+                    <circle cx="50" cy="50" r="25" fill="#2d5016" opacity="0.3"/>
+                    <circle cx="50" cy="50" r="15" fill="#2d5016" opacity="0.4"/>
+                    <circle cx="50" cy="50" r="8" fill="#2d5016"/>
+                    <!-- Petals -->
+                    <ellipse cx="50" cy="25" rx="12" ry="20" fill="#2d5016" opacity="0.6"/>
+                    <ellipse cx="75" cy="50" rx="20" ry="12" fill="#2d5016" opacity="0.6"/>
+                    <ellipse cx="50" cy="75" rx="12" ry="20" fill="#2d5016" opacity="0.6"/>
+                    <ellipse cx="25" cy="50" rx="20" ry="12" fill="#2d5016" opacity="0.6"/>
+                    <ellipse cx="64" cy="36" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
+                    <ellipse cx="36" cy="64" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
+                    <ellipse cx="36" cy="36" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
+                    <ellipse cx="64" cy="64" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
+                </svg>
+            </div>
+            <h1 class="spa-title">Tenderbody Therapeutic Spa & Massage</h1>
+            <h2 class="registration-title">Guest Registration</h2>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="registration-form-container">
+            @using (Html.BeginForm("UpSert", "Client", FormMethod.Post, new { @class = "registration-form", @id = "clientRegistrationForm" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.DateRegistered)
+                @Html.HiddenFor(m => m.ClientId)
+                @Html.HiddenFor(m => m.IsActive)
+
+                <div class="form-fields">
+                    <div class="form-group">
+                        <label for="FirstName" class="form-label">First Name</label>
+                        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", required = "required", placeholder = "Enter first name" })
+                        @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="LastName" class="form-label">Last Name</label>
+                        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", required = "required", placeholder = "Enter last name" })
+                        @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="PhoneNumber" class="form-label">Phone Number</label>
+                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", required = "required", placeholder = "Enter phone number" })
+                        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Gender" class="form-label">Gender</label>
+                        @Html.DropDownListFor(m => m.Gender, new SelectList(new[] { "Male", "Female", "Other" }), "Select Gender", new { @class = "form-control", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "validation-message" })
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="registerBtn" class="register-button">
+                        Register
+                    </button>
+                </div>
+            }
         </div>
     </div>
-
-@*     <div class="form-group">
-        @Html.LabelFor(m => m.Age, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Age, new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.Age, "", new { @class = "text-danger" })
-        </div>
-    </div>
- *@
-
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.Gender, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(m => m.Gender, new SelectList(new[] { "Male", "Female", "Other" }), "Select Gender", new { @class = "form-control", required = "required" })
-            @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.PhoneNumber, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", required = "required" })
-            @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <button type="button" id="registerBtn" class="btn btn-primary">Register</button>
-            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
-        </div>
-    </div>
-}
+</div>
 
 <!-- Registration Confirmation Modal -->
 <div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
@@ -134,17 +155,17 @@
                     <h4 class="text-success">Welcome Back!</h4>
                     <p class="text-muted">We noticed you've registered with us before. We'd love to hear about your experience!</p>
                 </div>
-                
+
                 @if (ViewBag.ExistingClient != null)
                 {
                     <div class="alert alert-info">
                         <i class="fas fa-user me-2"></i>
-                        <strong>Previous Registration:</strong> We found an existing account for <strong>@ViewBag.ExistingClient.FirstName @ViewBag.ExistingClient.LastName</strong> 
+                        <strong>Previous Registration:</strong> We found an existing account for <strong>@ViewBag.ExistingClient.FirstName @ViewBag.ExistingClient.LastName</strong>
                         with phone number <strong>@ViewBag.ExistingClient.PhoneNumber</strong>
                     </div>
                 }
-                
-                <form id="retentionSurveyForm">
+
+                <form id="retentionSurveyForm" onsubmit="return false;">
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group mb-4">
@@ -168,36 +189,36 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group mb-4">
                                 <label class="form-label fw-bold">
                                     <i class="fas fa-comment me-2"></i>What did you like most about our services?
                                 </label>
-                                <textarea class="form-control" id="feedback" name="feedback" rows="3" 
-                                    placeholder="Please share what you enjoyed most about your previous visit..."></textarea>
+                                <textarea class="form-control" id="feedback" name="feedback" rows="3"
+                                          placeholder="Please share what you enjoyed most about your previous visit..."></textarea>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group mb-4">
                                 <label class="form-label fw-bold">
                                     <i class="fas fa-lightbulb me-2"></i>How can we improve our services?
                                 </label>
-                                <textarea class="form-control" id="improvementSuggestions" name="improvementSuggestions" rows="3" 
-                                    placeholder="Any suggestions for improvement or new services you'd like to see..."></textarea>
+                                <textarea class="form-control" id="improvementSuggestions" name="improvementSuggestions" rows="3"
+                                          placeholder="Any suggestions for improvement or new services you'd like to see..."></textarea>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-12">
                             <div class="alert alert-warning">
                                 <i class="fas fa-info-circle me-2"></i>
-                                <strong>Note:</strong> Your feedback helps us provide better services and improve client retention. 
+                                <strong>Note:</strong> Your feedback helps us provide better services and improve client retention.
                                 We value your input and will use it to enhance your spa experience.
                             </div>
                         </div>
@@ -222,21 +243,21 @@
             // Show retention modal if this is a duplicate registration
             @if (ViewBag.ShowRetentionModal == true)
             {
-                <text>
-                $('#retentionModal').modal('show');
-                </text>
+                    <text>
+                    $('#retentionModal').modal('show');
+                    </text>
             }
-            
+
             // Handle register button click
             $('#registerBtn').on('click', function(e) {
                 e.preventDefault();
-                
+
                 // Validate form before showing modal
-                var form = $('form');
+                var form = $('#clientRegistrationForm');
                 var isValid = true;
-                
+
                 // Check required fields
-                $('input[required], select[required]').each(function() {
+                form.find('input[required], select[required]').each(function() {
                     if (!$(this).val()) {
                         isValid = false;
                         $(this).addClass('is-invalid');
@@ -244,33 +265,55 @@
                         $(this).removeClass('is-invalid');
                     }
                 });
-                
+
                 if (!isValid) {
                     alert('Please fill in all required fields before registering.');
                     return;
                 }
-                
+
                 // Show the modal
                 $('#registrationModal').modal('show');
             });
-            
+
             // Handle confirm registration button
             $('#confirmRegistration').on('click', function() {
+                // Close the modal first
+                $('#registrationModal').modal('hide');
+
+                // Ensure form is valid before submitting
+                var form = $('#clientRegistrationForm');
+                var isValid = true;
+
+                // Check required fields again
+                form.find('input[required], select[required]').each(function() {
+                    if (!$(this).val()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    alert('Please fill in all required fields before registering.');
+                    return;
+                }
+
                 // Submit the form
-                $('form').submit();
+                form.submit();
             });
-            
+
             // Handle retention survey submission
             $('#submitRetentionSurvey').on('click', function() {
                 var satisfactionRating = $('input[name="satisfactionRating"]:checked').val();
                 var feedback = $('#feedback').val();
                 var improvementSuggestions = $('#improvementSuggestions').val();
-                
+
                 if (!satisfactionRating) {
                     alert('Please select a satisfaction rating.');
                     return;
                 }
-                
+
                 // Submit survey data
                 $.ajax({
                     url: '@Url.Action("SubmitRetentionSurvey", "Client")',
@@ -295,13 +338,13 @@
                     }
                 });
             });
-            
+
             // Handle modal close - reset form if needed
             $('#registrationModal').on('hidden.bs.modal', function() {
                 // Optional: Reset form validation classes
                 $('.is-invalid').removeClass('is-invalid');
             });
-            
+
             // Handle retention modal close
             $('#retentionModal').on('hidden.bs.modal', function() {
                 // Reset survey form
@@ -313,117 +356,471 @@
 }
 
 <style>
-    .modal-content {
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    body {
+        background-color: #ffffff;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        margin: 0;
+        padding: 0;
     }
-    
-    .modal-header {
-        border-radius: 15px 15px 0 0;
-        border-bottom: none;
+
+    .guest-registration-container {
+        min-height: 100vh;
+        background-color: #ffffff;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
-    
-    .modal-body {
-        padding: 2rem;
+
+    .back-button-container {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
     }
-    
-    .modal-footer {
-        border-top: none;
-        padding: 1rem 2rem 2rem;
+
+    .back-button {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 8px 16px;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
-    
-    .btn-close-white {
-        filter: invert(1);
+
+    .back-button:hover {
+        background-color: #e9ecef;
+        color: #495057;
+        text-decoration: none;
     }
-    
+
+    .registration-panel {
+        background-color: #e8f5e8;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 40px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .lotus-logo {
+        margin-bottom: 20px;
+    }
+
+    .spa-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 20px;
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+
+    .registration-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 24px;
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 30px;
+    }
+
+    .registration-form-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 30px;
+    }
+
+    .registration-form {
+        width: 100%;
+    }
+
+    .form-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 16px;
+        font-weight: bold;
+        color: #2d5016;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #2d5016;
+        border-radius: 4px;
+        background-color: #ffffff;
+        font-size: 16px;
+        color: #2d5016;
+        box-sizing: border-box;
+        font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #2d5016;
+        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.2);
+    }
+
+    .form-control::placeholder {
+        color: #999;
+        font-style: italic;
+    }
+
+    .validation-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
     .form-control.is-invalid {
         border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        background-color: #fff5f5;
     }
-    
+
+    .form-actions {
+        text-align: center;
+    }
+
+    .register-button {
+        background-color: #ffffff;
+        border: 2px solid #2d5016;
+        border-radius: 6px;
+        padding: 12px 24px;
+        color: #2d5016;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        min-width: 120px;
+    }
+
+    .register-button:hover {
+        background-color: #2d5016;
+        color: #ffffff;
+    }
+
+    .register-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.3);
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        border: none;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .modal-body {
+        padding: 2.5rem;
+        background: #f8f9fa;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 1.5rem 2.5rem 2.5rem;
+        background: white;
+    }
+
+    .btn-close-white {
+        filter: invert(1);
+        opacity: 0.8;
+    }
+
+        .btn-close-white:hover {
+            opacity: 1;
+        }
+
     .alert {
-        border-radius: 10px;
+        border-radius: 15px;
+        border: none;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
     }
-    
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        color: #856404;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #d1ecf1, #74b9ff);
+        color: #0c5460;
+    }
+
     .list-unstyled li {
-        padding: 0.5rem 0;
+        padding: 0.75rem 0;
+        font-size: 1rem;
     }
-    
+
     .fa-3x {
         font-size: 3em;
     }
-    
+
     .modal-dialog-centered {
         display: flex;
         align-items: center;
         min-height: calc(100% - 1rem);
     }
-    
+
     /* Star Rating Styles */
     .star-rating {
         display: flex;
         flex-direction: row-reverse;
         justify-content: center;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
+        margin: 1.5rem 0;
     }
-    
-    .star-rating input[type="radio"] {
-        display: none;
-    }
-    
-    .star-rating label {
-        font-size: 2rem;
-        color: #ddd;
-        cursor: pointer;
-        transition: color 0.2s ease;
-    }
-    
-    .star-rating label:hover,
-    .star-rating label:hover ~ label,
-    .star-rating input[type="radio"]:checked ~ label {
-        color: #ffc107;
-    }
-    
-    .star-rating input[type="radio"]:checked ~ label {
-        color: #ffc107;
-    }
-    
+
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 2.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+            .star-rating label:hover,
+            .star-rating label:hover ~ label,
+            .star-rating input[type="radio"]:checked ~ label {
+                color: #ffc107;
+                transform: scale(1.1);
+            }
+
+        .star-rating input[type="radio"]:checked ~ label {
+            color: #ffc107;
+        }
+
     .rating-container {
-        margin: 1rem 0;
+        margin: 2rem 0;
     }
-    
+
     /* Retention Modal Specific Styles */
     #retentionModal .modal-content {
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        border-radius: 25px;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
     }
-    
+
     #retentionModal .modal-header {
-        border-radius: 20px 20px 0 0;
+        border-radius: 25px 25px 0 0;
         background: linear-gradient(135deg, #28a745, #20c997);
+        padding: 2.5rem;
     }
-    
+
     #retentionModal .form-control {
-        border-radius: 10px;
-        border: 2px solid #e9ecef;
-        transition: border-color 0.3s ease;
-    }
-    
-    #retentionModal .form-control:focus {
-        border-color: #28a745;
-        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    }
-    
-    #retentionModal .alert {
         border-radius: 15px;
-        border: none;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        padding: 1.25rem;
+        background: white;
     }
-    
+
+        #retentionModal .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.15);
+            transform: translateY(-2px);
+        }
+
+    #retentionModal .alert {
+        border-radius: 20px;
+        border: none;
+        padding: 2rem;
+    }
+
     #retentionModal .btn {
-        border-radius: 10px;
-        padding: 0.75rem 1.5rem;
+        border-radius: 15px;
+        padding: 1rem 2rem;
         font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        #retentionModal .btn:hover {
+            transform: translateY(-2px);
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .guest-registration-container {
+            padding: 10px;
+        }
+
+        .registration-panel {
+            padding: 30px 20px;
+            max-width: 100%;
+        }
+
+        .spa-title {
+            font-size: 18px;
+        }
+
+        .registration-title {
+            font-size: 20px;
+        }
+
+        .registration-form-container {
+            padding: 20px;
+        }
+
+        .lotus-logo svg {
+            width: 60px;
+            height: 60px;
+        }
+
+        .back-button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .back-button-container {
+            top: 10px;
+            left: 10px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .registration-panel {
+            padding: 20px 15px;
+        }
+
+        .registration-form-container {
+            padding: 15px;
+        }
+
+        .spa-title {
+            font-size: 16px;
+        }
+
+        .registration-title {
+            font-size: 18px;
+        }
+
+        .form-label {
+            font-size: 14px;
+        }
+
+        .form-control {
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .register-button {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+    }
+
+    /* Animation for form elements */
+    .form-group {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .form-group:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Loading state for buttons */
+    .btn.loading {
+        position: relative;
+        color: transparent;
+    }
+
+        .btn.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+    @@keyframes spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
     }
 </style>
 

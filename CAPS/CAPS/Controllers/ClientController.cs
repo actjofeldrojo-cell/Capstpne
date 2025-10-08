@@ -14,14 +14,14 @@ namespace CAPS.Controllers
         {
             // Get completed client IDs from session
             var completedClientIds = HttpContext.Session.GetString("CompletedClients")?.Split(',').Select(int.Parse).ToList() ?? new List<int>();
-            
+
             // Get active clients (excluding completed ones)
             var activeClients = await db.Clients
                 .Include(c => c.Appointments)
                     .ThenInclude(a => a.Service)
                 .Where(c => c.IsActive && !completedClientIds.Contains(c.ClientId)) // Exclude completed clients
                 .ToListAsync();
-            
+
             // Get completed clients
             var completedClients = await db.Clients
                 .Include(c => c.Appointments)
@@ -30,7 +30,7 @@ namespace CAPS.Controllers
                 .ToListAsync();
 
             var allClients = activeClients.Concat(completedClients).ToList();
-            
+
             return View(allClients);
         }
 
@@ -44,12 +44,15 @@ namespace CAPS.Controllers
         public ActionResult UpSert(Client client)
         {
             if (!ModelState.IsValid) { return View(client); }
-            if (client.ClientId == 0)
+
+            bool isNewClient = client.ClientId == 0;
+
+            if (isNewClient)
             {
                 // Check if client with same phone number already exists
                 var existingClient = db.Clients
                     .FirstOrDefault(c => c.PhoneNumber == client.PhoneNumber && c.IsActive);
-                
+
                 if (existingClient != null)
                 {
                     // Client already exists - this is a duplicate registration
@@ -59,7 +62,7 @@ namespace CAPS.Controllers
                     ViewBag.IsDuplicateRegistration = true;
                     return View(client);
                 }
-                
+
                 // Create Client from bound data
                 client.IsActive = true;
                 client.DateRegistered = DateTime.Now;
@@ -71,17 +74,17 @@ namespace CAPS.Controllers
             }
 
             db.SaveChanges();
-            
-            if (client.ClientId == 0)
+
+            if (isNewClient)
             {
                 TempData["SuccessMessage"] = "Client registered successfully!";
+                return RedirectToAction("Index", "Home");
             }
             else
             {
                 TempData["SuccessMessage"] = "Client updated successfully!";
+                return RedirectToAction("Index", "Client");
             }
-            
-            return RedirectToAction("Index", "Client");
         }
 
         // Handle retention survey submission
@@ -92,7 +95,7 @@ namespace CAPS.Controllers
             {
                 // Here you could save the retention survey data to a database table
                 // For now, we'll just log it and show a success message
-                
+
                 // You could create a ClientRetentionSurvey model and save it:
                 // var survey = new ClientRetentionSurvey
                 // {
@@ -104,7 +107,7 @@ namespace CAPS.Controllers
                 // };
                 // db.ClientRetentionSurveys.Add(survey);
                 // db.SaveChanges();
-                
+
                 TempData["SuccessMessage"] = "Thank you for your feedback! We appreciate your input and will use it to improve our services.";
                 return Json(new { success = true, message = "Survey submitted successfully!" });
             }
@@ -133,7 +136,7 @@ namespace CAPS.Controllers
                     completedClientIds.Add(id);
                     HttpContext.Session.SetString("CompletedClients", string.Join(",", completedClientIds));
                 }
-                
+
                 TempData["SuccessMessage"] = $"Client {client.FirstName} {client.LastName} has been completed successfully.";
             }
             catch (Exception ex)
@@ -159,7 +162,7 @@ namespace CAPS.Controllers
                 client.IsActive = false;
                 db.Clients.Update(client);
                 db.SaveChanges();
-                
+
                 TempData["SuccessMessage"] = $"Client {client.FirstName} {client.LastName} has been cancelled successfully.";
             }
             catch (Exception ex)
@@ -268,7 +271,7 @@ namespace CAPS.Controllers
                         {
                             // Ensure duration meets validation requirements (15-480 minutes)
                             var validDuration = Math.Max(15, Math.Min(480, duration));
-                            
+
                             var newAppointment = new Appointment
                             {
                                 ClientId = clientId,
@@ -304,14 +307,14 @@ namespace CAPS.Controllers
         {
             var services = await db.Services
                 .Where(s => s.isActive)
-                .Select(s => new { 
-                    serviceId = s.ServiceId, 
-                    name = s.Name, 
-                    price = s.Price, 
-                    duration = s.Duration 
+                .Select(s => new {
+                    serviceId = s.ServiceId,
+                    name = s.Name,
+                    price = s.Price,
+                    duration = s.Duration
                 })
                 .ToListAsync();
-            
+
             return Json(services);
         }
 
@@ -321,13 +324,13 @@ namespace CAPS.Controllers
         {
             var rooms = await db.Rooms
                 .Where(r => r.IsAvailable)
-                .Select(r => new { 
-                    roomId = r.RoomId, 
-                    roomNumber = r.RoomNumber, 
-                    roomType = r.RoomType 
+                .Select(r => new {
+                    roomId = r.RoomId,
+                    roomNumber = r.RoomNumber,
+                    roomType = r.RoomType
                 })
                 .ToListAsync();
-            
+
             return Json(rooms);
         }
 
@@ -337,13 +340,13 @@ namespace CAPS.Controllers
         {
             var staff = await db.Staffs
                 .Where(s => s.IsActive)
-                .Select(s => new { 
-                    staffId = s.StaffId, 
-                    fullName = s.FullName, 
-                    expertise = s.Expertise 
+                .Select(s => new {
+                    staffId = s.StaffId,
+                    fullName = s.FullName,
+                    expertise = s.Expertise
                 })
                 .ToListAsync();
-            
+
             return Json(staff);
         }
 
@@ -395,15 +398,15 @@ namespace CAPS.Controllers
                             IsActive = true,
                             DateCreated = DateTime.Now
                         };
-                        
+
                         db.Appointments.Add(appointment);
                     }
                 }
 
                 await db.SaveChangesAsync();
-                
+
                 TempData["SuccessMessage"] = $"Client {client.FirstName} {client.LastName} has been put in-service successfully!";
-                
+
                 return Json(new { success = true, message = "Client put in-service successfully." });
             }
             catch (Exception ex)

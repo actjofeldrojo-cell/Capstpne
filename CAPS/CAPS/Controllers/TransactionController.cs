@@ -1,3 +1,4 @@
+using CAPS.Migrations;
 using CAPS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -98,6 +99,7 @@ namespace CAPS.Controllers
                 ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
                 ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
                 ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
+                ViewBag.Products = db.Products.Where(p => p.IsActive).ToList();
 
                 return View(transaction);
             }
@@ -118,6 +120,14 @@ namespace CAPS.Controllers
                 ViewBag.Services = db.Services.Where(s => s.isActive).ToList();
                 ViewBag.Staff = db.Staffs.Where(s => s.IsActive).ToList();
 
+                ViewBag.Products = db.Products.Where(p => p.IsActive).ToList();
+
+                // Load products used for this transaction if editing
+                ViewBag.ProductsUsed = db.ProductUsed
+                    .Include(pu => pu.Product)
+                    .Where(pu => pu.ServiceId == transaction.ServiceId && pu.IsActive)
+                    .ToList();
+
                 return View(transaction);
             }
         }
@@ -125,7 +135,7 @@ namespace CAPS.Controllers
         // POST: Transaction/UpSert
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult UpSert(Transaction transaction, decimal? tenderedAmount = null, decimal? discountPercentage = null)
+        public ActionResult UpSert(Transaction transaction, decimal? tenderedAmount = null, decimal? discountPercentage = null, List<ProductUsedViewModel>? productUsed = null)
         {
             ModelState.Remove("Staff");
             ModelState.Remove("Client");
@@ -204,6 +214,31 @@ namespace CAPS.Controllers
                                         };
                                         
                                         db.Transactions.Add(serviceTransaction);
+                                        db.SaveChanges(); // Save to get the transaction ID
+                                        
+                                        // Add products used for this transaction
+                                        if (productUsed != null && productUsed.Any())
+                                        {
+                                            foreach (var product in productUsed.Where(p => p.ProductId > 0 && p.Quantity > 0))
+                                            {
+                                                var productUsedEntity = new ProductUsed
+                                                {
+                                                    ProductId = product.ProductId,
+                                                    ServiceId = availedService.Service.ServiceId,
+                                                    TransactionId = serviceTransaction.TransactionId,
+                                                    Quantity = product.Quantity,
+                                                    DateUsed = DateTime.Now,
+                                                    DateCreated = DateTime.Now,
+                                                    IsActive = true
+                                                };
+
+                                                Products mainProduct = db.Products.Find(product.ProductId);
+                                                mainProduct.StockQuantity -= productUsedEntity.Quantity;
+
+                                                db.Products.Update(mainProduct);
+                                                db.ProductUsed.Add(productUsedEntity);
+                                            }
+                                        }
                                     }
                                     
                                     decimal changeAmount = 0;
@@ -350,6 +385,23 @@ namespace CAPS.Controllers
             return Json(new { duration = 0 });
         }
 
+        // AJAX method to get product information
+        [HttpGet]
+        public ActionResult GetProductInfo(int productId)
+        {
+            var product = db.Products.FirstOrDefault(p => p.ProductId == productId);
+            if (product != null)
+            {
+                return Json(new { 
+                    name = product.Name, 
+                    category = product.Category,
+                    stockQuantity = product.StockQuantity,
+                    isActive = product.IsActive
+                });
+            }
+            return Json(new { name = "", category = "", stockQuantity = 0, isActive = false });
+        }
+
         // GET: Transaction/Report
         public ActionResult Report(DateTime? fromDate = null, DateTime? toDate = null)
         {
@@ -394,5 +446,12 @@ namespace CAPS.Controllers
     {
         public Service Service { get; set; }
         public int TotalDuration { get; set; }
+    }
+
+    // ViewModel for products used
+    public class ProductUsedViewModel
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

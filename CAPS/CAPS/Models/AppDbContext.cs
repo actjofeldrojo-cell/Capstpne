@@ -15,5 +15,6 @@ namespace CAPS.Models
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Room> Rooms { get; set; }
+        public DbSet<ProductUsed> ProductUsed { get; set; }
     }
 }

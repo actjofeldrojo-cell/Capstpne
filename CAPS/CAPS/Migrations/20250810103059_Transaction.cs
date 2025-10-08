@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CAPS.Migrations
 {
     /// <inheritdoc />
-    public partial class Transaction : Migration
+    public partial class TransactionM : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

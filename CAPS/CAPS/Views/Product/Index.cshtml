@@ -5,110 +5,394 @@
 	Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container my-4">
-	<div class="d-flex justify-content-between align-items-center mb-3">
-		<h2>@ViewData["Title"]</h2>
-		<a asp-action="UpSert" class="btn btn-primary">
-			<i class="bi bi-plus-lg"></i> New Product
+<div class="products-container">
+	<!-- Page Title Banner -->
+	<div class="page-title-container">
+		<h1 class="page-title">PRODUCTS</h1>
+	</div>
+
+	<!-- New Product Button -->
+	<div class="new-product-container">
+		<a asp-action="UpSert" class="new-product-btn">
+			<i class="bi bi-plus"></i> New Product
 		</a>
 	</div>
 
-	@if (TempData["SuccessMessage"] != null)
-	{
-		<div class="alert alert-success alert-dismissible fade show" role="alert">
-			@TempData["SuccessMessage"]
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	<!-- Products Management Panel -->
+	<div class="products-panel">
+		<div class="panel-header">
+			<h2 class="panel-title">Products Management</h2>
 		</div>
-	}
 
-	@if (TempData["WarningMessage"] != null)
-	{
-		<div class="alert alert-warning alert-dismissible fade show" role="alert">
-			@TempData["WarningMessage"]
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
-	}
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				@TempData["SuccessMessage"]
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+		}
 
-	<div class="table-responsive">
-		<table class="table table-striped table-bordered align-middle">
-			<thead class="table-dark">
-				<tr>
-					<th>Name</th>
-					<th>Description</th>
-					<th>Category</th>
-					<th>Stock</th>
-					<th>Date Created</th>
-					<th class="text-center">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
+		@if (TempData["WarningMessage"] != null)
+		{
+			<div class="alert alert-warning alert-dismissible fade show" role="alert">
+				@TempData["WarningMessage"]
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+		}
+
+		<div class="products-table-container">
+			<div class="table-header">
+				<div class="table-header-cell">Name</div>
+				<div class="table-header-cell">Description</div>
+				<div class="table-header-cell">Category</div>
+				<div class="table-header-cell">Stock</div>
+				<div class="table-header-cell">Date Created</div>
+				<div class="table-header-cell">Actions</div>
+			</div>
+
+			<div class="table-body">
 				@foreach (var item in Model)
 				{
-					<tr>
-						<td>@item.Name</td>
-						<td class="text-truncate" style="max-width: 150px;">
-							@(
-								!string.IsNullOrEmpty(item.Description) && item.Description.Length > 50
-								? item.Description.Substring(0, 50) + "…"
-								: item.Description
-								)
-						</td>
-						<td>@item.Category</td>
-						<td>
-							@if (item.StockQuantity > 10)
-							{
-								<span class="badge bg-success">@item.StockQuantity</span>
-							}
-							else if (item.StockQuantity > 0)
-							{
-								<span class="badge bg-warning">@item.StockQuantity</span>
-							}
-							else
-							{
-								<span class="badge bg-danger">@item.StockQuantity</span>
-							}
-						</td>
-						<td>@item.DateCreated.ToString("yyyy-MM-dd")</td>
-						<td class="text-center">
-							<a asp-action="UpSert" asp-route-id="@item.ProductId" class="btn btn-sm btn-warning" title="Edit">
-								<i class="bi bi-pencil-square"></i>
-							</a>
-							<a asp-action="Delete" asp-route-id="@item.ProductId" class="btn btn-sm btn-danger" title="Delete">
-								<i class="bi bi-trash"></i>
-							</a>
-						</td>
-					</tr>
+					<div class="table-row">
+						<div class="table-cell">@item.Name</div>
+						<div class="table-cell">@item.Description</div>
+						<div class="table-cell">@item.Category</div>
+						<div class="table-cell">@item.StockQuantity</div>
+						<div class="table-cell">@item.DateCreated.ToString("yyyy-MM-dd")</div>
+						<div class="table-cell">
+							<div class="action-buttons">
+								<a asp-action="UpSert" asp-route-id="@item.ProductId" class="action-btn edit-btn" title="Edit">
+									<i class="bi bi-pencil-square"></i>
+								</a>
+								<a asp-action="Delete" asp-route-id="@item.ProductId" class="action-btn delete-btn" title="Delete">
+									<i class="bi bi-x-circle"></i>
+								</a>
+							</div>
+						</div>
+					</div>
 				}
-			</tbody>
-		</table>
-	</div>
+			</div>
 
-	@if (Model.Count == 0)
-	{
-		<div class="text-center my-5">
-			<i class="bi bi-box h1 text-muted"></i>
-			<h4 class="text-muted mt-3">No products found.</h4>
-			<p class="text-muted">Start by adding your first product.</p>
-			<a asp-action="UpSert" class="btn btn-primary">
-				<i class="bi bi-plus-lg"></i> Add First Product
-			</a>
+			@if (Model.Count == 0)
+			{
+				<div class="empty-state">
+					<div class="empty-icon">
+						<i class="bi bi-box"></i>
+					</div>
+					<h3 class="empty-message">No products found</h3>
+					<p class="empty-description">Start by adding your first product.</p>
+					<a asp-action="UpSert" class="empty-action-btn">
+						<i class="bi bi-plus"></i> Add First Product
+					</a>
+				</div>
+			}
 		</div>
-	}
+	</div>
 </div>
 
 <style>
-	.table th {
-		white-space: nowrap;
-		vertical-align: middle;
+	body {
+		background-color: #f8f9fa;
+		font-family: 'Georgia', 'Times New Roman', serif;
+		margin: 0;
+		padding: 0;
 	}
-	
-	.table td {
-		vertical-align: middle;
+
+	.products-container {
+		padding: 30px;
+		background-color: #f8f9fa;
+		min-height: 100vh;
 	}
-	
-	.text-truncate {
+
+	.page-title-container {
+		background-color: #e8f5e8;
+		border: 2px solid #2d5016;
+		border-radius: 8px;
+		padding: 20px;
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	.page-title {
+		font-family: 'Georgia', 'Times New Roman', serif;
+		font-size: 32px;
+		font-weight: bold;
+		color: #2d5016;
+		margin: 0;
+		letter-spacing: 2px;
+	}
+
+	.new-product-container {
+		margin-bottom: 20px;
+	}
+
+	.new-product-btn {
+		background-color: #e8f5e8;
+		border: 2px solid #2d5016;
+		border-radius: 8px;
+		padding: 12px 24px;
+		color: #2d5016;
+		text-decoration: none;
+		font-weight: bold;
+		font-size: 16px;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		transition: all 0.3s ease;
+		font-family: 'Georgia', 'Times New Roman', serif;
+	}
+
+	.new-product-btn:hover {
+		background-color: #2d5016;
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+	.products-panel {
+		background-color: #ffffff;
+		border: 2px solid #e8f5e8;
+		border-radius: 8px;
 		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.panel-header {
+		background-color: #ffffff;
+		padding: 20px 30px;
+		border-bottom: 1px solid #e9ecef;
+	}
+
+	.panel-title {
+		font-family: 'Georgia', 'Times New Roman', serif;
+		font-size: 24px;
+		font-weight: bold;
+		color: #2d5016;
+		margin: 0;
+	}
+
+	.products-table-container {
+		background-color: #ffffff;
+	}
+
+	.table-header {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 0.8fr 1fr 1fr;
+		background-color: #e8f5e8;
+		border-bottom: 2px solid #2d5016;
+	}
+
+	.table-header-cell {
+		padding: 15px 20px;
+		font-weight: bold;
+		color: #2d5016;
+		font-size: 16px;
+		font-family: 'Georgia', 'Times New Roman', serif;
+		border-right: 1px solid #2d5016;
+		text-align: left;
+	}
+
+	.table-header-cell:last-child {
+		border-right: none;
+		text-align: center;
+	}
+
+	.table-body {
+		background-color: #ffffff;
+	}
+
+	.table-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 0.8fr 1fr 1fr;
+		border-bottom: 1px solid #e9ecef;
+		transition: background-color 0.3s ease;
+	}
+
+	.table-row:hover {
+		background-color: #f8f9fa;
+	}
+
+	.table-row:last-child {
+		border-bottom: none;
+	}
+
+	.table-cell {
+		padding: 15px 20px;
+		color: #333333;
+		font-size: 14px;
+		font-family: 'Georgia', 'Times New Roman', serif;
+		border-right: 1px solid #e9ecef;
+		display: flex;
+		align-items: center;
+	}
+
+	.table-cell:last-child {
+		border-right: none;
+		justify-content: center;
+	}
+
+	.action-buttons {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+	}
+
+	.action-btn {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-decoration: none;
+		transition: all 0.3s ease;
+		border: none;
+		cursor: pointer;
+	}
+
+	.edit-btn {
+		background-color: #ffffff;
+		color: #333333;
+		border: 1px solid #333333;
+	}
+
+	.edit-btn:hover {
+		background-color: #333333;
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+	.delete-btn {
+		background-color: #dc3545;
+		color: #ffffff;
+		border: 1px solid #dc3545;
+	}
+
+	.delete-btn:hover {
+		background-color: #ffffff;
+		color: #dc3545;
+		text-decoration: none;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 60px 20px;
+		color: #6c757d;
+	}
+
+	.empty-icon {
+		font-size: 64px;
+		margin-bottom: 20px;
+		color: #dee2e6;
+	}
+
+	.empty-message {
+		color: #2d5016;
+		margin-bottom: 10px;
+		font-size: 24px;
+		font-weight: bold;
+	}
+
+	.empty-description {
+		color: #6c757d;
+		margin-bottom: 20px;
+		font-size: 16px;
+	}
+
+	.empty-action-btn {
+		background-color: #2d5016;
+		color: #ffffff;
+		border: 2px solid #2d5016;
+		border-radius: 8px;
+		padding: 12px 24px;
+		text-decoration: none;
+		font-weight: bold;
+		font-size: 16px;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		transition: all 0.3s ease;
+		font-family: 'Georgia', 'Times New Roman', serif;
+	}
+
+	.empty-action-btn:hover {
+		background-color: #ffffff;
+		color: #2d5016;
+		text-decoration: none;
+	}
+
+	.alert {
+		margin: 20px 30px;
+		border-radius: 6px;
+		border: none;
+	}
+
+	/* Responsive Design */
+	@@media (max-width: 768px) {
+		.products-container {
+			padding: 15px;
+		}
+
+		.page-title {
+			font-size: 24px;
+		}
+
+		.panel-title {
+			font-size: 20px;
+		}
+
+		.table-header,
+		.table-row {
+			grid-template-columns: 1fr;
+			gap: 10px;
+		}
+
+		.table-header-cell,
+		.table-cell {
+			border-right: none;
+			border-bottom: 1px solid #e9ecef;
+			padding: 10px 15px;
+		}
+
+		.table-header-cell:last-child,
+		.table-cell:last-child {
+			border-bottom: none;
+		}
+
+		.table-header-cell::before {
+			content: attr(data-label);
+			font-weight: bold;
+			margin-right: 10px;
+		}
+
+		.table-cell::before {
+			content: attr(data-label);
+			font-weight: bold;
+			margin-right: 10px;
+			min-width: 120px;
+		}
+
+		.table-header-cell:first-child::before {
+			content: "Name";
+		}
+
+		.table-header-cell:nth-child(2)::before {
+			content: "Description";
+		}
+
+		.table-header-cell:nth-child(3)::before {
+			content: "Category";
+		}
+
+		.table-header-cell:nth-child(4)::before {
+			content: "Stock";
+		}
+
+		.table-header-cell:nth-child(5)::before {
+			content: "Date Created";
+		}
+
+		.table-header-cell:last-child::before {
+			content: "Actions";
+		}
 	}
 </style>
