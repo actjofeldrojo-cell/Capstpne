@@ -113,8 +113,8 @@
                         </div>
                     </div>
                     <div class="table-cell">
-                        <a href="@Url.Action("UpSert", "Transaction", new { id = transaction.TransactionId })" 
-                           class="payment-btn" 
+                        <a href="@Url.Action("UpSert", "Transaction", new { id = transaction.TransactionId })"
+                           class="payment-btn"
                            title="For Payment">
                             <i class="bi bi-pencil-square"></i> For Payment
                         </a>
@@ -154,7 +154,7 @@
                 $('.table-row').each(function() {
                     var clientName = $(this).find('.client-name').text().toLowerCase();
                     var serviceName = $(this).find('.service-name').text().toLowerCase();
-                    
+
                     if (clientName.includes(searchTerm) || serviceName.includes(searchTerm)) {
                         $(this).show();
                     } else {
@@ -176,13 +176,13 @@
             function updateSummaryCards() {
                 var visibleRows = $('.table-row:visible');
                 var totalAmount = 0;
-                
+
                 visibleRows.each(function() {
                     var amountText = $(this).find('.amount-value').text();
                     var amount = parseFloat(amountText.replace(/[^0-9.-]+/g, ''));
                     totalAmount += amount;
                 });
-                
+
                 $('#totalTransactions').text(visibleRows.length);
                 $('#totalRevenue').text('$' + totalAmount.toFixed(2));
                 $('#avgValue').text(visibleRows.length > 0 ? '$' + (totalAmount / visibleRows.length).toFixed(2) : '$0.00');
@@ -209,7 +209,7 @@
 <style>
     body {
         background-color: #f8f9fa;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
     }
@@ -230,7 +230,7 @@
     }
 
     .page-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 32px;
         font-weight: bold;
         color: #137759;
@@ -257,14 +257,14 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s ease;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
-    .action-btn:hover {
-        background-color: #137759;
-        color: #ffffff;
-        text-decoration: none;
-    }
+        .action-btn:hover {
+            background-color: #137759;
+            color: #ffffff;
+            text-decoration: none;
+        }
 
     .search-filter-panel {
         background-color: #e8f5e8;
@@ -291,13 +291,13 @@
         flex-direction: column;
     }
 
-    .search-field label {
-        font-family: 'Georgia', 'Times New Roman', serif;
-        font-size: 16px;
-        font-weight: bold;
-        color: #137759;
-        margin-bottom: 8px;
-    }
+        .search-field label {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: #137759;
+            margin-bottom: 8px;
+        }
 
     .form-control {
         width: 100%;
@@ -308,14 +308,14 @@
         font-size: 16px;
         color: #2d5016;
         box-sizing: border-box;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
     }
 
-    .form-control:focus {
-        outline: none;
-        border-color: #137759;
-        box-shadow: 0 0 0 2px rgba(19, 119, 89, 0.2);
-    }
+        .form-control:focus {
+            outline: none;
+            border-color: #137759;
+            box-shadow: 0 0 0 2px rgba(19, 119, 89, 0.2);
+        }
 
     .clear-button-container {
         display: flex;
@@ -332,14 +332,14 @@
         font-size: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         white-space: nowrap;
     }
 
-    .clear-btn:hover {
-        background-color: #137759;
-        color: #ffffff;
-    }
+        .clear-btn:hover {
+            background-color: #137759;
+            color: #ffffff;
+        }
 
     .summary-cards-container {
         display: grid;
@@ -361,7 +361,7 @@
     }
 
     .card-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 18px;
         font-weight: bold;
         color: #137759;
@@ -369,7 +369,7 @@
     }
 
     .card-value {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 24px;
         font-weight: bold;
         color: #2d5016;
@@ -403,7 +403,7 @@
     }
 
     .table-header-cell {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 16px;
         font-weight: bold;
         color: #ffffff;
@@ -424,17 +424,17 @@
         align-items: center;
     }
 
-    .table-row:last-child {
-        border-bottom: none;
-    }
+        .table-row:last-child {
+            border-bottom: none;
+        }
 
-    .table-row:nth-child(even) {
-        background-color: #f8f9fa;
-    }
+        .table-row:nth-child(even) {
+            background-color: #f8f9fa;
+        }
 
-    .table-row:nth-child(odd) {
-        background-color: #ffffff;
-    }
+        .table-row:nth-child(odd) {
+            background-color: #ffffff;
+        }
 
     .table-cell {
         display: flex;
@@ -458,7 +458,7 @@
         justify-content: center;
         font-weight: bold;
         font-size: 16px;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
     }
 
     .client-details {
@@ -467,7 +467,7 @@
     }
 
     .client-name {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 16px;
         font-weight: bold;
         color: #2d5016;
@@ -475,7 +475,7 @@
     }
 
     .client-id {
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 14px;
         color: #6c757d;
     }
@@ -486,7 +486,7 @@
     }
 
     .service-name {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 16px;
         font-weight: bold;
         color: #2d5016;
@@ -494,7 +494,7 @@
     }
 
     .service-duration {
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 14px;
         color: #6c757d;
     }
@@ -505,7 +505,7 @@
     }
 
     .amount-value {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 16px;
         font-weight: bold;
         color: #28a745;
@@ -513,7 +513,7 @@
     }
 
     .discount-amount {
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 14px;
         color: #dc3545;
         font-weight: bold;
@@ -532,14 +532,14 @@
         align-items: center;
         gap: 6px;
         transition: all 0.3s ease;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
     }
 
-    .payment-btn:hover {
-        background-color: #0056b3;
-        color: #ffffff;
-        text-decoration: none;
-    }
+        .payment-btn:hover {
+            background-color: #0056b3;
+            color: #ffffff;
+            text-decoration: none;
+        }
 
     /* Responsive Design */
     @@media (max-width: 768px) {

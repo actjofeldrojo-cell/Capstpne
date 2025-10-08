@@ -93,7 +93,7 @@
 <style>
 	body {
 		background-color: #f8f9fa;
-		font-family: 'Georgia', 'Times New Roman', serif;
+		font-family: Arial, sans-serif;
 		margin: 0;
 		padding: 0;
 	}
@@ -114,7 +114,7 @@
 	}
 
 	.page-title {
-		font-family: 'Georgia', 'Times New Roman', serif;
+		font-family: Arial, sans-serif;
 		font-size: 32px;
 		font-weight: bold;
 		color: #2d5016;
@@ -139,14 +139,14 @@
 		align-items: center;
 		gap: 8px;
 		transition: all 0.3s ease;
-		font-family: 'Georgia', 'Times New Roman', serif;
+		font-family: Arial, sans-serif;
 	}
 
-	.new-product-btn:hover {
-		background-color: #2d5016;
-		color: #ffffff;
-		text-decoration: none;
-	}
+		.new-product-btn:hover {
+			background-color: #2d5016;
+			color: #ffffff;
+			text-decoration: none;
+		}
 
 	.products-panel {
 		background-color: #ffffff;
@@ -163,7 +163,7 @@
 	}
 
 	.panel-title {
-		font-family: 'Georgia', 'Times New Roman', serif;
+		font-family: Arial, sans-serif;
 		font-size: 24px;
 		font-weight: bold;
 		color: #2d5016;
@@ -186,15 +186,15 @@
 		font-weight: bold;
 		color: #2d5016;
 		font-size: 16px;
-		font-family: 'Georgia', 'Times New Roman', serif;
+		font-family: Arial, sans-serif;
 		border-right: 1px solid #2d5016;
 		text-align: left;
 	}
 
-	.table-header-cell:last-child {
-		border-right: none;
-		text-align: center;
-	}
+		.table-header-cell:last-child {
+			border-right: none;
+			text-align: center;
+		}
 
 	.table-body {
 		background-color: #ffffff;
@@ -207,28 +207,28 @@
 		transition: background-color 0.3s ease;
 	}
 
-	.table-row:hover {
-		background-color: #f8f9fa;
-	}
+		.table-row:hover {
+			background-color: #f8f9fa;
+		}
 
-	.table-row:last-child {
-		border-bottom: none;
-	}
+		.table-row:last-child {
+			border-bottom: none;
+		}
 
 	.table-cell {
 		padding: 15px 20px;
 		color: #333333;
 		font-size: 14px;
-		font-family: 'Georgia', 'Times New Roman', serif;
+		font-family: Arial, sans-serif;
 		border-right: 1px solid #e9ecef;
 		display: flex;
 		align-items: center;
 	}
 
-	.table-cell:last-child {
-		border-right: none;
-		justify-content: center;
-	}
+		.table-cell:last-child {
+			border-right: none;
+			justify-content: center;
+		}
 
 	.action-buttons {
 		display: flex;
@@ -255,11 +255,11 @@
 		border: 1px solid #333333;
 	}
 
-	.edit-btn:hover {
-		background-color: #333333;
-		color: #ffffff;
-		text-decoration: none;
-	}
+		.edit-btn:hover {
+			background-color: #333333;
+			color: #ffffff;
+			text-decoration: none;
+		}
 
 	.delete-btn {
 		background-color: #dc3545;
@@ -267,11 +267,11 @@
 		border: 1px solid #dc3545;
 	}
 
-	.delete-btn:hover {
-		background-color: #ffffff;
-		color: #dc3545;
-		text-decoration: none;
-	}
+		.delete-btn:hover {
+			background-color: #ffffff;
+			color: #dc3545;
+			text-decoration: none;
+		}
 
 	.empty-state {
 		text-align: center;
@@ -311,14 +311,14 @@
 		align-items: center;
 		gap: 8px;
 		transition: all 0.3s ease;
-		font-family: 'Georgia', 'Times New Roman', serif;
+		font-family: Arial, sans-serif;
 	}
 
-	.empty-action-btn:hover {
-		background-color: #ffffff;
-		color: #2d5016;
-		text-decoration: none;
-	}
+		.empty-action-btn:hover {
+			background-color: #ffffff;
+			color: #2d5016;
+			text-decoration: none;
+		}
 
 	.alert {
 		margin: 20px 30px;
@@ -353,46 +353,46 @@
 			padding: 10px 15px;
 		}
 
-		.table-header-cell:last-child,
-		.table-cell:last-child {
-			border-bottom: none;
-		}
+			.table-header-cell:last-child,
+			.table-cell:last-child {
+				border-bottom: none;
+			}
 
-		.table-header-cell::before {
-			content: attr(data-label);
-			font-weight: bold;
-			margin-right: 10px;
-		}
+			.table-header-cell::before {
+				content: attr(data-label);
+				font-weight: bold;
+				margin-right: 10px;
+			}
 
-		.table-cell::before {
-			content: attr(data-label);
-			font-weight: bold;
-			margin-right: 10px;
-			min-width: 120px;
-		}
+			.table-cell::before {
+				content: attr(data-label);
+				font-weight: bold;
+				margin-right: 10px;
+				min-width: 120px;
+			}
 
-		.table-header-cell:first-child::before {
-			content: "Name";
-		}
+			.table-header-cell:first-child::before {
+				content: "Name";
+			}
 
-		.table-header-cell:nth-child(2)::before {
-			content: "Description";
-		}
+			.table-header-cell:nth-child(2)::before {
+				content: "Description";
+			}
 
-		.table-header-cell:nth-child(3)::before {
-			content: "Category";
-		}
+			.table-header-cell:nth-child(3)::before {
+				content: "Category";
+			}
 
-		.table-header-cell:nth-child(4)::before {
-			content: "Stock";
-		}
+			.table-header-cell:nth-child(4)::before {
+				content: "Stock";
+			}
 
-		.table-header-cell:nth-child(5)::before {
-			content: "Date Created";
-		}
+			.table-header-cell:nth-child(5)::before {
+				content: "Date Created";
+			}
 
-		.table-header-cell:last-child::before {
-			content: "Actions";
-		}
+			.table-header-cell:last-child::before {
+				content: "Actions";
+			}
 	}
 </style>

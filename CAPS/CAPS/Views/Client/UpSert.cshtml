@@ -21,20 +21,20 @@
             <div class="lotus-logo">
                 <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <!-- Lotus Flower Design -->
-                    <circle cx="50" cy="50" r="45" fill="#2d5016" opacity="0.1"/>
-                    <circle cx="50" cy="50" r="35" fill="#2d5016" opacity="0.2"/>
-                    <circle cx="50" cy="50" r="25" fill="#2d5016" opacity="0.3"/>
-                    <circle cx="50" cy="50" r="15" fill="#2d5016" opacity="0.4"/>
-                    <circle cx="50" cy="50" r="8" fill="#2d5016"/>
+                    <circle cx="50" cy="50" r="45" fill="#2d5016" opacity="0.1" />
+                    <circle cx="50" cy="50" r="35" fill="#2d5016" opacity="0.2" />
+                    <circle cx="50" cy="50" r="25" fill="#2d5016" opacity="0.3" />
+                    <circle cx="50" cy="50" r="15" fill="#2d5016" opacity="0.4" />
+                    <circle cx="50" cy="50" r="8" fill="#2d5016" />
                     <!-- Petals -->
-                    <ellipse cx="50" cy="25" rx="12" ry="20" fill="#2d5016" opacity="0.6"/>
-                    <ellipse cx="75" cy="50" rx="20" ry="12" fill="#2d5016" opacity="0.6"/>
-                    <ellipse cx="50" cy="75" rx="12" ry="20" fill="#2d5016" opacity="0.6"/>
-                    <ellipse cx="25" cy="50" rx="20" ry="12" fill="#2d5016" opacity="0.6"/>
-                    <ellipse cx="64" cy="36" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
-                    <ellipse cx="36" cy="64" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
-                    <ellipse cx="36" cy="36" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
-                    <ellipse cx="64" cy="64" rx="12" ry="20" fill="#2d5016" opacity="0.5"/>
+                    <ellipse cx="50" cy="25" rx="12" ry="20" fill="#2d5016" opacity="0.6" />
+                    <ellipse cx="75" cy="50" rx="20" ry="12" fill="#2d5016" opacity="0.6" />
+                    <ellipse cx="50" cy="75" rx="12" ry="20" fill="#2d5016" opacity="0.6" />
+                    <ellipse cx="25" cy="50" rx="20" ry="12" fill="#2d5016" opacity="0.6" />
+                    <ellipse cx="64" cy="36" rx="12" ry="20" fill="#2d5016" opacity="0.5" />
+                    <ellipse cx="36" cy="64" rx="12" ry="20" fill="#2d5016" opacity="0.5" />
+                    <ellipse cx="36" cy="36" rx="12" ry="20" fill="#2d5016" opacity="0.5" />
+                    <ellipse cx="64" cy="64" rx="12" ry="20" fill="#2d5016" opacity="0.5" />
                 </svg>
             </div>
             <h1 class="spa-title">Tenderbody Therapeutic Spa & Massage</h1>
@@ -243,9 +243,9 @@
             // Show retention modal if this is a duplicate registration
             @if (ViewBag.ShowRetentionModal == true)
             {
-                    <text>
-                    $('#retentionModal').modal('show');
-                    </text>
+                        <text>
+                        $('#retentionModal').modal('show');
+                        </text>
             }
 
             // Handle register button click
@@ -358,7 +358,7 @@
 <style>
     body {
         background-color: #ffffff;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
     }
@@ -394,11 +394,11 @@
         gap: 6px;
     }
 
-    .back-button:hover {
-        background-color: #e9ecef;
-        color: #495057;
-        text-decoration: none;
-    }
+        .back-button:hover {
+            background-color: #e9ecef;
+            color: #495057;
+            text-decoration: none;
+        }
 
     .registration-panel {
         background-color: #e8f5e8;
@@ -420,7 +420,7 @@
     }
 
     .spa-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 20px;
         font-weight: bold;
         color: #2d5016;
@@ -429,7 +429,7 @@
     }
 
     .registration-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 24px;
         font-weight: bold;
         color: #2d5016;
@@ -459,7 +459,7 @@
     }
 
     .form-label {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 16px;
         font-weight: bold;
         color: #2d5016;
@@ -475,19 +475,19 @@
         font-size: 16px;
         color: #2d5016;
         box-sizing: border-box;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
-    .form-control:focus {
-        outline: none;
-        border-color: #2d5016;
-        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.2);
-    }
+        .form-control:focus {
+            outline: none;
+            border-color: #2d5016;
+            box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.2);
+        }
 
-    .form-control::placeholder {
-        color: #999;
-        font-style: italic;
-    }
+        .form-control::placeholder {
+            color: #999;
+            font-style: italic;
+        }
 
     .validation-message {
         color: #dc3545;
@@ -515,19 +515,19 @@
         font-size: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         min-width: 120px;
     }
 
-    .register-button:hover {
-        background-color: #2d5016;
-        color: #ffffff;
-    }
+        .register-button:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+        }
 
-    .register-button:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.3);
-    }
+        .register-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.3);
+        }
 
     /* Modal Styles */
     .modal-content {
@@ -775,18 +775,15 @@
         }
 
     @@keyframes fadeInUp {
-        from
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
 
-    {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     /* Loading state for buttons */
@@ -811,16 +808,13 @@
         }
 
     @@keyframes spin {
-        0%
+        0% {
+            transform: rotate(0deg);
+        }
 
-    {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
 
