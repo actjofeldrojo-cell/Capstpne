@@ -25,7 +25,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
-                    
+
                     @if (TempData["ErrorMessage"] != null)
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -33,20 +33,20 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
-                    
+
                     <form asp-action="Login" method="post">
                         @Html.AntiForgeryToken()
-                        
+
                         <div class="form-group">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" 
+                            <input type="text" class="form-control" id="username" name="username"
                                    placeholder="Enter username" required autofocus>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="password" class="form-label">Password</label>
                             <div class="password-input-container">
-                                <input type="password" class="form-control" id="password" name="password" 
+                                <input type="password" class="form-control" id="password" name="password"
                                        placeholder="Enter password" required>
                                 <button type="button" class="password-toggle" onclick="togglePassword()">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -56,12 +56,12 @@
                                 </button>
                             </div>
                         </div>
-                        
+
                         <button type="submit" class="login-btn">LOGIN</button>
                     </form>
-                    
+
                     <div class="back-link">
-            @*             <a asp-controller="Home" asp-action="Index">← Back to Home</a> *@
+                        @*             <a asp-controller="Home" asp-action="Index">← Back to Home</a> *@
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
 <style>
     body {
         background-color: #ffffff;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
     .login-panel {
@@ -95,7 +95,7 @@
     }
 
     .spa-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 24px;
         font-weight: bold;
         color: #2d5016;
@@ -104,7 +104,7 @@
     }
 
     .admin-login-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 18px;
         font-weight: bold;
         color: #2d5016;
@@ -136,11 +136,11 @@
         box-sizing: border-box;
     }
 
-    .form-control:focus {
-        outline: none;
-        border-color: #2d5016;
-        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.2);
-    }
+        .form-control:focus {
+            outline: none;
+            border-color: #2d5016;
+            box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.2);
+        }
 
     .password-input-container {
         position: relative;
@@ -148,9 +148,9 @@
         align-items: center;
     }
 
-    .password-input-container .form-control {
-        padding-right: 50px;
-    }
+        .password-input-container .form-control {
+            padding-right: 50px;
+        }
 
     .password-toggle {
         position: absolute;
@@ -165,9 +165,9 @@
         justify-content: center;
     }
 
-    .password-toggle:hover {
-        color: #1a3a0e;
-    }
+        .password-toggle:hover {
+            color: #1a3a0e;
+        }
 
     .login-btn {
         width: 100%;
@@ -183,30 +183,30 @@
         margin-top: 20px;
     }
 
-    .login-btn:hover {
-        background-color: #2d5016;
-        color: #ffffff;
-    }
+        .login-btn:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+        }
 
-    .login-btn:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.3);
-    }
+        .login-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.3);
+        }
 
     .back-link {
         text-align: center;
         margin-top: 20px;
     }
 
-    .back-link a {
-        color: #2d5016;
-        text-decoration: none;
-        font-size: 14px;
-    }
+        .back-link a {
+            color: #2d5016;
+            text-decoration: none;
+            font-size: 14px;
+        }
 
-    .back-link a:hover {
-        text-decoration: underline;
-    }
+            .back-link a:hover {
+                text-decoration: underline;
+            }
 
     .alert {
         margin-bottom: 20px;
@@ -257,7 +257,7 @@
     function togglePassword() {
         const passwordInput = document.getElementById('password');
         const toggleButton = document.querySelector('.password-toggle');
-        
+
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             toggleButton.innerHTML = `

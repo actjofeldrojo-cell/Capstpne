@@ -85,15 +85,15 @@
                                     <option value="">Select Service</option>
                                     @foreach (var service in ViewBag.Services)
                                     {
-                                        <option value="@service.ServiceId" 
-                                                data-price="@service.Price" 
+                                        <option value="@service.ServiceId"
+                                                data-price="@service.Price"
                                                 data-duration="@service.Duration">
                                             @service.Name - $@service.Price (@service.Duration min)
                                         </option>
                                     }
                                 </select>
                             }
-                            
+
                             @if (ViewBag.AvailedServices != null)
                             {
                                 <input type="hidden" asp-for="ServiceId" id="hiddenServiceId" />
@@ -123,7 +123,7 @@
                                                 <option value="">Select Product</option>
                                                 @foreach (var product in ViewBag.Products)
                                                 {
-                                                    <option value="@product.ProductId" @@(product.ProductId == productUsed.ProductId ? "selected" : "")>
+                                                    <option value="@product.ProductId" @@(product.ProductId= =productUsed.ProductId ? "selected" : "" )>
                                                         @product.Name - @product.Category
                                                     </option>
                                                 }
@@ -131,7 +131,7 @@
                                         </div>
                                         <div class="quantity-field">
                                             <label>Quantity</label>
-                                            <input type="number" class="form-control quantity-input" name="productUsed[@((ViewBag.ProductsUsed as List<CAPS.Models.ProductUsed>).IndexOf(productUsed))].Quantity" 
+                                            <input type="number" class="form-control quantity-input" name="productUsed[@((ViewBag.ProductsUsed as List<CAPS.Models.ProductUsed>).IndexOf(productUsed))].Quantity"
                                                    value="@productUsed.Quantity" min="1" required />
                                         </div>
                                         <div class="remove-field">
@@ -143,7 +143,7 @@
                                 }
                             }
                         </div>
-                        
+
                         <div id="noProductsMessage" class="no-products-message">
                             No products added yet. Click "Add Product" to start adding products.
                         </div>
@@ -171,7 +171,7 @@
                                 <input type="text" class="form-control" id="changeAmount" readonly />
                             </div>
                         </div>
-                        
+
                         @if (ViewBag.IsEligibleForDiscount == true)
                         {
                             <div class="discount-section" id="discountSection">
@@ -194,7 +194,7 @@
                                 </div>
                             </div>
                         }
-                        
+
                         <div class="additional-fields">
                             <div class="additional-field">
                                 <label asp-for="PaymentMethod">Payment Method</label>
@@ -234,7 +234,7 @@
             $('#serviceSelect').on('change', function() {
                 var selectedOption = $(this).find('option:selected');
                 var price = selectedOption.data('price');
-                
+
                 if (price) {
                     $('#amountToPay').val(price);
                     calculateChange();
@@ -249,11 +249,11 @@
             // Auto-fill amount if service is pre-selected
             @if (Model.ServiceId > 0)
             {
-                <text>
-                var preSelectedPrice = @Model.Amount;
-                $('#amountToPay').val(preSelectedPrice);
-                calculateChange();
-                </text>
+                    <text>
+                    var preSelectedPrice = @Model.Amount;
+                    $('#amountToPay').val(preSelectedPrice);
+                    calculateChange();
+                    </text>
             }
 
             // Calculate change function
@@ -262,9 +262,9 @@
                 var tenderedAmount = parseFloat($('#tenderedAmount').val()) || 0;
                 var finalAmount = calculateFinalAmount();
                 var change = tenderedAmount - finalAmount;
-                
+
                 $('#changeAmount').val(change.toFixed(2));
-                
+
                 // Enable/disable Complete Payment button
                 if (tenderedAmount >= finalAmount && tenderedAmount > 0) {
                     $('#completePayment').prop('disabled', false);
@@ -277,19 +277,19 @@
             function calculateFinalAmount() {
                 var originalAmount = parseFloat($('#amountToPay').val()) || 0;
                 var discountPercentage = parseFloat($('#discountPercentage').val()) || 0;
-                
+
                 var totalDiscount = 0;
-                
+
                 if (discountPercentage > 0) {
                     totalDiscount = originalAmount * (discountPercentage / 100);
                 }
-                
+
                 var finalAmount = originalAmount - totalDiscount;
                 if (finalAmount < 0) finalAmount = 0;
-                
+
                 $('#finalAmount').val(finalAmount.toFixed(2));
                 $('#totalDiscount').val(totalDiscount.toFixed(2));
-                
+
                 return finalAmount;
             }
 
@@ -306,26 +306,26 @@
                 var finalAmount = calculateFinalAmount();
                 var serviceId = $('#serviceSelect').val() || $('#hiddenServiceId').val();
                 var hasAvailedServices = @(ViewBag.AvailedServices != null ? "true" : "false");
-                
+
                 // Validation - only check service if no availed services are pre-selected
                 if (!hasAvailedServices && !serviceId) {
                     alert('Please select a service.');
                     return;
                 }
-                
+
                 if (amountToPay <= 0) {
                     alert('Please enter a valid amount to pay.');
                     return;
                 }
-                
+
                 if (tenderedAmount < finalAmount) {
                     alert('Tendered amount must be greater than or equal to final amount after discount.');
                     return;
                 }
-                
+
                 // Show loading state
                 $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Processing...');
-                
+
                 // Submit the form
                 $('#transactionForm').submit();
             });
@@ -353,7 +353,7 @@
             $(document).on('change', '.product-select', function() {
                 var productId = $(this).val();
                 var row = $(this).closest('.product-item');
-                
+
                 if (productId) {
                     // Get product info via AJAX
                     $.get('@Url.Action("GetProductInfo", "Transaction")', { productId: productId }, function(data) {
@@ -380,7 +380,7 @@
                         </div>
                         <div class="quantity-field">
                             <label>Quantity</label>
-                            <input type="number" class="form-control quantity-input" name="productUsed[${productIndex}].Quantity" 
+                            <input type="number" class="form-control quantity-input" name="productUsed[${productIndex}].Quantity"
                                    value="1" min="1" required />
                         </div>
                         <div class="remove-field">
@@ -390,7 +390,7 @@
                         </div>
                     </div>
                 `;
-                
+
                 $('#productsUsedList').append(productHtml);
                 productIndex++;
                 toggleNoProductsMessage();
@@ -420,7 +420,7 @@
             // Initialize product index based on existing products
             @if (ViewBag.ProductsUsed != null && ((List<CAPS.Models.ProductUsed>)ViewBag.ProductsUsed).Any())
             {
-                <text>productIndex = @((ViewBag.ProductsUsed as List<CAPS.Models.ProductUsed>).Count);</text>
+                    <text>productIndex = @((ViewBag.ProductsUsed as List<CAPS.Models.ProductUsed>).Count);</text>
             }
 
             // Initialize no products message visibility
@@ -432,7 +432,7 @@
 <style>
     body {
         background-color: #ffffff;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
     }
@@ -468,14 +468,14 @@
         align-items: center;
         gap: 6px;
         font-weight: 500;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
     }
 
-    .back-button:hover {
-        background-color: #137759;
-        color: #ffffff;
-        text-decoration: none;
-    }
+        .back-button:hover {
+            background-color: #137759;
+            color: #ffffff;
+            text-decoration: none;
+        }
 
     .form-panel {
         background-color: #e8f5e8;
@@ -495,7 +495,7 @@
     }
 
     .form-title {
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 24px;
         font-weight: bold;
         color: #ffffff;
@@ -522,9 +522,9 @@
         overflow: hidden;
     }
 
-    .form-section.full-width {
-        grid-column: 1 / -1;
-    }
+        .form-section.full-width {
+            grid-column: 1 / -1;
+        }
 
     .section-header {
         background-color: #e8f5e8;
@@ -536,7 +536,7 @@
     }
 
     .section-title {
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 18px;
         font-weight: bold;
         color: #137759;
@@ -553,13 +553,13 @@
         font-size: 14px;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
     }
 
-    .add-product-btn:hover {
-        background-color: #137759;
-        color: #ffffff;
-    }
+        .add-product-btn:hover {
+            background-color: #137759;
+            color: #ffffff;
+        }
 
     .section-content {
         padding: 20px;
@@ -609,10 +609,10 @@
         border-radius: 4px;
     }
 
-    .service-item.selected {
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-    }
+        .service-item.selected {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
 
     .service-name {
         font-weight: bold;
@@ -635,19 +635,19 @@
         font-size: 16px;
         color: #2d5016;
         box-sizing: border-box;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
     }
 
-    .form-control:focus {
-        outline: none;
-        border-color: #137759;
-        box-shadow: 0 0 0 2px rgba(19, 119, 89, 0.2);
-    }
+        .form-control:focus {
+            outline: none;
+            border-color: #137759;
+            box-shadow: 0 0 0 2px rgba(19, 119, 89, 0.2);
+        }
 
-    .form-control::placeholder {
-        color: #6c757d;
-        font-style: normal;
-    }
+        .form-control::placeholder {
+            color: #6c757d;
+            font-style: normal;
+        }
 
     .product-row {
         display: grid;
@@ -700,9 +700,9 @@
         font-size: 16px;
     }
 
-    .remove-btn:hover {
-        background-color: #c82333;
-    }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
 
     .no-products-message {
         text-align: center;
@@ -726,12 +726,12 @@
         flex-direction: column;
     }
 
-    .payment-field label {
-        font-size: 14px;
-        font-weight: bold;
-        color: #137759;
-        margin-bottom: 8px;
-    }
+        .payment-field label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #137759;
+            margin-bottom: 8px;
+        }
 
     .discount-section {
         background-color: #fff3cd;
@@ -742,7 +742,7 @@
     }
 
     .discount-header h4 {
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 16px;
         font-weight: bold;
         color: #856404;
@@ -760,12 +760,12 @@
         flex-direction: column;
     }
 
-    .discount-field label {
-        font-size: 14px;
-        font-weight: bold;
-        color: #856404;
-        margin-bottom: 5px;
-    }
+        .discount-field label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
 
     .additional-fields {
         display: grid;
@@ -778,12 +778,12 @@
         flex-direction: column;
     }
 
-    .additional-field label {
-        font-size: 14px;
-        font-weight: bold;
-        color: #137759;
-        margin-bottom: 8px;
-    }
+        .additional-field label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #137759;
+            margin-bottom: 8px;
+        }
 
     .validation-message {
         color: #dc3545;
@@ -813,7 +813,7 @@
         font-size: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-family: 'Arial', sans-serif;
+        font-family: Arial, sans-serif;
         min-width: 120px;
         text-decoration: none;
         display: inline-block;
@@ -826,10 +826,10 @@
         border-color: #28a745;
     }
 
-    .complete-btn:hover {
-        background-color: #218838;
-        border-color: #1e7e34;
-    }
+        .complete-btn:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
 
     .cancel-btn {
         background-color: #ffffff;
@@ -837,11 +837,11 @@
         border-color: #137759;
     }
 
-    .cancel-btn:hover {
-        background-color: #137759;
-        color: #ffffff;
-        text-decoration: none;
-    }
+        .cancel-btn:hover {
+            background-color: #137759;
+            color: #ffffff;
+            text-decoration: none;
+        }
 
     /* Responsive Design */
     @@media (max-width: 768px) {

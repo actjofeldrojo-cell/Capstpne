@@ -79,7 +79,7 @@
                                         <a asp-action="UpSert" asp-route-id="@item.ServiceId" class="btn btn-outline-mint btn-sm" title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <button type="button" class="btn btn-outline-info btn-sm" title="View Details" 
+                                        <button type="button" class="btn btn-outline-info btn-sm" title="View Details"
                                                 onclick="showServiceDetails(@item.ServiceId, '@item.Name', '@item.Category', '@item.Description', @item.Price, @item.Duration)">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -127,7 +127,7 @@
                                         <a asp-action="UpSert" asp-route-id="@item.ServiceId" class="btn btn-outline-mint btn-sm" title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <button type="button" class="btn btn-outline-info btn-sm" title="View Details" 
+                                        <button type="button" class="btn btn-outline-info btn-sm" title="View Details"
                                                 onclick="showServiceDetails(@item.ServiceId, '@item.Name', '@item.Category', '@item.Description', @item.Price, @item.Duration)">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -194,7 +194,7 @@
             document.getElementById('modalServicePrice').textContent = '₱' + price.toFixed(2);
             document.getElementById('modalServiceDescription').textContent = description || 'No description available';
             document.getElementById('modalEditLink').href = '/Service/UpSert/' + serviceId;
-            
+
             var modal = new bootstrap.Modal(document.getElementById('serviceDetailsModal'));
             modal.show();
         }
@@ -204,7 +204,7 @@
 <style>
     body {
         background-color: #f8f9fa;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
     }
@@ -225,7 +225,7 @@
     }
 
     .page-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 32px;
         font-weight: bold;
         color: #2d5016;
@@ -250,14 +250,14 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s ease;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
-    .new-services-btn:hover {
-        background-color: #2d5016;
-        color: #ffffff;
-        text-decoration: none;
-    }
+        .new-services-btn:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+            text-decoration: none;
+        }
 
     .categories-panel {
         background-color: #ffffff;
@@ -274,7 +274,7 @@
     }
 
     .panel-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 20px;
         font-weight: bold;
         color: #2d5016;
@@ -396,37 +396,37 @@
     .text-mint {
         color: #2D5A4A !important;
     }
-    
+
     .btn-mint {
         background-color: #2D5A4A;
         border-color: #2D5A4A;
         color: white;
         transition: all 0.3s ease;
     }
-    
-    .btn-mint:hover {
-        background-color: #1a3a2e;
-        border-color: #1a3a2e;
-        color: white;
-        transform: translateY(-2px);
-    }
-    
+
+        .btn-mint:hover {
+            background-color: #1a3a2e;
+            border-color: #1a3a2e;
+            color: white;
+            transform: translateY(-2px);
+        }
+
     .btn-outline-mint {
         color: #2D5A4A;
         border-color: #2D5A4A;
         transition: all 0.3s ease;
     }
-    
-    .btn-outline-mint:hover {
-        background-color: #2D5A4A;
-        border-color: #2D5A4A;
-        color: white;
-    }
+
+        .btn-outline-mint:hover {
+            background-color: #2D5A4A;
+            border-color: #2D5A4A;
+            color: white;
+        }
 
     .modal-header.bg-mint {
         background-color: #2D5A4A !important;
     }
-    
+
     .btn-close-white {
         filter: invert(1) grayscale(100%) brightness(200%);
     }

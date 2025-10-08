@@ -45,7 +45,7 @@
         <div class="section-header">
             <h2 class="section-title">Ready to be served</h2>
         </div>
-        
+
         <div class="client-table-container">
             <div class="table-header">
                 <div class="table-header-row">
@@ -58,7 +58,7 @@
                     <div class="table-header-cell">Actions</div>
                 </div>
             </div>
-            
+
             <div class="table-body">
                 @if (Model != null && Model.Any())
                 {
@@ -81,14 +81,15 @@
                                 @if (client.Appointments != null && client.Appointments.Any(a => a.IsActive && a.Duration > 0))
                                 {
                                     var activeServices = client.Appointments
-                                        .Where(a => a.IsActive && a.Duration > 0)
-                                        .GroupBy(a => a.ServiceId)
-                                        .Select(g => new { 
-                                            Service = g.First().Service, 
-                                            TotalDuration = g.Sum(a => a.Duration) 
-                                        })
-                                        .ToList();
-                                    
+                                    .Where(a => a.IsActive && a.Duration > 0)
+                                    .GroupBy(a => a.ServiceId)
+                                    .Select(g => new
+                                    {
+                                        Service = g.First().Service,
+                                        TotalDuration = g.Sum(a => a.Duration)
+                                    })
+                                    .ToList();
+
                                     <div class="services-list">
                                         @foreach (var service in activeServices.Take(2))
                                         {
@@ -132,7 +133,7 @@
                                     @if (!isCompleted)
                                     {
                                         @Html.ActionLink("", "ServiceExtend", new { id = client.ClientId }, new { @class = "action-btn extend-btn", title = "Service Extend" })
-                                        <button type="button" class="action-btn service-btn" title="In-Service" 
+                                        <button type="button" class="action-btn service-btn" title="In-Service"
                                                 onclick="setClientForInService(@client.ClientId, '@client.FirstName', '@client.LastName')"
                                                 data-bs-toggle="modal" data-bs-target="#inServiceModal">
                                             <i class="bi bi-person-check"></i>
@@ -140,7 +141,7 @@
                                         @Html.ActionLink("", "UpSert", "Transaction", new { clientId = client.ClientId }, new { @class = "action-btn payment-btn", title = "For Payment" })
                                         @using (Html.BeginForm("Cancel", "Client", new { id = client.ClientId }, FormMethod.Post, true, new { @class = "d-inline" }))
                                         {
-                                            <button type="submit" class="action-btn delete-btn" title="Cancel Client" 
+                                            <button type="submit" class="action-btn delete-btn" title="Cancel Client"
                                                     onclick="return confirm('Are you sure you want to cancel this client?')">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
@@ -187,7 +188,7 @@
             <div class="modal-body in-service-body">
                 <form id="inServiceForm">
                     <input type="hidden" id="clientId" name="clientId" />
-                    
+
                     <div class="client-info-display">
                         <span class="client-label">Client Name:</span>
                         <span id="clientName" class="client-name"></span>
@@ -244,7 +245,7 @@
     .clients-container {
         padding: 30px;
         background-color: #ffffff;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
     .page-title-container {
@@ -257,7 +258,7 @@
     }
 
     .page-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 32px;
         font-weight: bold;
         color: #2d5016;
@@ -278,14 +279,14 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
-    .register-client-btn:hover {
-        background-color: #2d5016;
-        color: #ffffff;
-        text-decoration: none;
-    }
+        .register-client-btn:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+            text-decoration: none;
+        }
 
     .client-list-container {
         background-color: #ffffff;
@@ -302,7 +303,7 @@
     }
 
     .section-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 24px;
         font-weight: bold;
         color: #2d5016;
@@ -332,7 +333,7 @@
         font-weight: bold;
         font-size: 16px;
         text-align: center;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
     .table-body {
@@ -347,9 +348,9 @@
         border-bottom: 1px solid #e8f5e8;
     }
 
-    .table-row:hover {
-        background-color: #f0f8f0;
-    }
+        .table-row:hover {
+            background-color: #f0f8f0;
+        }
 
     .table-cell {
         background-color: #ffffff;
@@ -372,7 +373,7 @@
 
     .client-phone {
         color: #2d5016;
-        font-family: monospace;
+        font-family: Arial, sans-serif;
     }
 
     .registered-date {
@@ -421,23 +422,23 @@
         text-align: center;
     }
 
-    .status-badge.active {
-        background-color: #d4edda;
-        border: 1px solid #28a745;
-        color: #155724;
-    }
+        .status-badge.active {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+        }
 
-    .status-badge.completed {
-        background-color: #d1ecf1;
-        border: 1px solid #17a2b8;
-        color: #0c5460;
-    }
+        .status-badge.completed {
+            background-color: #d1ecf1;
+            border: 1px solid #17a2b8;
+            color: #0c5460;
+        }
 
-    .status-badge.inactive {
-        background-color: #f8d7da;
-        border: 1px solid #dc3545;
-        color: #721c24;
-    }
+        .status-badge.inactive {
+            background-color: #f8d7da;
+            border: 1px solid #dc3545;
+            color: #721c24;
+        }
 
     .action-buttons {
         display: flex;
@@ -466,10 +467,10 @@
         border: 1px solid #28a745;
     }
 
-    .extend-btn::before {
-        content: "⏱";
-        font-size: 14px;
-    }
+        .extend-btn::before {
+            content: "⏱";
+            font-size: 14px;
+        }
 
     .service-btn {
         background-color: #fff3cd;
@@ -483,10 +484,10 @@
         border: 1px solid #17a2b8;
     }
 
-    .payment-btn::before {
-        content: "₱";
-        font-weight: bold;
-    }
+        .payment-btn::before {
+            content: "₱";
+            font-weight: bold;
+        }
 
     .delete-btn {
         background-color: #f8d7da;
@@ -543,11 +544,11 @@
         gap: 8px;
     }
 
-    .empty-action-btn:hover {
-        background-color: #2d5016;
-        color: #ffffff;
-        text-decoration: none;
-    }
+        .empty-action-btn:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+            text-decoration: none;
+        }
 
     .alert {
         border-radius: 8px;
@@ -573,12 +574,12 @@
         color: #0c5460;
         font-weight: 600;
     }
-    
-    #selectedServices option:checked::before {
-        content: "✓ ";
-        color: #28a745;
-        font-weight: bold;
-    }
+
+        #selectedServices option:checked::before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
 
     /* Responsive design */
     @@media (max-width: 768px) {
@@ -605,22 +606,22 @@
             display: none;
         }
 
-        .table-header-cell:first-child,
-        .table-header-cell:nth-child(2),
-        .table-header-cell:last-child,
-        .table-cell:first-child,
-        .table-cell:nth-child(2),
-        .table-cell:last-child {
-            display: flex;
-        }
+            .table-header-cell:first-child,
+            .table-header-cell:nth-child(2),
+            .table-header-cell:last-child,
+            .table-cell:first-child,
+            .table-cell:nth-child(2),
+            .table-cell:last-child {
+                display: flex;
+            }
 
-        .table-header-cell:first-child::before {
-            content: "Name & Gender";
-        }
+                .table-header-cell:first-child::before {
+                    content: "Name & Gender";
+                }
 
-        .table-header-cell:last-child::before {
-            content: "Actions";
-        }
+                .table-header-cell:last-child::before {
+                    content: "Actions";
+                }
     }
 
     /* In-Service Modal Styles */
@@ -634,7 +635,7 @@
         border: none;
         border-radius: 8px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
     .in-service-header {
@@ -645,7 +646,7 @@
     }
 
     .in-service-title {
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         font-size: 28px;
         font-weight: bold;
         color: #2d5016;
@@ -717,7 +718,7 @@
         color: #2d5016;
         font-size: 16px;
         margin-bottom: 10px;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
     .services-container {
@@ -735,17 +736,17 @@
         background-color: transparent;
         font-size: 14px;
         color: #2d5016;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
     }
 
-    .services-select option {
-        padding: 8px;
-        border-bottom: 1px solid #e9ecef;
-    }
+        .services-select option {
+            padding: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
 
-    .services-select option:last-child {
-        border-bottom: none;
-    }
+            .services-select option:last-child {
+                border-bottom: none;
+            }
 
     .dropdown-select {
         width: 100%;
@@ -755,7 +756,7 @@
         background-color: #ffffff;
         font-size: 14px;
         color: #2d5016;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         appearance: none;
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%232d5016' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
         background-position: right 12px center;
@@ -764,11 +765,11 @@
         padding-right: 40px;
     }
 
-    .dropdown-select:focus {
-        outline: none;
-        border-color: #137759;
-        box-shadow: 0 0 0 2px rgba(19, 119, 89, 0.2);
-    }
+        .dropdown-select:focus {
+            outline: none;
+            border-color: #137759;
+            box-shadow: 0 0 0 2px rgba(19, 119, 89, 0.2);
+        }
 
     .notes-container {
         border: 2px solid #2d5016;
@@ -784,15 +785,15 @@
         background-color: transparent;
         font-size: 14px;
         color: #2d5016;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         resize: none;
         min-height: 100px;
     }
 
-    .notes-textarea::placeholder {
-        color: #999;
-        font-style: italic;
-    }
+        .notes-textarea::placeholder {
+            color: #999;
+            font-style: italic;
+        }
 
     .info-note {
         background-color: #ffffff;
@@ -822,7 +823,7 @@
         font-size: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, sans-serif;
         min-width: 100px;
     }
 
@@ -831,20 +832,20 @@
         color: #2d5016;
     }
 
-    .save-btn:hover {
-        background-color: #2d5016;
-        color: #ffffff;
-    }
+        .save-btn:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+        }
 
     .cancel-btn {
         background-color: #ffffff;
         color: #2d5016;
     }
 
-    .cancel-btn:hover {
-        background-color: #2d5016;
-        color: #ffffff;
-    }
+        .cancel-btn:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+        }
 
     /* Responsive Design for In-Service Modal */
     @@media (max-width: 768px) {
@@ -893,7 +894,7 @@
             currentClientId = clientId;
             document.getElementById('clientId').value = clientId;
             document.getElementById('clientName').textContent = firstName + ' ' + lastName;
-            
+
             // Load data for the modal
             loadServices();
             loadRooms();
@@ -951,11 +952,11 @@
         function submitInService() {
             const form = document.getElementById('inServiceForm');
             const formData = new FormData(form);
-            
+
             // Get selected services
             const selectedServices = Array.from(document.getElementById('selectedServices').selectedOptions)
                 .map(option => option.value);
-            
+
             if (selectedServices.length === 0) {
                 alert('Please select at least one service.');
                 return;
