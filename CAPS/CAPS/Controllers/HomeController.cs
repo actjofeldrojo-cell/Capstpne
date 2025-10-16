@@ -13,16 +13,11 @@ namespace CAPS.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
-        {
-            HttpContext.Session.Clear();
-            return View();
-        }
-
-        public ActionResult kupal()
-        {
-            return View();
-        }
+        //public IActionResult Index()
+        //{
+        //    HttpContext.Session.Clear();
+        //    return View();
+        //}
 
         public IActionResult Privacy()
         {

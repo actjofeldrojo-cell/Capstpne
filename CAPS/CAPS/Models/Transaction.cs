@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CAPS.Migrations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CAPS.Models
@@ -16,6 +17,8 @@ namespace CAPS.Models
 
         [Required]
         public int? StaffId { get; set; }
+        [Required]
+        public int AppointmentId { get; set; }
 
         [Required]
         public DateTime TransactionDate { get; set; }
@@ -75,6 +78,9 @@ namespace CAPS.Models
 
         [ForeignKey("StaffId")]
         public virtual Staff Staff { get; set; }
+
+        [ForeignKey("AppointmentId")]
+        public virtual Appointment Appointment { get; set; }
 
         // Navigation property for products used in this transaction
         public virtual ICollection<ProductUsed> ProductsUsed { get; set; } = new List<ProductUsed>();

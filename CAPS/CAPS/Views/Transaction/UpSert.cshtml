@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = Model.TransactionId == 0 ? "New Transaction" : "Edit Transaction";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var isEdit = Model.TransactionId != 0;
 }
 
@@ -30,6 +29,7 @@
                 <input type="hidden" asp-for="ClientId" />
                 <input type="hidden" asp-for="StaffId" value="1" />
                 <input type="hidden" asp-for="Status" value="Completed" />
+                <input type="hidden" asp-for="AppointmentId"/>
 
                 <div class="form-sections">
                     <!-- Client Information Section -->
@@ -74,7 +74,7 @@
                                     {
                                         <div class="service-item @(availedService.Service.ServiceId == Model.ServiceId ? "selected" : "")">
                                             <div class="service-name">@availedService.Service.Name</div>
-                                            <div class="service-details">@availedService.TotalDuration min - $@availedService.Service.Price</div>
+                                            <div class="service-details">@availedService.TotalDuration min - ₱@availedService.Service.Price</div>
                                         </div>
                                     }
                                 </div>
@@ -88,7 +88,7 @@
                                         <option value="@service.ServiceId"
                                                 data-price="@service.Price"
                                                 data-duration="@service.Duration">
-                                            @service.Name - $@service.Price (@service.Duration min)
+                                            @service.Name - ₱@service.Price (@service.Duration min)
                                         </option>
                                     }
                                 </select>
@@ -370,7 +370,7 @@
 
             function addProductRow() {
                 var productHtml = `
-                    <div class="product-row">
+                    <div class="product-row product-item">
                         <div class="product-field">
                             <label>Product</label>
                             <select class="form-control product-select" name="productUsed[${productIndex}].ProductId" required>

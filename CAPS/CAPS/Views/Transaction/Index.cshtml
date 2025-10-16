@@ -56,7 +56,7 @@
             <div class="card-header">
                 <h3 class="card-title">Total Revenue</h3>
             </div>
-            <div class="card-value" id="totalRevenue">$@Model.Sum(t => t.TotalAmount).ToString("N2")</div>
+            <div class="card-value" id="totalRevenue">₱@Model.Sum(t => t.TotalAmount).ToString("N2")</div>
         </div>
         <div class="summary-card">
             <div class="card-header">
@@ -68,7 +68,7 @@
             <div class="card-header">
                 <h3 class="card-title">Average Value</h3>
             </div>
-            <div class="card-value" id="avgValue">$@(Model.Any() ? Model.Average(t => t.TotalAmount).ToString("N2") : "0.00")</div>
+            <div class="card-value" id="avgValue">₱@(Model.Any() ? Model.Average(t => t.TotalAmount).ToString("N2") : "0.00")</div>
         </div>
     </div>
 
@@ -105,10 +105,10 @@
                     </div>
                     <div class="table-cell">
                         <div class="amount-info">
-                            <div class="amount-value">$@transaction.TotalAmount.ToString("N2")</div>
+                            <div class="amount-value">₱@transaction.TotalAmount.ToString("N2")</div>
                             @if (transaction.DiscountAmount > 0)
                             {
-                                <div class="discount-amount">-$@transaction.DiscountAmount.ToString("N2")</div>
+                                <div class="discount-amount">-₱@transaction.DiscountAmount.ToString("N2")</div>
                             }
                         </div>
                     </div>
@@ -147,55 +147,55 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
+        ₱(document).ready(function() {
             // Simple search functionality
-            $('#searchTerm').on('keyup', function() {
-                var searchTerm = $(this).val().toLowerCase();
-                $('.table-row').each(function() {
-                    var clientName = $(this).find('.client-name').text().toLowerCase();
-                    var serviceName = $(this).find('.service-name').text().toLowerCase();
+            ₱('#searchTerm').on('keyup', function() {
+                var searchTerm = ₱(this).val().toLowerCase();
+                ₱('.table-row').each(function() {
+                    var clientName = ₱(this).find('.client-name').text().toLowerCase();
+                    var serviceName = ₱(this).find('.service-name').text().toLowerCase();
 
                     if (clientName.includes(searchTerm) || serviceName.includes(searchTerm)) {
-                        $(this).show();
+                        ₱(this).show();
                     } else {
-                        $(this).hide();
+                        ₱(this).hide();
                     }
                 });
                 updateSummaryCards();
             });
 
             // Clear filters
-            $('#clearFilters').on('click', function() {
-                $('#searchTerm').val('');
-                $('#dateFrom').val('');
-                $('#dateTo').val('');
-                $('.table-row').show();
+            ₱('#clearFilters').on('click', function() {
+                ₱('#searchTerm').val('');
+                ₱('#dateFrom').val('');
+                ₱('#dateTo').val('');
+                ₱('.table-row').show();
                 updateSummaryCards();
             });
 
             function updateSummaryCards() {
-                var visibleRows = $('.table-row:visible');
+                var visibleRows = ₱('.table-row:visible');
                 var totalAmount = 0;
 
                 visibleRows.each(function() {
-                    var amountText = $(this).find('.amount-value').text();
+                    var amountText = ₱(this).find('.amount-value').text();
                     var amount = parseFloat(amountText.replace(/[^0-9.-]+/g, ''));
                     totalAmount += amount;
                 });
 
-                $('#totalTransactions').text(visibleRows.length);
-                $('#totalRevenue').text('$' + totalAmount.toFixed(2));
-                $('#avgValue').text(visibleRows.length > 0 ? '$' + (totalAmount / visibleRows.length).toFixed(2) : '$0.00');
+                ₱('#totalTransactions').text(visibleRows.length);
+                ₱('#totalRevenue').text('₱' + totalAmount.toFixed(2));
+                ₱('#avgValue').text(visibleRows.length > 0 ? '₱' + (totalAmount / visibleRows.length).toFixed(2) : '₱0.00');
             }
         });
 
         // Delete transaction function
         function deleteTransaction(id) {
-            $('#deleteModal').modal('show');
-            $('#confirmDelete').off('click').on('click', function() {
-                $.post('@Url.Action("DeleteConfirmed", "Transaction")', { id: id })
+            ₱('#deleteModal').modal('show');
+            ₱('#confirmDelete').off('click').on('click', function() {
+                ₱.post('@Url.Action("DeleteConfirmed", "Transaction")', { id: id })
                     .done(function() {
-                        $('#deleteModal').modal('hide');
+                        ₱('#deleteModal').modal('hide');
                         location.reload();
                     })
                     .fail(function() {
