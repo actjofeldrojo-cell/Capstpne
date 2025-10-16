@@ -1,11 +1,14 @@
 @{
     ViewData["Title"] = "Admin Login";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 }
 
 <div class="container-fluid">
     <div class="row justify-content-center align-items-center min-vh-100">
         <div class="col-md-6 col-lg-4">
+            <br />
+            <br />
+            <br />
             <div class="login-panel">
                 <!-- Logo Section -->
                 <div class="logo-section">
@@ -13,7 +16,6 @@
                         <img src="~/images/newlogo.png" alt="Lotus Logo" width="250" height="200" />
                     </div>
                     <h1 class="spa-title">Tenderbody Therapeutic Spa & Massage</h1>
-                    <h2 class="admin-login-title">Admin Login</h2>
                 </div>
 
                 <!-- Form Section -->
@@ -34,8 +36,11 @@
                         </div>
                     }
 
-                    <form asp-action="Login" method="post">
+                    <form asp-action="Login" method ="post">
                         @Html.AntiForgeryToken()
+
+                        <!-- Colori ni og red para sa validation -->
+                        @Html.ValidationSummary()
 
                         <div class="form-group">
                             <label for="username" class="form-label">Username</label>
@@ -99,7 +104,7 @@
         font-size: 24px;
         font-weight: bold;
         color: #2d5016;
-        margin-bottom: 10px;
+        margin-top: -70px;
         line-height: 1.2;
     }
 

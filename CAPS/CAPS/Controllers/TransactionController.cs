@@ -65,6 +65,7 @@ namespace CAPS.Controllers
                     
                     if (client != null)
                     {
+                        transaction.AppointmentId = client.Appointments.OrderByDescending(q => q.DateCreated).ToList()[0].AppointmentId;
                         transaction.ClientId = client.ClientId;
                         
                         // Check client's transaction count
@@ -140,6 +141,7 @@ namespace CAPS.Controllers
             ModelState.Remove("Staff");
             ModelState.Remove("Client");
             ModelState.Remove("Service");
+            ModelState.Remove("Appointment");
 
             if (ModelState.IsValid)
             {
@@ -210,9 +212,14 @@ namespace CAPS.Controllers
                                             ReceiptNumber = receiptNumber,
                                             TotalAmount = finalServiceAmount,
                                             DiscountAmount = serviceDiscount,
-                                            DiscountPercentage = discountPercentage ?? 0
+                                            DiscountPercentage = discountPercentage ?? 0,
+                                            AppointmentId = transaction.AppointmentId
                                         };
-                                        
+
+                                        Models.Appointment appointment = db.Appointments.Find(transaction.AppointmentId);
+                                        appointment.Status = "Completed";
+                                        db.Appointments.Update(appointment);
+
                                         db.Transactions.Add(serviceTransaction);
                                         db.SaveChanges(); // Save to get the transaction ID
                                         

@@ -138,6 +138,7 @@
                                                 data-bs-toggle="modal" data-bs-target="#inServiceModal">
                                             <i class="bi bi-person-check"></i>
                                         </button>
+
                                         @Html.ActionLink("", "UpSert", "Transaction", new { clientId = client.ClientId }, new { @class = "action-btn payment-btn", title = "For Payment" })
                                         @using (Html.BeginForm("Cancel", "Client", new { id = client.ClientId }, FormMethod.Post, true, new { @class = "d-inline" }))
                                         {
@@ -146,6 +147,7 @@
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         }
+
                                     }
                                     else
                                     {

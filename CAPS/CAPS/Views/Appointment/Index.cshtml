@@ -19,10 +19,13 @@
         <div class="col-12">
             <div class="status-filter-container">
                 <div class="status-filter-tabs">
-                    <button type="button" class="status-tab" onclick="filterAppointments('scheduled')" id="scheduledTab">
+                    <button type="button" class="status-tab active" onclick="filterAppointments('all')" id="allTab">
+                        All
+                    </button>
+                    <button type="button" class="status-tab" onclick="filterAppointments('in-service')" id="in-serviceTab">
                         Schedule
                     </button>
-                    <button type="button" class="status-tab active" onclick="filterAppointments('confirmed')" id="confirmedTab">
+                    <button type="button" class="status-tab" onclick="filterAppointments('confirmed')" id="confirmedTab">
                         Confirmed
                     </button>
                     <button type="button" class="status-tab" onclick="filterAppointments('completed')" id="completedTab">
@@ -927,7 +930,11 @@
 
         rows.forEach(row => {
             const statusElement = row.querySelector('.status-badge');
-            const statusText = statusElement ? statusElement.textContent.trim().toLowerCase() : '';
+            const statusText = statusElement.textContent.trim().toLowerCase();
+
+            console.log('statusText: ' + statusText);
+            console.log('status: ' + status);
+            console.log(statusText.includes(status));
 
             if (status === 'all' || statusText.includes(status)) {
                 row.style.display = 'grid';

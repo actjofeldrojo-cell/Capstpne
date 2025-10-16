@@ -1,6 +1,3 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-
-@{
-    bool isAdmin = bool.Parse(HttpContextAccessor?.HttpContext?.Session.GetString("IsAdmin") ?? "false");
-    Layout = isAdmin ? "~/Views/Shared/_AdminLayout.cshtml" : "_Layout";
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }

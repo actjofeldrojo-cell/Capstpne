@@ -75,16 +75,8 @@ namespace CAPS.Controllers
 
             db.SaveChanges();
 
-            if (isNewClient)
-            {
-                TempData["SuccessMessage"] = "Client registered successfully!";
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                TempData["SuccessMessage"] = "Client updated successfully!";
-                return RedirectToAction("Index", "Client");
-            }
+            TempData["SuccessMessage"] = "Client updated successfully!";
+            return RedirectToAction("Index", "Client");
         }
 
         // Handle retention survey submission
@@ -188,14 +180,14 @@ namespace CAPS.Controllers
                 return NotFound();
             }
 
-            // Get all active services
-            var allServices = await db.Services.Where(s => s.isActive).ToListAsync();
-
             // Get client's current service durations (if any exist in appointments)
             var clientAppointments = await db.Appointments
                 .Include(a => a.Service)
                 .Where(a => a.ClientId == id && a.IsActive)
                 .ToListAsync();
+
+            // Get all active services
+            var allServices = await db.Services.Where(s => s.isActive && clientAppointments.Select(q => q.ServiceId).Contains(s.ServiceId)).ToListAsync();
 
             // Create a dictionary to track client's current service durations
             var clientServiceDurations = clientAppointments
@@ -338,16 +330,31 @@ namespace CAPS.Controllers
         [HttpGet]
         public async Task<IActionResult> GetStaff()
         {
-            var staff = await db.Staffs
-                .Where(s => s.IsActive)
-                .Select(s => new {
-                    staffId = s.StaffId,
-                    fullName = s.FullName,
-                    expertise = s.Expertise
-                })
-                .ToListAsync();
+            var staffWithAppointments = db.Staffs
+               .Include(s => s.Appointments.Where(a => a.IsActive))
+               .Where(s => s.IsActive)
+               .Select(s => new
+               {
+                   staffId = s.StaffId,
+                   fullName = s.FullName,
+                   expertise = s.Expertise,
+                   IsCurrentlyInService = s.IsCurrentlyInService()
+               })
+               .ToList();
 
-            return Json(staff);
+            staffWithAppointments = staffWithAppointments.Where(q => !q.IsCurrentlyInService).ToList();
+            return Json(staffWithAppointments);
+
+            //var staff = await db.Staffs
+            //    .Where(s => s.IsActive && s.AvailabilityStatus == "Available")
+            //    .Select(s => new {
+            //        staffId = s.StaffId,
+            //        fullName = s.FullName,
+            //        expertise = s.Expertise
+            //    })
+            //    .ToListAsync();s
+
+            //return Json(staff);
         }
 
         // Put Client In-Service
@@ -396,9 +403,10 @@ namespace CAPS.Controllers
                             Status = "In-Service",
                             Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}",
                             IsActive = true,
-                            DateCreated = DateTime.Now
+                            DateCreated = DateTime.Now,
+                            StaffId = selectedStaff
                         };
-
+                        
                         db.Appointments.Add(appointment);
                     }
                 }

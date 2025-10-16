@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Service Extend - " + Model.FirstName + " " + Model.LastName;
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var allServices = ViewBag.AllServices as List<CAPS.Models.Service>;
     var clientServiceDurations = ViewBag.ClientServiceDurations as Dictionary<int, int>;
 }

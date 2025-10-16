@@ -19,11 +19,6 @@ namespace CAPS.Models
         public string Expertise { get; set; }
 
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
-        [StringLength(100)]
-        public string Email { get; set; }
-
-        [Required]
         [Phone(ErrorMessage = "Invalid phone number format.")]
         [StringLength(20)]
         public string PhoneNumber { get; set; }
@@ -45,7 +40,7 @@ namespace CAPS.Models
 
             // Check if staff has any active appointment that is currently in progress
             var currentAppointment = Appointments?.FirstOrDefault(a => 
-                a.IsActive && 
+                a.IsActive && a.StaffId == StaffId &&
                 a.Status != "Cancelled" &&
                 a.Status != "Completed" &&
                 a.Status != "No-Show" &&
