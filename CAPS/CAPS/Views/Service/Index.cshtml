@@ -128,7 +128,7 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         <button type="button" class="btn btn-outline-info btn-sm" title="View Details"
-                                                onclick="showServiceDetails(@item.ServiceId, '@item.Name', '@item.Category', '@item.Description', @item.Price, @item.Duration)">
+                                                onclick="showServiceDetails(@item.ServiceId, '@item.Name', '@item.Category', '@item.Description', ₱@item.Price, @item.Duration)">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                         <form asp-action="Delete" asp-route-id="@item.ServiceId" method="post" class="d-inline">

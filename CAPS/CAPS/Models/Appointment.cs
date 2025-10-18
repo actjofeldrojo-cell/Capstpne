@@ -14,6 +14,7 @@ namespace CAPS.Models
         [Required]
         public int ServiceId { get; set; }
 
+
         public int? StaffId { get; set; }
 
         [Required]

@@ -19,7 +19,7 @@ namespace CAPS.Controllers
             var activeClients = await db.Clients
                 .Include(c => c.Appointments)
                     .ThenInclude(a => a.Service)
-                .Where(c => c.IsActive && !completedClientIds.Contains(c.ClientId)) // Exclude completed clients
+                .Where(c => c.IsActive && !completedClientIds.Contains(c.ClientId))   // Exclude completed clients
                 .ToListAsync();
 
             // Get completed clients
@@ -33,6 +33,27 @@ namespace CAPS.Controllers
 
             return View(allClients);
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> MarkAsPaid(int clientId)
+        //{
+        //    var client = await db.Clients
+        //        .Include(c => c.Appointments)
+        //        .FirstOrDefaultAsync(c => c.ClientId == clientId);
+
+        //    if (client == null)
+        //        return Json(new { success = false, message = "Client not found." });
+
+        //    foreach (var appt in client.Appointments.Where(a => a.IsActive))
+        //    {
+        //        appt.IsPaid = true;
+        //    }
+
+        //    await db.SaveChangesAsync();
+        //    return Json(new { success = true, message = "Payment recorded and client removed from ready list." });
+        //}
+
+
 
         // Update and Insert Viewing
         public ActionResult UpSert(int? id)

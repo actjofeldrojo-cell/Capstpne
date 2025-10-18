@@ -13,11 +13,11 @@ namespace CAPS.Controllers
             var rooms = db.Rooms.Where(r => r.IsAvailable).ToList();
             
             // If no rooms exist, create sample rooms
-            if (!rooms.Any())
-            {
-                SeedSampleRooms();
-                rooms = db.Rooms.Where(r => r.IsAvailable).ToList();
-            }
+            //if (!rooms.Any())
+            //{
+            //    SeedSampleRooms();
+            //    rooms = db.Rooms.Where(r => r.IsAvailable).ToList();
+            //}
             
             return View(rooms);
         }
@@ -127,7 +127,7 @@ namespace CAPS.Controllers
             {
                 db.Rooms.Add(room);
             }
-            
+            db.Rooms.AddRange(sampleRooms);
             db.SaveChanges();
         }
     }

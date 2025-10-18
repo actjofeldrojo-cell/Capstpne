@@ -218,6 +218,11 @@ namespace CAPS.Controllers
 
                                         Models.Appointment appointment = db.Appointments.Find(transaction.AppointmentId);
                                         appointment.Status = "Completed";
+                                        
+                                        // Update appointment status to mark it as completed and paid
+                                        // This will remove the client from "Ready to be served" list
+                                        // without deactivating the client account
+                                        
                                         db.Appointments.Update(appointment);
 
                                         db.Transactions.Add(serviceTransaction);

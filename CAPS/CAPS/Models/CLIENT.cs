@@ -29,11 +29,13 @@ namespace CAPS.Models
         [StringLength(20)]
         public string PhoneNumber { get; set; }
 
+
         //[EmailAddress]
         //[StringLength(100)]
         //public string? Email { get; set; }
 
         public bool IsActive { get; set; } = true;
+
 
         [DataType(DataType.Date)]
         public DateTime DateRegistered { get; set; } = DateTime.Now;

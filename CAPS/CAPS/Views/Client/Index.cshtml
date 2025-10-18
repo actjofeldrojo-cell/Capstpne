@@ -112,14 +112,20 @@
                             </div>
                             <div class="table-cell">
                                 @{
-                                    var completedClientIds = Context.Session.GetString("CompletedClients")?.Split(',').Select(int.Parse).ToList() ?? new List<int>();
+                                    var completedClientIds = Context.Session.GetString("CompletedClients")?
+                                    .Split(',')
+                                    .Select(int.Parse)
+                                    .ToList() ?? new List<int>();
+
                                     var isCompleted = completedClientIds.Contains(client.ClientId);
+                                    var hasAvailedServices = client.Appointments != null && client.Appointments.Any(a => a.IsActive && a.Duration > 0);
                                 }
+
                                 @if (isCompleted)
                                 {
                                     <div class="status-badge completed">Completed</div>
                                 }
-                                else if (client.IsActive)
+                                else if (hasAvailedServices)
                                 {
                                     <div class="status-badge active">Active</div>
                                 }
@@ -127,6 +133,7 @@
                                 {
                                     <div class="status-badge inactive">Inactive</div>
                                 }
+
                             </div>
                             <div class="table-cell">
                                 <div class="action-buttons">
@@ -334,6 +341,7 @@
         color: #2d5016;
         font-weight: bold;
         font-size: 16px;
+        border-left: #2d5016; 
         text-align: center;
         font-family: Arial, sans-serif;
     }
@@ -346,8 +354,9 @@
         display: grid;
         grid-template-columns: 1.5fr 1fr 1.5fr 1.5fr 2fr 1fr 1.5fr;
         gap: 1px;
+        text-align: start;
         background-color: #f8f9fa;
-        border-bottom: 1px solid #e8f5e8;
+ 
     }
 
         .table-row:hover {
@@ -359,7 +368,7 @@
         padding: 15px 10px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: start;
         color: #2d5016;
         font-size: 14px;
     }
