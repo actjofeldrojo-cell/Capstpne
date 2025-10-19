@@ -35,8 +35,37 @@
                     <span class="info-value">@Model.PhoneNumber</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Gender:</span>
-                    <span class="info-value">@Model.Gender</span>
+                    <span class="info-label">Preferences:</span>
+                    <span class="info-value">
+                        @if (!string.IsNullOrEmpty(Model.PreferredTherapistGender))
+                        {
+                            <div>Therapist: @Model.PreferredTherapistGender</div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.MassagePressureLevel))
+                        {
+                            <div>Pressure: @Model.MassagePressureLevel</div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.MusicPreference))
+                        {
+                            <div>Music: @Model.MusicPreference</div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.TemperaturePreference))
+                        {
+                            <div>Temperature: @Model.TemperaturePreference</div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ComfortItemPreferences))
+                        {
+                            <div>Comfort: @Model.ComfortItemPreferences</div>
+                        }
+                        @if (string.IsNullOrEmpty(Model.PreferredTherapistGender) && 
+                             string.IsNullOrEmpty(Model.MassagePressureLevel) && 
+                             string.IsNullOrEmpty(Model.MusicPreference) && 
+                             string.IsNullOrEmpty(Model.TemperaturePreference) && 
+                             string.IsNullOrEmpty(Model.ComfortItemPreferences))
+                        {
+                            <div>No preferences set</div>
+                        }
+                    </span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Date Registered:</span>

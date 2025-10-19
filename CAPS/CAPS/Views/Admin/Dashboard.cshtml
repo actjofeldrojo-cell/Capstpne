@@ -1,6 +1,6 @@
 @model CAPS.Controllers.AdminDashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Business Analytics Dashboard";
 }
 
 @if (Model == null)
@@ -14,7 +14,6 @@
 
 @try
 {
-
 <!-- Dashboard Title -->
 <div class="row mb-4">
     <div class="col-12">
@@ -24,131 +23,217 @@
     </div>
 </div>
 
-<!-- Statistics Cards -->
+<!-- Key Performance Indicators -->
 <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="dashboard-card">
-            <a asp-controller="Client" asp-action="Index" class="card-link">
-                <div class="card-icon">
-                    <i class="bi bi-people"></i>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card revenue-card">
+            <div class="kpi-icon">
+                <i class="bi bi-currency-dollar"></i>
+            </div>
+            <div class="kpi-content">
+                <div class="kpi-value">₱@Model.MonthlyRevenue.ToString("N0")</div>
+                <div class="kpi-label">Monthly Revenue</div>
+                <div class="kpi-change @(Model.RevenueGrowth >= 0 ? "positive" : "negative")">
+                    @(Model.RevenueGrowth >= 0 ? "+" : "")@Model.RevenueGrowth.ToString("F1")% from last month
                 </div>
-                <div class="card-content">
-                    <span class="card-title">Clients</span>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
     
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="dashboard-card">
-            <a asp-controller="Product" asp-action="Index" class="card-link">
-                <div class="card-icon">
-                    <i class="bi bi-box"></i>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card sales-card">
+            <div class="kpi-icon">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <div class="kpi-content">
+                <div class="kpi-value">@Model.MonthlySales</div>
+                <div class="kpi-label">Monthly Sales</div>
+                <div class="kpi-change positive">
+                    @Model.DailySales sales today
                 </div>
-                <div class="card-content">
-                    <span class="card-title">Products</span>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
     
-    <div class="col-lg-4 col-md-6 mb-3">
-        <div class="dashboard-card">
-            <a asp-controller="Service" asp-action="Index" class="card-link">
-                <div class="card-icon">
-                    <i class="bi bi-hand-index"></i>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card avg-card">
+            <div class="kpi-icon">
+                <i class="bi bi-calculator"></i>
+            </div>
+            <div class="kpi-content">
+                <div class="kpi-value">₱@Model.AverageTransactionValue.ToString("N0")</div>
+                <div class="kpi-label">Avg. Transaction Value</div>
+                <div class="kpi-change neutral">
+                    Based on @Model.TotalSales total sales
                 </div>
-                <div class="card-content">
-                    <span class="card-title">Services</span>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
     
-    <div class="col-lg-6 col-md-6 mb-3">
-        <div class="dashboard-card">
-            <a asp-controller="Staff" asp-action="Index" class="card-link">
-                <div class="card-icon">
-                    <i class="bi bi-person"></i>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="kpi-card inventory-card @(Model.LowStockProducts > 0 ? "alert" : "")">
+            <div class="kpi-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="kpi-content">
+                <div class="kpi-value">@Model.LowStockProducts</div>
+                <div class="kpi-label">Low Stock Items</div>
+                <div class="kpi-change @(Model.LowStockProducts > 0 ? "negative" : "positive")">
+                    @(Model.LowStockProducts > 0 ? "Action Required" : "All Good")
                 </div>
-                <div class="card-content">
-                    <span class="card-title">Staff</span>
-                </div>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-lg-6 col-md-6 mb-3">
-        <div class="dashboard-card">
-            <a asp-controller="Transaction" asp-action="Index" class="card-link">
-                <div class="card-icon">
-                    <i class="bi bi-arrow-repeat"></i>
-                </div>
-                <div class="card-content">
-                    <span class="card-title">Transaction</span>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Clients Section -->
-<div class="row">
-    <div class="col-12">
-        <div class="recent-clients-container">
-            <div class="recent-clients-header">
-                <h2 class="recent-clients-title">Recent Clients</h2>
+<!-- Charts Section -->
+<div class="row mb-4">
+    <!-- Sales and Revenue Tracking Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Sales and Revenue Tracking</h3>
+                <div class="chart-subtitle">Business Performance Over Time</div>
             </div>
-            <div class="recent-clients-content">
-                @if (Model.RecentClients != null && Model.RecentClients.Any())
+            <div class="chart-content">
+                <canvas id="revenueChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Service Popularity Analysis -->
+    <div class="col-lg-4 mb-4">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Service Popularity</h3>
+                <div class="chart-subtitle">Top Performing Services</div>
+            </div>
+            <div class="chart-content">
+                <canvas id="serviceChart" width="300" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Alerts and Recent Activity -->
+<div class="row">
+    <!-- Low Stock Alerts -->
+    <div class="col-lg-6 mb-4">
+        <div class="alert-container">
+            <div class="alert-header">
+                <h3 class="alert-title">Product Inventory Alerts</h3>
+                <div class="alert-subtitle">Low Stock Items Requiring Attention</div>
+            </div>
+            <div class="alert-content">
+                @if (Model.LowStockItems != null && Model.LowStockItems.Any())
                 {
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Gender</th>
-                                    <th>Registered</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var client in Model.RecentClients.Where(c => c != null))
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar bg-info rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
-                                                    <i class="bi bi-person text-white small"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">@(client.FirstName ?? "Unknown") @(client.LastName ?? "")</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <small>@(client.PhoneNumber ?? "No phone")</small>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-secondary">@(client.Gender ?? "Unknown")</span>
-                                        </td>
-                                        <td>
-                                            <small>@(client.DateRegistered != default(DateTime) ? client.DateRegistered.ToString("MMM dd") : "Date not set")</small><br>
-                                            <small class="text-muted">@(client.DateRegistered != default(DateTime) ? client.DateRegistered.ToString("HH:mm") : "Time not set")</small>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                    <div class="alert-list">
+                        @foreach (var product in Model.LowStockItems.Take(5))
+                        {
+                            <div class="alert-item">
+                                <div class="alert-item-icon">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                </div>
+                                <div class="alert-item-content">
+                                    <div class="alert-item-name">@product.Name</div>
+                                    <div class="alert-item-details">
+                                        <span class="stock-quantity critical">
+                                            @product.StockQuantity units left
+                                        </span>
+                                        <span class="stock-category">@product.Category</span>
+                                    </div>
+                                </div>
+                                <div class="alert-item-action">
+                                    <a href="@Url.Action("Index", "Product")" class="btn btn-sm btn-outline-danger">
+                                        Restock
+                                    </a>
+                                </div>
+                            </div>
+                        }
                     </div>
                 }
                 else
                 {
-                    <div class="text-center text-muted py-5">
-                        <i class="bi bi-people display-4 text-muted"></i>
-                        <p class="mt-3">No recent clients found</p>
+                    <div class="no-alerts">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <p>All products are well stocked!</p>
                     </div>
                 }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Transactions -->
+    <div class="col-lg-6 mb-4">
+        <div class="recent-container">
+            <div class="recent-header">
+                <h3 class="recent-title">Recent Transactions</h3>
+                <div class="recent-subtitle">Latest Business Activity</div>
+            </div>
+            <div class="recent-content">
+                @if (Model.RecentTransactions != null && Model.RecentTransactions.Any())
+                {
+                    <div class="recent-list">
+                        @foreach (var transaction in Model.RecentTransactions.Take(5))
+                        {
+                            <div class="recent-item">
+                                <div class="recent-item-icon">
+                                    <i class="bi bi-receipt"></i>
+                                </div>
+                                <div class="recent-item-content">
+                                    <div class="recent-item-name">Transaction #@transaction.TransactionId</div>
+                                    <div class="recent-item-details">
+                                        <span class="transaction-amount">₱@transaction.TotalAmount.ToString("N0")</span>
+                                        <span class="transaction-service">@transaction.Status</span>
+                                    </div>
+                                </div>
+                                <div class="recent-item-time">
+                                    @transaction.TransactionDate.ToString("MMM dd, HH:mm")
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-recent">
+                        <i class="bi bi-clock"></i>
+                        <p>No recent transactions</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="quick-actions-container">
+            <div class="quick-actions-header">
+                <h3 class="quick-actions-title">Quick Actions</h3>
+            </div>
+            <div class="quick-actions-content">
+                <a asp-controller="Client" asp-action="Index" class="quick-action-btn">
+                    <i class="bi bi-people"></i>
+                    <span>Manage Clients</span>
+                </a>
+                <a asp-controller="Transaction" asp-action="Index" class="quick-action-btn">
+                    <i class="bi bi-receipt"></i>
+                    <span>View Transactions</span>
+                </a>
+                <a asp-controller="Product" asp-action="Index" class="quick-action-btn">
+                    <i class="bi bi-box"></i>
+                    <span>Manage Products</span>
+                </a>
+                <a asp-controller="Service" asp-action="Index" class="quick-action-btn">
+                    <i class="bi bi-hand-index"></i>
+                    <span>Manage Services</span>
+                </a>
+                <a asp-controller="Transaction" asp-action="Report" class="quick-action-btn">
+                    <i class="bi bi-graph-up"></i>
+                    <span>View Reports</span>
+                </a>
             </div>
         </div>
     </div>
@@ -156,170 +241,588 @@
 
 <style>
     .dashboard-title-container {
-        background-color: #e8f5e8;
-        border: 2px solid #2d5016;
-        border-radius: 8px;
-        padding: 20px;
+            background: #e8f5e8;
+            border: 2px solid #2d5016;
+            
+        border-radius: 12px;
+        padding: 30px;
         text-align: center;
         margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
 
     .dashboard-title {
-        font-size: 32px;
-        font-family: Arial, sans-serif;
-        font-weight: bold;
+        font-size: 36px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 700;
         color: #2d5016;
         margin: 0;
         letter-spacing: 2px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
-    .dashboard-card {
-        background-color: #ffffff;
-        border: 2px solid #e8f5e8;
-        border-radius: 8px;
-        padding: 30px;
-        text-align: center;
+    /* KPI Cards */
+    .kpi-card {
+            background: #e8f5e8;
+        border-radius: 16px;
+        border: 2px solid #2d5016;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
-        height: 120px;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .kpi-card.alert {
+        background: #e8f5e8;
+    }
+
+    .kpi-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    .dashboard-card:hover {
-        border-color: #2d5016;
-        background-color: #e8f5e8;
-        transform: translateY(-2px);
-    }
-
-    .card-link {
-        text-decoration: none;
-        color: #2d5016;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .card-link:hover {
-        text-decoration: none;
-        color: #2d5016;
-    }
-
-    .card-icon {
-        font-size: 36px;
-        margin-bottom: 15px;
-        color: #2d5016;
-    }
-
-    .card-content {
-            font-family: Arial, sans-serif;
-    }
-
-    .card-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #2d5016;
-    }
-
-    .recent-clients-container {
-        background-color: #ffffff;
-        border: 2px solid #e8f5e8;
-        border-radius: 8px;
-        margin-top: 30px;
-    }
-
-    .recent-clients-header {
-        background-color: #e8f5e8;
-        border-bottom: 2px solid #2d5016;
-        padding: 20px;
-        text-align: center;
-    }
-
-    .recent-clients-title {
-        font-family: Arial, sans-serif;
+        margin-right: 20px;
         font-size: 24px;
-        font-weight: bold;
-        color: #2d5016;
-        margin: 0;
+        color: #ffffff;
     }
 
-    .recent-clients-content {
-        padding: 30px;
-        min-height: 300px;
+    .revenue-card .kpi-icon {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     }
 
-    .table th {
-        border-top: none;
+    .sales-card .kpi-icon {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .avg-card .kpi-icon {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .inventory-card .kpi-icon {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    }
+
+    .inventory-card.alert .kpi-icon {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    }
+
+    .kpi-content {
+        flex: 1;
+    }
+
+    .kpi-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        line-height: 1;
+    }
+
+    .kpi-label {
+        font-size: 14px;
+        color: #7f8c8d;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    .kpi-change {
+        font-size: 12px;
         font-weight: 600;
-        color: #2d5016;
-        background-color: #f8f9fa;
-        border-bottom: 2px solid #e8f5e8;
+        padding: 4px 8px;
+        border-radius: 6px;
+        display: inline-block;
     }
 
-    .table td {
-        border-bottom: 1px solid #e8f5e8;
-        vertical-align: middle;
+    .kpi-change.positive {
+        background: #d4edda;
+        color: #155724;
     }
 
-    .avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .badge {
-        font-size: 0.75em;
-    }
-
-    .alert {
-        border-radius: 8px;
-        border: 2px solid #e8f5e8;
-    }
-
-    .alert-warning {
-        background-color: #fff3cd;
-        border-color: #ffeaa7;
-        color: #856404;
-    }
-
-    .alert-danger {
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
+    .kpi-change.negative {
+        background: #f8d7da;
         color: #721c24;
     }
 
-    /* Responsive design */
-    @@media (max-width: 768px) {
+    .kpi-change.neutral {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    /* Chart Containers */
+    .chart-container {
+        background: #e8f5e8;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 2px solid #2d5016;
+        height: 400px;
+    }
+
+    .chart-header {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .chart-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 4px 0;
+    }
+
+    .chart-subtitle {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+    .chart-content {
+        height: calc(100% - 60px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Alert Container */
+    .alert-container {
+            background: #e8f5e8;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 2px solid #2d5016;
+        height: 400px;
+    }
+
+    .alert-header {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .alert-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 4px 0;
+    }
+
+    .alert-subtitle {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+    .alert-content {
+        height: calc(100% - 60px);
+        overflow-y: auto;
+    }
+
+    .alert-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .alert-item {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        background: #fff5f5;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .alert-item:hover {
+        background: #fef2f2;
+        transform: translateX(4px);
+    }
+
+    .alert-item-icon {
+        width: 40px;
+        height: 40px;
+        background: #fecaca;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        color: #dc2626;
+        font-size: 18px;
+    }
+
+    .alert-item-content {
+        flex: 1;
+    }
+
+    .alert-item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+    }
+
+    .alert-item-details {
+        display: flex;
+        gap: 12px;
+        font-size: 12px;
+    }
+
+    .stock-quantity {
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .stock-quantity.critical {
+        background: #fecaca;
+        color: #dc2626;
+    }
+
+    .stock-quantity.warning {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .stock-category {
+        color: #6b7280;
+    }
+
+    .alert-item-action {
+        margin-left: 12px;
+    }
+
+    .no-alerts {
+        text-align: center;
+        padding: 40px 20px;
+        color: #10b981;
+    }
+
+    .no-alerts i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    /* Recent Container */
+    .recent-container {
+            background: #e8f5e8;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 2px solid #2d5016;
+        height: 400px;
+    }
+
+    .recent-header {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .recent-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 4px 0;
+    }
+
+    .recent-subtitle {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+    .recent-content {
+        height: calc(100% - 60px);
+        overflow-y: auto;
+    }
+
+    .recent-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .recent-item {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .recent-item:hover {
+        background: #f1f5f9;
+        transform: translateX(4px);
+    }
+
+    .recent-item-icon {
+        width: 40px;
+        height: 40px;
+        background: #dbeafe;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        color: #3b82f6;
+        font-size: 18px;
+    }
+
+    .recent-item-content {
+        flex: 1;
+    }
+
+    .recent-item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+    }
+
+    .recent-item-details {
+        display: flex;
+        gap: 12px;
+        font-size: 12px;
+    }
+
+    .transaction-amount {
+        font-weight: 600;
+        color: #059669;
+    }
+
+    .transaction-service {
+        color: #6b7280;
+    }
+
+    .recent-item-time {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-left: 12px;
+    }
+
+    .no-recent {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6b7280;
+    }
+
+    .no-recent i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    /* Quick Actions */
+    .quick-actions-container {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e8f2ff;
+        margin-top: 20px;
+    }
+
+    .quick-actions-header {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .quick-actions-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .quick-actions-content {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .quick-action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #475569;
+        transition: all 0.3s ease;
+        min-width: 120px;
+    }
+
+    .quick-action-btn:hover {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: #ffffff;
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+
+    .quick-action-btn i {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .quick-action-btn span {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    /* Responsive Design */
+
+    media (max-width: 768px) {
         .dashboard-title {
             font-size: 24px;
         }
 
-        .dashboard-card {
-            height: 100px;
+        .kpi-card {
+            height: auto;
             padding: 20px;
         }
 
-        .card-icon {
-            font-size: 28px;
-            margin-bottom: 10px;
+        .kpi-value {
+            font-size: 24px;
         }
 
-        .card-title {
-            font-size: 16px;
+        .chart-container,
+        .alert-container,
+        .recent-container {
+            height: auto;
+            min-height: 300px;
         }
 
-        .recent-clients-title {
-            font-size: 20px;
+        .quick-actions-content {
+            flex-direction: column;
+            align-items: center;
         }
 
-        .recent-clients-content {
-            padding: 20px;
+        .quick-action-btn {
+            width: 100%;
+            max-width: 200px;
         }
     }
 </style>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueData = @Html.Raw(Json.Serialize(Model.RevenueChartData.Select(r => new { Month = r.Month, Revenue = r.Revenue, Sales = r.Sales })));
+    
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: revenueData.map(d => d.month),
+            datasets: [{
+                label: 'Revenue (₱)',
+                data: revenueData.map(d => d.revenue),
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y'
+            }, {
+                label: 'Sales Count',
+                data: revenueData.map(d => d.sales),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Revenue (₱)'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Sales Count'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
+        }
+    });
+
+    // Service Popularity Chart
+    const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+    const serviceData = @Html.Raw(Json.Serialize(Model.ServicePopularity.Select(s => new { Name = s.ServiceName, Count = s.BookingCount, Percentage = s.Percentage })));
+    
+    new Chart(serviceCtx, {
+        type: 'doughnut',
+        data: {
+            labels: serviceData.map(s => s.name),
+            datasets: [{
+                data: serviceData.map(s => s.count),
+                backgroundColor: [
+                    '#3b82f6',
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+</script>
 
 }
 catch (Exception ex)

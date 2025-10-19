@@ -32,6 +32,13 @@
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             @TempData["ErrorMessage"]
+                            @if (TempData["ErrorDetails"] != null)
+                            {
+                                <details class="mt-2">
+                                    <summary>Error Details</summary>
+                                    <pre class="mt-2 small">@TempData["ErrorDetails"]</pre>
+                                </details>
+                            }
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }

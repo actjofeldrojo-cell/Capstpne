@@ -12,26 +12,25 @@ namespace CAPS.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Get completed client IDs from session
-            var completedClientIds = HttpContext.Session.GetString("CompletedClients")?.Split(',').Select(int.Parse).ToList() ?? new List<int>();
-
-            // Get active clients (excluding completed ones)
-            var activeClients = await db.Clients
+            var clients = await db.Clients
                 .Include(c => c.Appointments)
                     .ThenInclude(a => a.Service)
-                .Where(c => c.IsActive && !completedClientIds.Contains(c.ClientId))   // Exclude completed clients
+                .Where(c => c.IsActive)
                 .ToListAsync();
 
-            // Get completed clients
-            var completedClients = await db.Clients
-                .Include(c => c.Appointments)
-                    .ThenInclude(a => a.Service)
-                .Where(c => completedClientIds.Contains(c.ClientId))
+            // Filter out clients who have completed payments (have transactions with "Completed" status)
+            var clientsWithCompletedPayments = await db.Transactions
+                .Where(t => t.IsActive && t.Status == "Completed")
+                .Select(t => t.ClientId)
+                .Distinct()
                 .ToListAsync();
 
-            var allClients = activeClients.Concat(completedClients).ToList();
+            // Only show clients who don't have completed payments
+            var filteredClients = clients
+                .Where(c => !clientsWithCompletedPayments.Contains(c.ClientId))
+                .ToList();
 
-            return View(allClients);
+            return View(filteredClients);
         }
 
         //[HttpPost]
@@ -62,8 +61,14 @@ namespace CAPS.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpSert(Client client)
+        public ActionResult UpSert(Client client, string[] ComfortItemPreferences)
         {
+            // Handle checkbox values for comfort items
+            if (ComfortItemPreferences != null && ComfortItemPreferences.Length > 0)
+            {
+                client.ComfortItemPreferences = string.Join(", ", ComfortItemPreferences);
+            }
+
             if (!ModelState.IsValid) { return View(client); }
 
             bool isNewClient = client.ClientId == 0;
@@ -142,19 +147,15 @@ namespace CAPS.Controllers
                     return RedirectToAction("Index", "Client");
                 }
 
-                // Add client ID to completed clients in session
-                var completedClientIds = HttpContext.Session.GetString("CompletedClients")?.Split(',').Select(int.Parse).ToList() ?? new List<int>();
-                if (!completedClientIds.Contains(id))
-                {
-                    completedClientIds.Add(id);
-                    HttpContext.Session.SetString("CompletedClients", string.Join(",", completedClientIds));
-                }
+                client.IsActive = false;
+                db.Clients.Update(client);
+                db.SaveChanges();
 
-                TempData["SuccessMessage"] = $"Client {client.FirstName} {client.LastName} has been completed successfully.";
+                TempData["SuccessMessage"] = $"Client {client.FirstName} {client.LastName} has been deleted successfully.";
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error completing client: {ex.Message}";
+                TempData["ErrorMessage"] = $"Error deleting client: {ex.Message}";
             }
 
             return RedirectToAction("Index", "Client");

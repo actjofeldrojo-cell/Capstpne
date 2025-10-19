@@ -50,7 +50,7 @@
             <div class="table-header">
                 <div class="table-header-row">
                     <div class="table-header-cell">Name</div>
-                    <div class="table-header-cell">Gender</div>
+                    <div class="table-header-cell">Preferences</div>
                     <div class="table-header-cell">Phone</div>
                     <div class="table-header-cell">Registered On</div>
                     <div class="table-header-cell">Availed Services</div>
@@ -69,7 +69,36 @@
                                 <div class="client-name">@client.FirstName @client.LastName</div>
                             </div>
                             <div class="table-cell">
-                                <div class="client-gender">@client.Gender</div>
+                                <div class="client-preferences">
+                                    @if (!string.IsNullOrEmpty(client.PreferredTherapistGender))
+                                    {
+                                        <div class="preference-item"><strong>Therapist:</strong> @client.PreferredTherapistGender</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(client.MassagePressureLevel))
+                                    {
+                                        <div class="preference-item"><strong>Pressure:</strong> @client.MassagePressureLevel</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(client.MusicPreference))
+                                    {
+                                        <div class="preference-item"><strong>Music:</strong> @client.MusicPreference</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(client.TemperaturePreference))
+                                    {
+                                        <div class="preference-item"><strong>Temperature:</strong> @client.TemperaturePreference</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(client.ComfortItemPreferences))
+                                    {
+                                        <div class="preference-item"><strong>Comfort:</strong> @client.ComfortItemPreferences</div>
+                                    }
+                                    @if (string.IsNullOrEmpty(client.PreferredTherapistGender) && 
+                                         string.IsNullOrEmpty(client.MassagePressureLevel) && 
+                                         string.IsNullOrEmpty(client.MusicPreference) && 
+                                         string.IsNullOrEmpty(client.TemperaturePreference) && 
+                                         string.IsNullOrEmpty(client.ComfortItemPreferences))
+                                    {
+                                        <div class="preference-item">No preferences set</div>
+                                    }
+                                </div>
                             </div>
                             <div class="table-cell">
                                 <div class="client-phone">@client.PhoneNumber</div>
@@ -112,20 +141,10 @@
                             </div>
                             <div class="table-cell">
                                 @{
-                                    var completedClientIds = Context.Session.GetString("CompletedClients")?
-                                    .Split(',')
-                                    .Select(int.Parse)
-                                    .ToList() ?? new List<int>();
-
-                                    var isCompleted = completedClientIds.Contains(client.ClientId);
                                     var hasAvailedServices = client.Appointments != null && client.Appointments.Any(a => a.IsActive && a.Duration > 0);
                                 }
 
-                                @if (isCompleted)
-                                {
-                                    <div class="status-badge completed">Completed</div>
-                                }
-                                else if (hasAvailedServices)
+                                @if (hasAvailedServices)
                                 {
                                     <div class="status-badge active">Active</div>
                                 }
@@ -137,29 +156,20 @@
                             </div>
                             <div class="table-cell">
                                 <div class="action-buttons">
-                                    @if (!isCompleted)
+                                    @Html.ActionLink("", "ServiceExtend", new { id = client.ClientId }, new { @class = "action-btn extend-btn", title = "Service Extend" })
+                                    <button type="button" class="action-btn service-btn" title="In-Service"
+                                            onclick="setClientForInService(@client.ClientId, '@client.FirstName', '@client.LastName')"
+                                            data-bs-toggle="modal" data-bs-target="#inServiceModal">
+                                        <i class="bi bi-person-check"></i>
+                                    </button>
+
+                                    @Html.ActionLink("", "UpSert", "Transaction", new { clientId = client.ClientId }, new { @class = "action-btn payment-btn", title = "For Payment" })
+                                    @using (Html.BeginForm("Delete", "Client", new { id = client.ClientId }, FormMethod.Post, true, new { @class = "d-inline" }))
                                     {
-                                        @Html.ActionLink("", "ServiceExtend", new { id = client.ClientId }, new { @class = "action-btn extend-btn", title = "Service Extend" })
-                                        <button type="button" class="action-btn service-btn" title="In-Service"
-                                                onclick="setClientForInService(@client.ClientId, '@client.FirstName', '@client.LastName')"
-                                                data-bs-toggle="modal" data-bs-target="#inServiceModal">
-                                            <i class="bi bi-person-check"></i>
+                                        <button type="submit" class="action-btn delete-btn" title="Delete Client"
+                                                onclick="return confirm('Are you sure you want to delete this client?')">
+                                            <i class="bi bi-trash"></i>
                                         </button>
-
-                                        @Html.ActionLink("", "UpSert", "Transaction", new { clientId = client.ClientId }, new { @class = "action-btn payment-btn", title = "For Payment" })
-                                        @using (Html.BeginForm("Cancel", "Client", new { id = client.ClientId }, FormMethod.Post, true, new { @class = "d-inline" }))
-                                        {
-                                            <button type="submit" class="action-btn delete-btn" title="Cancel Client"
-                                                    onclick="return confirm('Are you sure you want to cancel this client?')">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        @Html.ActionLink("", "UpSert", "Transaction", new { clientId = client.ClientId }, new { @class = "action-btn payment-btn", title = "For Payment" })
-                                        <span class="completed-text">Service Completed</span>
                                     }
                                 </div>
                             </div>
@@ -378,8 +388,19 @@
         color: #2d5016;
     }
 
-    .client-gender {
+    .client-preferences {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .preference-item {
+        margin-bottom: 2px;
+        line-height: 1.3;
+    }
+
+    .preference-item strong {
         color: #2d5016;
+        font-size: 11px;
     }
 
     .client-phone {
@@ -459,23 +480,23 @@
     }
 
     .action-btn {
-        width: 32px;
-        height: 32px;
+        width: 30px;
+        height: 30px;
         border: none;
-        border-radius: 50%;
+        border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .extend-btn {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #28a745;
+        background-color: #e8f5e8;
+        color: #2d5016;
+        border: 1px solid #2d5016;
     }
 
         .extend-btn::before {
@@ -490,9 +511,9 @@
     }
 
     .payment-btn {
-        background-color: #d1ecf1;
-        color: #0c5460;
-        border: 1px solid #17a2b8;
+        background-color: #74b9ff;
+        color: #fff;
+        border: 1px solid #000;
     }
 
         .payment-btn::before {
@@ -627,7 +648,7 @@
             }
 
                 .table-header-cell:first-child::before {
-                    content: "Name & Gender";
+                    content: "Name & Preferences";
                 }
 
                 .table-header-cell:last-child::before {
@@ -921,7 +942,7 @@
                     data.forEach(service => {
                         const option = document.createElement('option');
                         option.value = service.serviceId;
-                        option.textContent = `${service.name} - $${service.price} (${service.duration} min)`;
+                        option.textContent = `${service.name} - ₱${service.price} (${service.duration} min)`;
                         select.appendChild(option);
                     });
                 })

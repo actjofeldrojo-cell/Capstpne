@@ -70,9 +70,54 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="Gender" class="form-label">Gender</label>
-                        @Html.DropDownListFor(m => m.Gender, new SelectList(new[] { "Male", "Female", "Other" }), "Select Gender", new { @class = "form-control", required = "required" })
-                        @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "validation-message" })
+                        <label for="PreferredTherapistGender" class="form-label">Preferred Therapist Gender</label>
+                        @Html.DropDownListFor(m => m.PreferredTherapistGender, new SelectList(new[] { "Female", "Male", "No Preference" }), "Select Preference", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.PreferredTherapistGender, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="MassagePressureLevel" class="form-label">Massage Pressure Level</label>
+                        @Html.DropDownListFor(m => m.MassagePressureLevel, new SelectList(new[] { "Soft", "Medium", "Hard" }), "Select Pressure Level", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.MassagePressureLevel, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="MusicPreference" class="form-label">Music Preference</label>
+                        @Html.DropDownListFor(m => m.MusicPreference, new SelectList(new[] { "Relaxing Music", "Nature Sounds", "Silence", "No Preference" }), "Select Music Preference", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.MusicPreference, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="TemperaturePreference" class="form-label">Temperature Preference</label>
+                        @Html.DropDownListFor(m => m.TemperaturePreference, new SelectList(new[] { "Warm Room", "Cool Room", "Heated Bed/Table", "No Preference" }), "Select Temperature Preference", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.TemperaturePreference, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ComfortItemPreferences" class="form-label">Comfort Item Preferences</label>
+                        <div class="checkbox-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Extra Pillow" id="extraPillow">
+                                <label class="form-check-label" for="extraPillow">Extra Pillow</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Blanket" id="blanket">
+                                <label class="form-check-label" for="blanket">Blanket</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Neck Roll" id="neckRoll">
+                                <label class="form-check-label" for="neckRoll">Neck Roll</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Eye Mask" id="eyeMask">
+                                <label class="form-check-label" for="eyeMask">Eye Mask</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="No Additional Items" id="noItems">
+                                <label class="form-check-label" for="noItems">No Additional Items</label>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ComfortItemPreferences, "", new { @class = "validation-message" })
                     </div>
                 </div>
 
@@ -187,6 +232,29 @@
     .form-group {
         display: flex;
         flex-direction: column;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-check-input {
+        margin: 0;
+    }
+
+    .form-check-label {
+        margin: 0;
+        font-size: 14px;
+        color: #2d5016;
     }
 
     .form-label {

@@ -70,7 +70,24 @@
                                 </p>
                                 <p class="mb-0">
                                     <i class="bi bi-gender-ambiguous text-muted"></i>
-                                    @appointment.Client?.Gender
+                                    @if (!string.IsNullOrEmpty(appointment.Client?.PreferredTherapistGender))
+                                    {
+                                        <div>Therapist: @appointment.Client.PreferredTherapistGender</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(appointment.Client?.MassagePressureLevel))
+                                    {
+                                        <div>Pressure: @appointment.Client.MassagePressureLevel</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(appointment.Client?.MusicPreference))
+                                    {
+                                        <div>Music: @appointment.Client.MusicPreference</div>
+                                    }
+                                    @if (string.IsNullOrEmpty(appointment.Client?.PreferredTherapistGender) && 
+                                         string.IsNullOrEmpty(appointment.Client?.MassagePressureLevel) && 
+                                         string.IsNullOrEmpty(appointment.Client?.MusicPreference))
+                                    {
+                                        <div>No preferences set</div>
+                                    }
                                 </p>
                             </div>
 

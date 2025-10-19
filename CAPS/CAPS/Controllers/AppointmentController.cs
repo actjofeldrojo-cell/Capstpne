@@ -19,6 +19,9 @@ namespace CAPS.Controllers
         // GET: Appointment
         public async Task<IActionResult> Index()
         {
+            // First, automatically delete appointments older than 1 day
+            await DeleteOldAppointments();
+
             var appointmentsQuery = _context.Appointments
                 .Include(a => a.Client)
                 .Include(a => a.Service)
@@ -26,7 +29,7 @@ namespace CAPS.Controllers
 
             var appointments = await appointmentsQuery
                 .OrderByDescending(a => a.AppointmentDate)
-                .ThenBy(a => a.AppointmentTime)
+                .ThenByDescending(a => a.AppointmentTime)
                 .ToListAsync();
                 
             return View(appointments);
@@ -53,14 +56,23 @@ namespace CAPS.Controllers
         }
 
         // GET: Appointment/UpSert/5 (for combined Create/Edit view)
-        public async Task<IActionResult> UpSert(int? id)
+        public async Task<IActionResult> UpSert(int? id, string? date = null, string? time = null)
         {
             ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
             
             if (id == null || id == 0)
             {
                 // Create new appointment
-                return View(new AppointmentWithClientDto());
+                var dto = new AppointmentWithClientDto();
+                if (DateTime.TryParse(date, out var parsedDate))
+                {
+                    dto.AppointmentDate = parsedDate;
+                }
+                if (TimeSpan.TryParse(time, out var parsedTime))
+                {
+                    dto.AppointmentTime = parsedTime;
+                }
+                return View(dto);
             }
             else
             {
@@ -86,7 +98,11 @@ namespace CAPS.Controllers
                     ClientFirstName = appointment.Client?.FirstName,
                     ClientLastName = appointment.Client?.LastName,
                     ClientPhoneNumber = appointment.Client?.PhoneNumber,
-                    ClientGender = appointment.Client?.Gender
+                    PreferredTherapistGender = appointment.Client?.PreferredTherapistGender,
+                    MassagePressureLevel = appointment.Client?.MassagePressureLevel,
+                    MusicPreference = appointment.Client?.MusicPreference,
+                    TemperaturePreference = appointment.Client?.TemperaturePreference,
+                    ComfortItemPreferences = appointment.Client?.ComfortItemPreferences
                 };
                 
                 return View(dto);
@@ -96,8 +112,14 @@ namespace CAPS.Controllers
         // POST: Appointment/UpSert
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpSert(AppointmentWithClientDto appointmentDto)
+        public async Task<IActionResult> UpSert(AppointmentWithClientDto appointmentDto, string[] ComfortItemPreferences)
         {
+            // Handle checkbox values for comfort items
+            if (ComfortItemPreferences != null && ComfortItemPreferences.Length > 0)
+            {
+                appointmentDto.ComfortItemPreferences = string.Join(", ", ComfortItemPreferences);
+            }
+
             // Remove validation for navigation properties that aren't being set
             ModelState.Remove("Client");
             ModelState.Remove("Service");
@@ -120,7 +142,11 @@ namespace CAPS.Controllers
                             FirstName = appointmentDto.ClientFirstName,
                             LastName = appointmentDto.ClientLastName,
                             PhoneNumber = appointmentDto.ClientPhoneNumber,
-                            Gender = appointmentDto.ClientGender,
+                            PreferredTherapistGender = appointmentDto.PreferredTherapistGender,
+                            MassagePressureLevel = appointmentDto.MassagePressureLevel,
+                            MusicPreference = appointmentDto.MusicPreference,
+                            TemperaturePreference = appointmentDto.TemperaturePreference,
+                            ComfortItemPreferences = appointmentDto.ComfortItemPreferences,
                             IsActive = true,
                             DateRegistered = DateTime.Now
                         };
@@ -262,7 +288,7 @@ namespace CAPS.Controllers
                 .Include(a => a.Service)
                 .Where(a => a.IsActive)
                 .OrderByDescending(a => a.AppointmentDate)
-                .ThenBy(a => a.AppointmentTime);
+                .ThenByDescending(a => a.AppointmentTime);
 
             var appointments = await appointmentsQuery.ToListAsync();
             ViewBag.Services = await _context.Services.Where(s => s.isActive).ToListAsync();
@@ -279,8 +305,14 @@ namespace CAPS.Controllers
         // POST: Appointment/Book
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book(AppointmentWithClientDto appointmentDto)
+        public async Task<IActionResult> Book(AppointmentWithClientDto appointmentDto, string[] ComfortItemPreferences)
         {
+            // Handle checkbox values for comfort items
+            if (ComfortItemPreferences != null && ComfortItemPreferences.Length > 0)
+            {
+                appointmentDto.ComfortItemPreferences = string.Join(", ", ComfortItemPreferences);
+            }
+
             // Remove validation for navigation properties that aren't being set
             ModelState.Remove("Client");
             ModelState.Remove("Service");
@@ -305,7 +337,11 @@ namespace CAPS.Controllers
                         FirstName = appointmentDto.ClientFirstName,
                         LastName = appointmentDto.ClientLastName,
                         PhoneNumber = appointmentDto.ClientPhoneNumber,
-                        Gender = appointmentDto.ClientGender,
+                        PreferredTherapistGender = appointmentDto.PreferredTherapistGender,
+                        MassagePressureLevel = appointmentDto.MassagePressureLevel,
+                        MusicPreference = appointmentDto.MusicPreference,
+                        TemperaturePreference = appointmentDto.TemperaturePreference,
+                        ComfortItemPreferences = appointmentDto.ComfortItemPreferences,
                         IsActive = true,
                         DateRegistered = DateTime.Now
                     };
@@ -355,7 +391,11 @@ namespace CAPS.Controllers
                 ClientFirstName = appointment.Client?.FirstName,
                 ClientLastName = appointment.Client?.LastName,
                 ClientPhoneNumber = appointment.Client?.PhoneNumber,
-                ClientGender = appointment.Client?.Gender
+                PreferredTherapistGender = appointment.Client?.PreferredTherapistGender,
+                MassagePressureLevel = appointment.Client?.MassagePressureLevel,
+                MusicPreference = appointment.Client?.MusicPreference,
+                TemperaturePreference = appointment.Client?.TemperaturePreference,
+                ComfortItemPreferences = appointment.Client?.ComfortItemPreferences
             };
             
             return View(dto);
@@ -477,7 +517,7 @@ namespace CAPS.Controllers
                 .Include(a => a.Service)
                 .Where(a => a.IsActive && a.AppointmentDate >= DateTime.Today)
                 .OrderBy(a => a.AppointmentDate)
-                .ThenBy(a => a.AppointmentTime)
+                .ThenByDescending(a => a.AppointmentTime)
                 .ToListAsync();
             return View(appointments);
         }
@@ -490,7 +530,7 @@ namespace CAPS.Controllers
                 .Include(a => a.Client)
                 .Include(a => a.Service)
                 .Where(a => a.IsActive && a.AppointmentDate == today)
-                .OrderBy(a => a.AppointmentTime)
+                .OrderByDescending(a => a.AppointmentTime)
                 .ToListAsync();
             return View(appointments);
         }
@@ -500,6 +540,32 @@ namespace CAPS.Controllers
         private bool AppointmentExists(int id)
         {
             return _context.Appointments.Any(e => e.AppointmentId == id);
+        }
+
+        // Helper method to automatically delete appointments older than 1 day
+        private async Task DeleteOldAppointments()
+        {
+            var oneDayAgo = DateTime.Today.AddDays(-1);
+            
+            var oldAppointments = await _context.Appointments
+                .Where(a => a.IsActive && a.AppointmentDate < oneDayAgo)
+                .ToListAsync();
+
+            if (oldAppointments.Any())
+            {
+                foreach (var appointment in oldAppointments)
+                {
+                    // Soft delete - mark as inactive
+                    appointment.IsActive = false;
+                    appointment.DateModified = DateTime.Now;
+                    appointment.Status = "Auto-Deleted";
+                    appointment.CancellationReason = "Automatically deleted - appointment date is more than 1 day old";
+                    appointment.CancellationDate = DateTime.Now;
+                    appointment.CancelledBy = "System";
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
     }
 
@@ -523,9 +589,21 @@ namespace CAPS.Controllers
         [StringLength(20)]
         public string? ClientPhoneNumber { get; set; }
         
-        [Required]
+        // Client Preferences
+        [StringLength(50)]
+        public string? PreferredTherapistGender { get; set; }
+
         [StringLength(20)]
-        public string? ClientGender { get; set; }
+        public string? MassagePressureLevel { get; set; }
+
+        [StringLength(50)]
+        public string? MusicPreference { get; set; }
+
+        [StringLength(50)]
+        public string? TemperaturePreference { get; set; }
+
+        [StringLength(200)]
+        public string? ComfortItemPreferences { get; set; }
         public int ServiceId { get; internal set; }
         public DateTime AppointmentDate { get; internal set; }
         public TimeSpan AppointmentTime { get; internal set; }

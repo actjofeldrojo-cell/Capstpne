@@ -61,13 +61,13 @@
             <div class="card border-success">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-dollar-sign me-2"></i>Revenue Summary
+                        <i class="fas fa-peso-sign me-2"></i>Revenue Summary
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-md-4">
-                            <h2 class="text-success mb-1">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</h2>
+                            <h2 class="text-success mb-1">₱@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</h2>
                             <p class="text-muted mb-0">Total Revenue</p>
                         </div>
                         <div class="col-md-4">
@@ -75,7 +75,7 @@
                             <p class="text-muted mb-0">Total Transactions</p>
                         </div>
                         <div class="col-md-4">
-                            <h2 class="text-warning mb-1">$@(((decimal)ViewBag.AverageValue).ToString("N2"))</h2>
+                            <h2 class="text-warning mb-1">₱@(((decimal)ViewBag.AverageValue).ToString("N2"))</h2>
                             <p class="text-muted mb-0">Average per Transaction</p>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                 <text>Showing transactions up to @(((DateTime)ViewBag.ToDate).ToString("MMM dd, yyyy"))</text>
             }
             <div class="mt-2">
-                <strong>Total Revenue for Selected Period: <span class="text-primary">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</span></strong>
+                <strong>Total Revenue for Selected Period: <span class="text-primary">₱@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</span></strong>
             </div>
         </div>
     }
@@ -111,7 +111,7 @@
     {
         <div class="alert alert-success">
             <i class="fas fa-chart-line me-2"></i>
-            <strong>All Time Revenue: <span class="text-primary">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</span></strong>
+            <strong>All Time Revenue: <span class="text-primary">₱@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</span></strong>
             <small class="d-block text-muted">Select a date range to filter results</small>
         </div>
     }
@@ -172,10 +172,10 @@
                                     </td>
                                     <td>
                                         <div class="d-flex flex-column">
-                                            <span class="fw-bold text-success">$@transaction.TotalAmount.ToString("N2")</span>
+                                            <span class="fw-bold text-success">₱@transaction.TotalAmount.ToString("N2")</span>
                                             @if (transaction.DiscountAmount > 0)
                                             {
-                                                <small class="text-danger">-$@transaction.DiscountAmount.ToString("N2")</small>
+                                                <small class="text-danger">-₱@transaction.DiscountAmount.ToString("N2")</small>
                                             }
                                         </div>
                                     </td>
@@ -211,7 +211,7 @@
                         <tfoot class="table-light">
                             <tr>
                                 <th colspan="4" class="text-end">Total for Filtered Results:</th>
-                                <th class="text-success fw-bold">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</th>
+                                <th class="text-success fw-bold">₱@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</th>
                                 <th colspan="3"></th>
                             </tr>
                         </tfoot>

@@ -20,9 +20,26 @@ namespace CAPS.Models
         [StringLength(100)]
         public string? Age { get; set; }
 
-        [Required]
+        // Client Preferences
+        [StringLength(50)]
+        [Display(Name = "Preferred Therapist Gender")]
+        public string? PreferredTherapistGender { get; set; }
+
         [StringLength(20)]
-        public string Gender { get; set; }
+        [Display(Name = "Massage Pressure Level")]
+        public string? MassagePressureLevel { get; set; }
+
+        [StringLength(50)]
+        [Display(Name = "Music Preference")]
+        public string? MusicPreference { get; set; }
+
+        [StringLength(50)]
+        [Display(Name = "Temperature Preference")]
+        public string? TemperaturePreference { get; set; }
+
+        [StringLength(200)]
+        [Display(Name = "Comfort Item Preferences")]
+        public string? ComfortItemPreferences { get; set; }
 
         [Required]
         [Phone]

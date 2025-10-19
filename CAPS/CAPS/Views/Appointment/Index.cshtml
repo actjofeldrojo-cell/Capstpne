@@ -25,9 +25,9 @@
                     <button type="button" class="status-tab" onclick="filterAppointments('in-service')" id="in-serviceTab">
                         Schedule
                     </button>
-                    <button type="button" class="status-tab" onclick="filterAppointments('confirmed')" id="confirmedTab">
+                    @* <button type="button" class="status-tab" onclick="filterAppointments('confirmed')" id="confirmedTab">
                         Confirmed
-                    </button>
+                    </button> *@
                     <button type="button" class="status-tab" onclick="filterAppointments('completed')" id="completedTab">
                         Completed
                     </button>
@@ -111,7 +111,8 @@
                                     <div class="status-badge no-show">No-Show</div>
                                     break;
                                 default:
-                                    <div class="status-badge default">@item.Status</div>
+                                //In-Service
+                                    <div class="status-badge completed">@item.Status</div>
                                     break;
                             }
                         </div>
@@ -128,7 +129,7 @@
                         <div class="table-cell">
                             <div class="action-buttons">
                                 <button type="button" class="action-btn view-btn" title="View Details"
-                                        onclick="showDetailsModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@item.Duration', '@Html.Raw(item.Status)', '@Html.Raw(item.Cost?.ToString("N2") ?? "Not set")', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Client?.PhoneNumber)', '@Html.Raw(item.Client?.Gender)', '@Html.Raw(item.Service?.Name)', '@Html.Raw(item.Service?.Category)', '@Html.Raw(item.Notes ?? "")')">
+                                        onclick="showDetailsModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@item.Duration', '@Html.Raw(item.Status)', '@Html.Raw(item.Cost?.ToString("N2") ?? "Not set")', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Client?.PhoneNumber)', '@Html.Raw(item.Client?.PreferredTherapistGender ?? "No Preference")', '@Html.Raw(item.Client?.MassagePressureLevel ?? "No Preference")', '@Html.Raw(item.Client?.MusicPreference ?? "No Preference")', '@Html.Raw(item.Client?.TemperaturePreference ?? "No Preference")', '@Html.Raw(item.Client?.ComfortItemPreferences ?? "None")', '@Html.Raw(item.Service?.Name)', '@Html.Raw(item.Service?.Category)', '@Html.Raw(item.Notes ?? "")')">
                                     <i class="bi bi-eye"></i>
                                 </button>
                                 <a asp-action="UpSert" asp-route-id="@item.AppointmentId" class="action-btn edit-btn" title="Edit">
@@ -589,9 +590,9 @@
     }
 
     .edit-btn {
-        background-color: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffc107;
+        background-color: #74b9ff;
+        color: #ffff;
+        border: 1px solid #000;
     }
 
     .confirm-btn {
@@ -614,7 +615,6 @@
 
     .action-btn:hover {
         transform: scale(1.1);
-        opacity: 0.8;
     }
 
     .empty-state {
@@ -758,7 +758,7 @@
 <script>
     let currentAppointmentId = null;
 
-    function showDetailsModal(id, date, time, duration, status, cost, clientName, clientPhone, clientGender, serviceName, serviceCategory, notes) {
+    function showDetailsModal(id, date, time, duration, status, cost, clientName, clientPhone, therapistGender, pressureLevel, musicPreference, temperaturePreference, comfortItems, serviceName, serviceCategory, notes) {
         const modalBody = document.getElementById('detailsModalBody');
         modalBody.innerHTML = `
             <div class="row">
@@ -790,7 +790,13 @@
                                     <h6 class="fw-bold">Client Information:</h6>
                                     <p class="mb-1"><strong>${clientName}</strong></p>
                                     <p class="text-muted mb-1"><i class="bi bi-telephone"></i> ${clientPhone}</p>
-                                    <p class="text-muted mb-3"><i class="bi bi-gender-ambiguous"></i> ${clientGender}</p>
+                                    <div class="text-muted mb-3">
+                                        <p class="mb-1"><i class="bi bi-person"></i> <strong>Therapist:</strong> ${therapistGender}</p>
+                                        <p class="mb-1"><i class="bi bi-hand-index"></i> <strong>Pressure:</strong> ${pressureLevel}</p>
+                                        <p class="mb-1"><i class="bi bi-music-note"></i> <strong>Music:</strong> ${musicPreference}</p>
+                                        <p class="mb-1"><i class="bi bi-thermometer"></i> <strong>Temperature:</strong> ${temperaturePreference}</p>
+                                        <p class="mb-1"><i class="bi bi-heart"></i> <strong>Comfort:</strong> ${comfortItems}</p>
+                                    </div>
 
                                     <h6 class="fw-bold">Service:</h6>
                                     <p class="mb-1"><strong>${serviceName}</strong></p>
