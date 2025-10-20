@@ -47,76 +47,14 @@
                             <span asp-validation-for="ClientPhoneNumber" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="PreferredTherapistGender" class="form-label">Preferred Therapist Gender</label>
-                            <select asp-for="PreferredTherapistGender" class="form-select">
-                                <option value="">Select Preference</option>
-                                <option value="Female">Female</option>
+                            <label asp-for="PreferredTherapistGender" class="form-label">Gender *</label>
+                            <select asp-for="PreferredTherapistGender" class="form-select" required>
+                                <option value="">Select Gender</option>
                                 <option value="Male">Male</option>
-                                <option value="No Preference">No Preference</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
                             </select>
                             <span asp-validation-for="PreferredTherapistGender" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="MassagePressureLevel" class="form-label">Massage Pressure Level</label>
-                            <select asp-for="MassagePressureLevel" class="form-select">
-                                <option value="">Select Pressure Level</option>
-                                <option value="Soft">Soft</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Hard">Hard</option>
-                            </select>
-                            <span asp-validation-for="MassagePressureLevel" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="MusicPreference" class="form-label">Music Preference</label>
-                            <select asp-for="MusicPreference" class="form-select">
-                                <option value="">Select Music Preference</option>
-                                <option value="Relaxing Music">Relaxing Music</option>
-                                <option value="Nature Sounds">Nature Sounds</option>
-                                <option value="Silence">Silence</option>
-                                <option value="No Preference">No Preference</option>
-                            </select>
-                            <span asp-validation-for="MusicPreference" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="TemperaturePreference" class="form-label">Temperature Preference</label>
-                            <select asp-for="TemperaturePreference" class="form-select">
-                                <option value="">Select Temperature Preference</option>
-                                <option value="Warm Room">Warm Room</option>
-                                <option value="Cool Room">Cool Room</option>
-                                <option value="Heated Bed/Table">Heated Bed/Table</option>
-                                <option value="No Preference">No Preference</option>
-                            </select>
-                            <span asp-validation-for="TemperaturePreference" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="ComfortItemPreferences" class="form-label">Comfort Item Preferences</label>
-                            <div class="checkbox-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Extra Pillow" id="extraPillow">
-                                    <label class="form-check-label" for="extraPillow">Extra Pillow</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Blanket" id="blanket">
-                                    <label class="form-check-label" for="blanket">Blanket</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Neck Roll" id="neckRoll">
-                                    <label class="form-check-label" for="neckRoll">Neck Roll</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="Eye Mask" id="eyeMask">
-                                    <label class="form-check-label" for="eyeMask">Eye Mask</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="ComfortItemPreferences" value="No Additional Items" id="noItems">
-                                    <label class="form-check-label" for="noItems">No Additional Items</label>
-                                </div>
-                            </div>
-                            <span asp-validation-for="ComfortItemPreferences" class="text-danger small"></span>
                         </div>
                     </div>
                 </div>
@@ -194,29 +132,6 @@
         font-weight: 500;
         color: #495057;
         margin-bottom: 0.5rem;
-    }
-
-    .checkbox-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-top: 8px;
-    }
-
-    .form-check {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .form-check-input {
-        margin: 0;
-    }
-
-    .form-check-label {
-        margin: 0;
-        font-size: 14px;
-        color: #2d5016;
     }
     
     .service-info {

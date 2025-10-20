@@ -12,14 +12,14 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="action-buttons-container">
+    @* <div class="action-buttons-container">
         <a asp-action="UpSert" class="action-btn new-transaction-btn">
             <i class="bi bi-plus"></i> New Transaction
         </a>
         <a asp-action="Report" class="action-btn reports-btn">
             <i class="bi bi-list-ul"></i> Reports
         </a>
-    </div>
+    </div> *@
 
     <!-- Search and Filter Panel -->
     <div class="search-filter-panel">
@@ -83,41 +83,55 @@
             </div>
         </div>
         <div class="table-body" id="transactionsTable">
-            @foreach (var transaction in Model)
+            @{
+                // Group transactions by client ID
+                var groupedTransactions = Model.GroupBy(t => t.ClientId).ToList();
+            }
+            
+            @foreach (var clientGroup in groupedTransactions)
             {
-                <div class="table-row" data-transaction-id="@transaction.TransactionId">
-                    <div class="table-cell">
-                        <div class="client-info">
-                            <div class="client-avatar">
-                                @(transaction.Client?.FirstName?.Substring(0, 1) ?? "?")
+                var clientTransactions = clientGroup.ToList();
+                var firstTransaction = clientTransactions.First();
+                var totalClientAmount = clientTransactions.Sum(t => t.TotalAmount);
+
+                <div class="client-group">
+                    <div class="table-row" data-transaction-id="@firstTransaction.TransactionId">
+                        <div class="table-cell">
+                            <div class="client-info">
+                                <div class="client-avatar">
+                                    @(firstTransaction.Client?.FirstName?.Substring(0, 1) ?? "?")
+                                </div>
+                                <div class="client-details">
+                                    <div class="client-name">@(firstTransaction.Client?.FirstName + " " + firstTransaction.Client?.LastName)</div>
+                                    <div class="client-id">@firstTransaction.Client?.PhoneNumber</div>
+                                </div>
                             </div>
-                            <div class="client-details">
-                                <div class="client-name">@(transaction.Client?.FirstName + " " + transaction.Client?.LastName)</div>
-                                <div class="client-id">@transaction.Client?.PhoneNumber</div>
+                        </div>
+                        <div class="table-cell">
+                            <div class="service-info">
+                                @foreach (var t in clientTransactions)
+                                {
+                                    <div class="service-name">@t.Service?.Name</div>
+                                    <div class="service-duration">@t.Service?.Duration min</div>
+                                }
                             </div>
                         </div>
-                    </div>
-                    <div class="table-cell">
-                        <div class="service-info">
-                            <div class="service-name">@transaction.Service?.Name</div>
-                            <div class="service-duration">@transaction.Service?.Duration min</div>
+                        <div class="table-cell">
+                            <div class="amount-info">
+                                @foreach (var t in clientTransactions)
+                                {
+                                    <div class="amount-value">₱@t.TotalAmount.ToString("N2")</div>
+                                }
+                                <div class="amount-value">Total: ₱@totalClientAmount.ToString("N2")</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="table-cell">
-                        <div class="amount-info">
-                            <div class="amount-value">₱@transaction.TotalAmount.ToString("N2")</div>
-                            @if (transaction.DiscountAmount > 0)
-                            {
-                                <div class="discount-amount">-₱@transaction.DiscountAmount.ToString("N2")</div>
-                            }
+                        <div class="table-cell">
+                            <a href="@Url.Action("UpSert", "Transaction", new { id = firstTransaction.TransactionId })"
+                               class="payment-btn"
+                               title="For Payment">
+                                <i class="bi bi-pencil-square"></i> For Payment
+                            </a>
                         </div>
-                    </div>
-                    <div class="table-cell">
-                        <a href="@Url.Action("UpSert", "Transaction", new { id = transaction.TransactionId })"
-                           class="payment-btn"
-                           title="For Payment">
-                            <i class="bi bi-pencil-square"></i> For Payment
-                        </a>
                     </div>
                 </div>
             }
@@ -146,56 +160,92 @@
 
 
 @section Scripts {
+    <style>
+        .total-row {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .total-label {
+            font-size: 14px;
+            color: #495057;
+            text-align: right;
+            padding-right: 10px;
+        }
+        
+        .total-amount .amount-value {
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+    
     <script>
-        ₱(document).ready(function() {
-            // Simple search functionality
-            ₱('#searchTerm').on('keyup', function() {
-                var searchTerm = ₱(this).val().toLowerCase();
-                ₱('.table-row').each(function() {
-                    var clientName = ₱(this).find('.client-name').text().toLowerCase();
-                    var serviceName = ₱(this).find('.service-name').text().toLowerCase();
-
-                    if (clientName.includes(searchTerm) || serviceName.includes(searchTerm)) {
-                        ₱(this).show();
-                    } else {
-                        ₱(this).hide();
+        $(document).ready(function() {
+            // Enhanced search functionality for client names and services
+            $('#searchTerm').on('keyup', function() {
+                var searchTerm = $(this).val().toLowerCase();
+                
+                // First hide all client groups
+                $('.client-group').hide();
+                
+                // Search through client groups
+                $('.client-group').each(function() {
+                    var clientGroup = $(this);
+                    var clientName = clientGroup.find('.client-name').first().text().toLowerCase();
+                    var clientPhone = clientGroup.find('.client-id').first().text().toLowerCase();
+                    var serviceNames = [];
+                    
+                    // Collect all service names in this client group
+                    clientGroup.find('.service-name').each(function() {
+                        serviceNames.push($(this).text().toLowerCase());
+                    });
+                    
+                    // Check if search term matches client name, phone, or any service
+                    var matchFound = clientName.includes(searchTerm) || 
+                                    clientPhone.includes(searchTerm) ||
+                                    serviceNames.some(service => service.includes(searchTerm));
+                    
+                    if (matchFound) {
+                        clientGroup.show();
                     }
                 });
+                
                 updateSummaryCards();
             });
 
             // Clear filters
-            ₱('#clearFilters').on('click', function() {
-                ₱('#searchTerm').val('');
-                ₱('#dateFrom').val('');
-                ₱('#dateTo').val('');
-                ₱('.table-row').show();
+            $('#clearFilters').on('click', function() {
+                $('#searchTerm').val('');
+                $('#dateFrom').val('');
+                $('#dateTo').val('');
+                $('.table-row').show();
                 updateSummaryCards();
             });
 
             function updateSummaryCards() {
-                var visibleRows = ₱('.table-row:visible');
+                var visibleRows = $('.table-row:visible');
                 var totalAmount = 0;
 
                 visibleRows.each(function() {
-                    var amountText = ₱(this).find('.amount-value').text();
+                    var amountText = $(this).find('.amount-value').text();
                     var amount = parseFloat(amountText.replace(/[^0-9.-]+/g, ''));
                     totalAmount += amount;
                 });
 
-                ₱('#totalTransactions').text(visibleRows.length);
-                ₱('#totalRevenue').text('₱' + totalAmount.toFixed(2));
-                ₱('#avgValue').text(visibleRows.length > 0 ? '₱' + (totalAmount / visibleRows.length).toFixed(2) : '₱0.00');
+                $('#totalTransactions').text(visibleRows.length);
+                $('#totalRevenue').text('₱' + totalAmount.toFixed(2));
+                $('#avgValue').text(visibleRows.length > 0 ? '₱' + (totalAmount / visibleRows.length).toFixed(2) : '₱0.00');
             }
         });
 
         // Delete transaction function
         function deleteTransaction(id) {
-            ₱('#deleteModal').modal('show');
-            ₱('#confirmDelete').off('click').on('click', function() {
-                ₱.post('@Url.Action("DeleteConfirmed", "Transaction")', { id: id })
+            $('#deleteModal').modal('show');
+            $('#confirmDelete').off('click').on('click', function() {
+                $.post('@Url.Action("DeleteConfirmed", "Transaction")', { id: id })
                     .done(function() {
-                        ₱('#deleteModal').modal('hide');
+                        $('#deleteModal').modal('hide');
                         location.reload();
                     })
                     .fail(function() {
@@ -435,6 +485,27 @@
         .table-row:nth-child(odd) {
             background-color: #ffffff;
         }
+        
+    .service-only-row {
+        width: 100%;
+    }
+    
+    .service-only-row .empty-cell {
+        width: 25%;
+        min-width: 200px;
+    }
+    
+    .service-only-row .service-cell {
+        padding-left: 0;
+    }
+    
+    .client-group {
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .client-group .table-row:last-child {
+        border-bottom: none;
+    }
 
     .table-cell {
         display: flex;
