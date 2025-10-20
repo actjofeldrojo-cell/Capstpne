@@ -150,7 +150,7 @@
             color: #2d5016;
         }
 
-        @@media (max-width: 768px) {
+        media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
@@ -176,7 +176,7 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="lotus-logo">
-                    <img src="~/images/newlogo.png" alt="Lotus Logo" width="250" height="200" />
+                    <img src="~/images/LOGO.png" alt="Lotus Logo" width="250" height="200" />
                 </div>
                 <div class="sidebar-brand">
                     Tenderbody Therapeutic Spa & Massage
@@ -232,11 +232,18 @@
                         <span>Transaction</span>
                     </a>
                 </div>
+
+                <div class="nav-item">
+                    <a class="nav-link" asp-controller="Transaction" asp-action="Report">
+                        <i class="bi bi-arrow-repeat"></i>
+                        <span>Report</span>
+                    </a>
+                </div>
             </div>
 
             <div class="sidebar-footer">
                 <div class="logout-nav-item">
-                    <a class="nav-link" asp-controller="Admin" asp-action="Logout">
+                    <a class="nav-link" asp-controller="Admin" asp-action="Login">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Logout</span>
                     </a>

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CAPS.Models.Client>
+@model IEnumerable<CAPS.Models.Client>
 
 @{
     ViewBag.Title = "Clients";
@@ -31,12 +31,25 @@
         </div>
     }
 
-    <!-- Register New Client Button -->
+    <!-- Search and Register New Client Button -->
     <div class="row mb-4">
-        <div class="col-12">
+        <div class="col-md-4 text-start">
             <a asp-action="UpSert" class="register-client-btn">
                 <i class="bi bi-plus-lg"></i> Register new client
             </a>
+        </div>
+        <div class="col-md-8">
+            <form method="get" asp-action="Index" class="d-flex">
+                <div class="input-group">
+                    <input type="text" name="searchName" class="form-control" placeholder="Search by client name" value="@ViewBag.CurrentSearch">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -284,6 +297,21 @@
         margin: 0;
         letter-spacing: 2px;
     }
+
+    .form-control {
+        background-color: #ffffff;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        color: #2d5016;
+        
+    }
+
+    .btn-outline-secondary {
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+
 
     .register-client-btn {
         background-color: #ffffff;

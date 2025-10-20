@@ -1,4 +1,5 @@
-﻿@model List<CAPS.Models.Appointment>
+@model List<CAPS.Models.Appointment>
+@using System.Collections.Generic
 
 @{
     ViewData["Title"] = "Appointments";
@@ -58,6 +59,7 @@
             </div>
         </div>
         <div class="table-body">
+            @{ var displayedClients = new HashSet<int>(); }
             @if (Model != null && Model.Any())
             {
                 @foreach (var item in Model)
@@ -71,8 +73,17 @@
                         </div>
                         <div class="table-cell">
                             <div class="client-info">
-                                <div class="client-name">@item.Client?.FirstName @item.Client?.LastName</div>
-                                <div class="client-phone">@item.Client?.PhoneNumber</div>
+                                @if (item.ClientId != 0 && !displayedClients.Contains(item.ClientId))
+                                {
+                                    displayedClients.Add(item.ClientId);
+                                    <div class="client-name">@item.Client?.FirstName @item.Client?.LastName</div>
+                                    <div class="client-phone">@item.Client?.PhoneNumber</div>
+                                }
+                                else
+                                {
+                                    <div class="client-name">&nbsp;</div>
+                                    <div class="client-phone">&nbsp;</div>
+                                }
                             </div>
                         </div>
                         <div class="table-cell">
