@@ -89,11 +89,11 @@
                 border-color: #2d5016;
             }
 
-            .nav-link.active {
+            /* .nav-link.active {
                 background-color: #EAF1E7;
                 border-color: #2d5016;
                 font-weight: bold;
-            }
+            } */
 
             .nav-link i {
                 margin-right: 15px;
@@ -151,7 +151,7 @@
         }
 
         media (max-width: 768px) {
-            .sidebar {
+            sidebar {
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
             }
@@ -222,7 +222,7 @@
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Staff" asp-action="Index">
                         <i class="bi bi-person"></i>
-                        <span>Staff</span>
+                        <span>Therapist</span>
                     </a>
                 </div>
 
@@ -235,7 +235,7 @@
 
                 <div class="nav-item">
                     <a class="nav-link" asp-controller="Transaction" asp-action="Report">
-                        <i class="bi bi-arrow-repeat"></i>
+                        <i class="bi bi-graph-up"></i>
                         <span>Report</span>
                     </a>
                 </div>

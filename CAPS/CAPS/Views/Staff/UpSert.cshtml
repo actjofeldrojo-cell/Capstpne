@@ -31,10 +31,10 @@
                         <span asp-validation-for="FullName" class="validation-message"></span>
                     </div>
 
-                    <div class="form-group">
+                    @* <div class="form-group">
                         <input asp-for="Expertise" class="form-control" placeholder="Last Name" required />
                         <span asp-validation-for="Expertise" class="validation-message"></span>
-                    </div>
+                    </div> *@
 
                     <div class="form-group">
                         <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" required />
@@ -46,9 +46,20 @@
                             <option value="">Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            @* <option value="Other">Other</option> *@
                         </select>
                         <span asp-validation-for="Gender" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <select asp-for="Role" class="form-control" required>
+                            <option value="">Select Role</option>
+                            <option value="Massage Therapist">Massage Therapist</option>
+                            <option value="Aromatherapy Therapist">Aromatherapy Therapist</option>
+                            <option value="Reflexology Therapist">Reflexology Therapist</option>
+                            <option value="Facial/Beauty Therapist">Facial/Beauty Therapist</option>
+                        </select>
+                        <span asp-validation-for="Role" class="validation-message"></span>
                     </div>
                 </div>
 

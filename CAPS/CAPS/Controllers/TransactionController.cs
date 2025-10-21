@@ -95,6 +95,11 @@ namespace CAPS.Controllers
                         transaction.PaymentMethod = "Cash";
                         transaction.Status = "Pending";
                     }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Please Select In-Service.";
+                    }
+
                 }
 
                 ViewBag.Clients = db.Clients.Where(c => c.IsActive).ToList();
@@ -441,13 +446,47 @@ namespace CAPS.Controllers
             var totalRevenue = transactions.Sum(t => t.TotalAmount);
             var averageValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
             var todayTransactions = transactions.Count(t => t.TransactionDate.Date == DateTime.Today);
-
+            
+            // Calculate additional metrics for dashboard cards
+            var todayRevenue = transactions.Where(t => t.TransactionDate.Date == DateTime.Today).Sum(t => t.TotalAmount);
+            var monthlyRevenue = transactions.Where(t => t.TransactionDate.Month == DateTime.Now.Month && t.TransactionDate.Year == DateTime.Now.Year).Sum(t => t.TotalAmount);
+            var paidClients = transactions.Select(t => t.ClientId).Distinct().Count();
+            
+            // Set all ViewBag properties
             ViewBag.FromDate = fromDate;
             ViewBag.ToDate = toDate;
             ViewBag.TotalTransactions = totalTransactions;
             ViewBag.TotalRevenue = totalRevenue;
             ViewBag.AverageValue = averageValue;
             ViewBag.TodayTransactions = todayTransactions;
+            ViewBag.TodayRevenue = todayRevenue;
+            ViewBag.MonthlyRevenue = monthlyRevenue;
+            ViewBag.PaidClients = paidClients;
+            
+            // Count inactive clients (clients with no active appointments or services)
+            var inactiveClientsCount = db.Clients
+                .Where(c => c.IsActive && (!c.Appointments.Any() || !c.Appointments.Any(a => a.IsActive && a.Duration > 0)))
+                .Count();
+            ViewBag.LowStockCount = inactiveClientsCount; // Using this for inactive clients count
+            
+            // Add missing ViewBag properties
+            ViewBag.TotalPayments = totalTransactions; // Total number of successful payments
+            
+            // Count active clients that are ready to be served (not paid today)
+            var today = DateTime.Today;
+            var paidClientIdsToday = db.Transactions
+                .Where(t => t.IsActive && t.Status == "Completed" && t.TransactionDate.Date == today)
+                .Select(t => t.ClientId)
+                .Distinct()
+                .ToList();
+                
+            var activeClientsCount = db.Clients
+                .Count(c => c.IsActive && 
+                       c.Appointments.Any(a => a.IsActive && a.Duration > 0) && 
+                       !paidClientIdsToday.Contains(c.ClientId));
+            ViewBag.InServiceToday = activeClientsCount; // Active clients ready to be served today
+
+            // Chart data preparation code removed as requested
 
             return View(transactions);
         }

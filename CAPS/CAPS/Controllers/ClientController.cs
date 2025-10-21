@@ -10,27 +10,41 @@ namespace CAPS.Controllers
         readonly AppDbContext db;
         public ClientController(AppDbContext db) { this.db = db; }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchName)
         {
-            var clients = await db.Clients
+            // Base query: show all active clients with their appointments/services
+            var query = db.Clients
                 .Include(c => c.Appointments)
                     .ThenInclude(a => a.Service)
                 .Where(c => c.IsActive)
-                .ToListAsync();
+                .AsQueryable();
 
-            // Filter out clients who have completed payments (have transactions with "Completed" status)
-            var clientsWithCompletedPayments = await db.Transactions
-                .Where(t => t.IsActive && t.Status == "Completed")
+            // Optional search by first or last name (used by the view's search box)
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                var search = searchName.Trim();
+                query = query.Where(c =>
+                    EF.Functions.Like(c.FirstName, "%" + search + "%") ||
+                    EF.Functions.Like(c.LastName, "%" + search + "%"));
+                ViewBag.CurrentSearch = searchName;
+            }
+
+            var clients = await query.ToListAsync();
+
+            // Exclude clients who already completed a payment today
+            var today = DateTime.Today;
+            var paidClientIdsToday = await db.Transactions
+                .Where(t => t.IsActive && t.Status == "Completed" && t.TransactionDate.Date == today)
                 .Select(t => t.ClientId)
                 .Distinct()
                 .ToListAsync();
 
-            // Only show clients who don't have completed payments
-            var filteredClients = clients
-                .Where(c => !clientsWithCompletedPayments.Contains(c.ClientId))
+            var readyClients = clients
+                .Where(c => !paidClientIdsToday.Contains(c.ClientId))
+                .OrderByDescending(c => c.DateRegistered)
                 .ToList();
 
-            return View(filteredClients);
+            return View(readyClients);
         }
 
         //[HttpPost]
@@ -75,20 +89,6 @@ namespace CAPS.Controllers
 
             if (isNewClient)
             {
-                // Check if client with same phone number already exists
-                var existingClient = db.Clients
-                    .FirstOrDefault(c => c.PhoneNumber == client.PhoneNumber && c.IsActive);
-
-                if (existingClient != null)
-                {
-                    // Client already exists - this is a duplicate registration
-                    // Set flag to show retention modal
-                    ViewBag.ShowRetentionModal = true;
-                    ViewBag.ExistingClient = existingClient;
-                    ViewBag.IsDuplicateRegistration = true;
-                    return View(client);
-                }
-
                 // Create Client from bound data
                 client.IsActive = true;
                 client.DateRegistered = DateTime.Now;
@@ -359,6 +359,7 @@ namespace CAPS.Controllers
                {
                    staffId = s.StaffId,
                    fullName = s.FullName,
+                   role = s.Role,
                    expertise = s.Expertise,
                    IsCurrentlyInService = s.IsCurrentlyInService()
                })
