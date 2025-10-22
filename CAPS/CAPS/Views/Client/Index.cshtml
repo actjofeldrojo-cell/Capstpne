@@ -252,7 +252,7 @@
                         </div>
 
                         <div class="form-section staff-section">
-                            <label for="selectedStaff" class="section-label">Select Staff</label>
+                            <label for="selectedStaff" class="section-label">Select Therapist</label>
                             <select id="selectedStaff" name="selectedStaff" class="dropdown-select" required>
                                 <option value="">-Select Staff-</option>
                                 <!-- Staff will be loaded via AJAX -->
@@ -1023,12 +1023,11 @@
                 .then(response => response.json())
                 .then(data => {
                     const select = document.getElementById('selectedStaff');
-                    select.innerHTML = '<option value="">-- Select Staff --</option>';
+                    select.innerHTML = '<option value="">-- Select Therapist --</option>';
                     data.forEach(staff => {
                         const option = document.createElement('option');
                         option.value = staff.staffId;
-                        const roleText = staff.role || staff.expertise;
-                        option.textContent = `${staff.fullName} - ${staff.roleText}`;
+                        option.textContent = staff.fullName;
                         select.appendChild(option);
                     });
                 })

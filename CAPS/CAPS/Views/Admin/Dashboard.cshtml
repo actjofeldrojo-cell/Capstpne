@@ -32,7 +32,7 @@
             </div>
             <div class="kpi-content">
                 <div class="kpi-value">₱@Model.MonthlyRevenue.ToString("N0")</div>
-                <div class="kpi-label">Monthly Revenue</div>
+                <div class="kpi-label">Monthly Payment</div>
                 <div class="kpi-change @(Model.RevenueGrowth >= 0 ? "positive" : "negative")">
                     @(Model.RevenueGrowth >= 0 ? "+" : "")@Model.RevenueGrowth.ToString("F1")% from last month
                 </div>
@@ -47,9 +47,9 @@
             </div>
             <div class="kpi-content">
                 <div class="kpi-value">@Model.MonthlySales</div>
-                <div class="kpi-label">Monthly Sales</div>
+                <div class="kpi-label">Monthly Transaction</div>
                 <div class="kpi-change positive">
-                    @Model.DailySales sales today
+                    @Model.DailySales transaction today
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
                 <div class="kpi-value">₱@Model.AverageTransactionValue.ToString("N0")</div>
                 <div class="kpi-label">Avg. Transaction Value</div>
                 <div class="kpi-change neutral">
-                    Based on @Model.TotalSales total sales
+                    Based on @Model.TotalSales transaction
                 </div>
             </div>
         </div>
@@ -89,7 +89,7 @@
 <!-- Charts Section -->
 <div class="row mb-4">
     <!-- Sales and Revenue Tracking Chart -->
-    <div class="col-lg-8 mb-4">
+    <div class="col-lg-7 mb-4">
         <div class="chart-container">
             <div class="chart-header">
                 <h3 class="chart-title">Sales and Revenue Tracking</h3>
@@ -102,14 +102,25 @@
     </div>
     
     <!-- Service Popularity Analysis -->
-    <div class="col-lg-4 mb-4">
+    <div class="col-lg-5 mb-4">
         <div class="chart-container">
             <div class="chart-header">
                 <h3 class="chart-title">Service Popularity</h3>
                 <div class="chart-subtitle">Top Performing Services</div>
             </div>
             <div class="chart-content">
-                <canvas id="serviceChart" width="300" height="200"></canvas>
+                <div class="service-chart-flex-container">
+                    <div id="serviceDonutChart" class="service-donut-container">
+                        <div class="service-donut-center">
+                            <div class="service-donut-sessions">32</div>
+                            <div class="service-donut-label">Sessions</div>
+                        </div>
+                        <canvas id="serviceChart" width="300" height="200"></canvas>
+                    </div>
+                    <div class="service-legend-container">
+                        <div id="serviceLegend"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -207,7 +218,7 @@
 </div>
 
 <!-- Quick Actions -->
-<div class="row">
+@* <div class="row">
     <div class="col-12">
         <div class="quick-actions-container">
             <div class="quick-actions-header">
@@ -237,7 +248,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 
 <style>
     .dashboard-title-container {
@@ -392,6 +403,77 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
+    }
+    
+    /* Service Donut Chart Styling */
+    .service-chart-flex-container {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .service-donut-container {
+        position: relative;
+        width: 45%;
+        max-width: 200px;
+    }
+    
+    .service-donut-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 10;
+    }
+    
+    .service-donut-sessions {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2c3e50;
+        line-height: 1;
+    }
+    
+    .service-donut-label {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin-top: 4px;
+    }
+    
+    .service-legend-container {
+        width: 50%;
+        padding-left: 20px;
+    }
+    
+    .service-legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 14px;
+        justify-content: space-between;
+    }
+    
+    .service-legend-left {
+        display: flex;
+        align-items: center;
+    }
+    
+    .service-legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+    
+    .service-legend-text {
+        color: #2c3e50;
+    }
+    
+    .service-legend-count {
+        font-weight: 600;
+        color: #2c3e50;
     }
 
     /* Alert Container */
@@ -792,20 +874,27 @@
     const serviceCtx = document.getElementById('serviceChart').getContext('2d');
     const serviceData = @Html.Raw(Json.Serialize(Model.ServicePopularity.Select(s => new { Name = s.ServiceName, Count = s.BookingCount, Percentage = s.Percentage })));
     
-    new Chart(serviceCtx, {
+    // Colors for the chart
+    const chartColors = [
+        '#7b9ecc', // Light blue
+        '#a8c0e0', // Lighter blue
+        '#f8d49d', // Light yellow
+        '#c4d7a4', // Light green
+        '#a8c0e0', // Lighter blue
+        '#c4d7a4', // Light green
+        '#f8d49d'  // Light yellow
+    ];
+    
+    // Create the chart
+    const serviceChart = new Chart(serviceCtx, {
         type: 'doughnut',
         data: {
             labels: serviceData.map(s => s.name),
             datasets: [{
                 data: serviceData.map(s => s.count),
-                backgroundColor: [
-                    '#3b82f6',
-                    '#10b981',
-                    '#f59e0b',
-                    '#ef4444',
-                    '#8b5cf6'
-                ],
-                borderWidth: 0
+                backgroundColor: chartColors,
+                borderWidth: 0,
+                cutout: '75%'
             }]
         },
         options: {
@@ -813,13 +902,55 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ` ${context.label}: ${context.raw}`;
+                        }
                     }
                 }
             }
+        }
+    });
+    
+    // Create custom legend
+    const legendContainer = document.getElementById('serviceLegend');
+    legendContainer.innerHTML = '';
+    
+    // Calculate total sessions
+    const totalSessions = serviceData.reduce((sum, service) => sum + service.count, 0);
+    document.querySelector('.service-donut-sessions').textContent = totalSessions;
+    
+    // Generate legend items
+    serviceData.forEach((service, index) => {
+        if (index < 7) { // Limit to 7 services to match colors
+            const legendItem = document.createElement('div');
+            legendItem.className = 'service-legend-item';
+            
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'service-legend-left';
+            
+            const colorSpan = document.createElement('span');
+            colorSpan.className = 'service-legend-color';
+            colorSpan.style.backgroundColor = chartColors[index];
+            
+            const textSpan = document.createElement('span');
+            textSpan.className = 'service-legend-text';
+            textSpan.textContent = service.name;
+            
+            const countSpan = document.createElement('span');
+            countSpan.className = 'service-legend-count';
+            countSpan.textContent = service.count;
+            
+            leftDiv.appendChild(colorSpan);
+            leftDiv.appendChild(textSpan);
+            
+            legendItem.appendChild(leftDiv);
+            legendItem.appendChild(countSpan);
+            
+            legendContainer.appendChild(legendItem);
         }
     });
 </script>

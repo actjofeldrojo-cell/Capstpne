@@ -9,20 +9,20 @@
 <div class="staff-container">
     <!-- Page Title Banner -->
     <div class="page-title-container">
-        <h1 class="page-title">THERAPIEST</h1>
+        <h1 class="page-title">THERAPIST</h1>
     </div>
 
     <!-- Add Staff Button -->
     <div class="add-staff-container">
         <a asp-action="UpSert" class="add-staff-btn">
-            <i class="bi bi-plus"></i> Add Therapiest
+            <i class="bi bi-plus"></i> Add Therapist
         </a>
     </div>
 
     <!-- Staff List Panel -->
     <div class="staff-panel">
         <div class="panel-header">
-            <h2 class="panel-title">Therapiest</h2>
+            <h2 class="panel-title">Therapist</h2>
         </div>
         <div class="panel-content">
             @if (Model.Count > 0)
@@ -32,6 +32,7 @@
                         <div class="table-header-row">
                             <div class="table-header-cell">Name</div>
                             <div class="table-header-cell">Gender</div>
+                            <div class="table-header-cell">Role</div>
                             <div class="table-header-cell">Phone</div>
                             <div class="table-header-cell">Appointments</div>
                             <div class="table-header-cell">Status</div>
@@ -47,6 +48,9 @@
                                 </div>
                                 <div class="table-cell">
                                     <div class="staff-gender">@item.Staff.Gender</div>
+                                </div>
+                                <div class="table-cell">
+                                    <div class="staff-role">@item.Staff.Role</div>
                                 </div>
                                 <div class="table-cell">
                                     <div class="staff-phone">@item.Staff.PhoneNumber</div>
@@ -205,14 +209,15 @@
     }
 
     .table-header {
-        background-color: #f8f9fa;
-        border-bottom: 2px solid #e9ecef;
+        background-color: #e8f5e8;
+        border-bottom: 2px solid #2d5016;
+        border-bottom: 1px solid #2d5016;
         margin-bottom: 0;
     }
 
     .table-header-row {
         display: grid;
-        grid-template-columns: 1fr 1fr 1.5fr 1.5fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1.5fr 1.5fr 1fr 1fr 1fr;
         gap: 20px;
         padding: 15px 0;
     }
@@ -233,7 +238,7 @@
 
     .table-row {
         display: grid;
-        grid-template-columns: 1fr 1fr 1.5fr 1.5fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1.5fr 1.5fr 1fr 1fr 1fr;
         gap: 20px;
         padding: 15px 0;
         border-bottom: 1px solid #e9ecef;

@@ -1,4 +1,4 @@
-﻿@model CAPS.Models.Client
+@model CAPS.Models.Client
 
 @{
     ViewBag.Title = "Guest Registration";
@@ -49,6 +49,8 @@
                 @Html.HiddenFor(m => m.DateRegistered)
                 @Html.HiddenFor(m => m.ClientId)
                 @Html.HiddenFor(m => m.IsActive)
+
+                @Html.ValidationSummary(true, "", new { @class = "validation-summary" })
 
                 <div class="form-fields">
                     <div class="form-group">

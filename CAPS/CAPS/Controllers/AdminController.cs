@@ -115,7 +115,7 @@ namespace CAPS.Controllers
                         Revenue = g.Sum(t => t.TotalAmount)
                     })
                     .OrderByDescending(s => s.BookingCount)
-                    .Take(5)
+                    .Take(7)
                     .ToListAsync();
 
                 // Calculate percentages for service popularity
