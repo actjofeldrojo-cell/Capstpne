@@ -126,6 +126,21 @@
     </div>
 </div>
 
+<!-- Staff Performance: Clients Served -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Staff Performance</h3>
+                <div class="chart-subtitle">Clients Served This Month</div>
+            </div>
+            <div class="chart-content">
+                <canvas id="staffPerformanceChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Low Stock Alerts and Recent Activity -->
 <div class="row">
     <!-- Low Stock Alerts -->
@@ -876,13 +891,13 @@
     
     // Colors for the chart
     const chartColors = [
-        '#7b9ecc', // Light blue
-        '#a8c0e0', // Lighter blue
-        '#f8d49d', // Light yellow
-        '#c4d7a4', // Light green
-        '#a8c0e0', // Lighter blue
-        '#c4d7a4', // Light green
-        '#f8d49d'  // Light yellow
+        '#7b9ecc',
+        '#a8c0e0',
+        '#f8d49d',
+        '#c4d7a4',
+        '#a8c0e0',
+        '#c4d7a4',
+        '#f8d49d'
     ];
     
     // Create the chart
@@ -951,6 +966,32 @@
             legendItem.appendChild(countSpan);
             
             legendContainer.appendChild(legendItem);
+        }
+    });
+
+    // Staff Performance Chart: Clients Served This Month
+    const staffCtx = document.getElementById('staffPerformanceChart').getContext('2d');
+    const staffData = @Html.Raw(Json.Serialize(Model.StaffPerformance.Select(s => new { Name = s.StaffName, Count = s.ClientsServed })));
+
+    new Chart(staffCtx, {
+        type: 'bar',
+        data: {
+            labels: staffData.map(s => s.name),
+            datasets: [{
+                label: 'Clients Served',
+                data: staffData.map(s => s.count),
+                backgroundColor: '#2d5016'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
         }
     });
 </script>

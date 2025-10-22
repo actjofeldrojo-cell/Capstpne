@@ -17,9 +17,8 @@ namespace CAPS.Controllers
                 .Select(s => new StaffWithAppointmentCount
                 {
                     Staff = s,
-                    TotalAppointments = s.IsCurrentlyInService() ? 
-                        db.Transactions.Count(a => a.StaffId == s.StaffId && a.IsActive) + 1 : 
-                        db.Transactions.Count(a => a.StaffId == s.StaffId && a.IsActive),
+                    TotalAppointments = db.Appointments.Count(a => a.StaffId == s.StaffId && a.IsActive && 
+                        (a.Status == "Completed" || a.Status == "Scheduled" || a.Status == "In Progress")),
                     IsCurrentlyInService = s.IsCurrentlyInService()
                 })
                 .ToList();

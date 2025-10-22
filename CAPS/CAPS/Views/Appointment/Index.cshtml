@@ -10,7 +10,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="page-title-container">
-                <h1 class="page-title">APPOINTMENTS</h1>
+                <h1 class="page-title">Client Profile</h1>
             </div>
         </div>
     </div>
@@ -20,18 +20,18 @@
         <div class="col-12">
             <div class="status-filter-container">
                 <div class="status-filter-tabs">
-                    <button type="button" class="status-tab active" onclick="filterAppointments('all')" id="allTab">
+                    @* <button type="button" class="status-tab active" onclick="filterAppointments('all')" id="allTab">
                         All
                     </button>
                     <button type="button" class="status-tab" onclick="filterAppointments('in-service')" id="in-serviceTab">
                         Schedule
-                    </button>
+                    </button> *@
                     @* <button type="button" class="status-tab" onclick="filterAppointments('confirmed')" id="confirmedTab">
                         Confirmed
                     </button> *@
-                    <button type="button" class="status-tab" onclick="filterAppointments('completed')" id="completedTab">
+                    @* <button type="button" class="status-tab" onclick="filterAppointments('completed')" id="completedTab">
                         Completed
-                    </button>
+                    </button> *@
                 </div>
             </div>
         </div>
@@ -49,12 +49,12 @@
     <div class="appointments-table-container">
         <div class="table-header">
             <div class="table-header-row">
-                <div class="table-header-cell">Date&Time</div>
+                <div class="table-header-cell">Date & Time</div>
                 <div class="table-header-cell">Client</div>
-                <div class="table-header-cell">Services</div>
+                @* <div class="table-header-cell">Services</div>
                 <div class="table-header-cell">Duration</div>
                 <div class="table-header-cell">Status</div>
-                <div class="table-header-cell">Cost</div>
+                <div class="table-header-cell">Cost</div> *@
                 <div class="table-header-cell">Actions</div>
             </div>
         </div>
@@ -86,7 +86,7 @@
                                 }
                             </div>
                         </div>
-                        <div class="table-cell">
+                       @*  <div class="table-cell">
                             <div class="service-info">
                                 <div class="service-name">@item.Service?.Name</div>
                                 <div class="service-category">@item.Service?.Category</div>
@@ -136,16 +136,16 @@
                             {
                                 <div class="cost-empty">-</div>
                             }
-                        </div>
+                        </div> *@
                         <div class="table-cell">
                             <div class="action-buttons">
                                 <button type="button" class="action-btn view-btn" title="View Details"
                                         onclick="showDetailsModal(@item.AppointmentId, '@Html.Raw(item.AppointmentDate.ToString("MMMM dd, yyyy"))', '@Html.Raw(item.AppointmentTime.ToString(@"hh\:mm"))', '@item.Duration', '@Html.Raw(item.Status)', '@Html.Raw(item.Cost?.ToString("N2") ?? "Not set")', '@Html.Raw(item.Client?.FirstName + " " + item.Client?.LastName)', '@Html.Raw(item.Client?.PhoneNumber)', '@Html.Raw(item.Client?.PreferredTherapistGender ?? "No Preference")', '@Html.Raw(item.Client?.MassagePressureLevel ?? "No Preference")', '@Html.Raw(item.Client?.MusicPreference ?? "No Preference")', '@Html.Raw(item.Client?.TemperaturePreference ?? "No Preference")', '@Html.Raw(item.Client?.ComfortItemPreferences ?? "None")', '@Html.Raw(item.Service?.Name)', '@Html.Raw(item.Service?.Category)', '@Html.Raw(item.Notes ?? "")')">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                <a asp-action="UpSert" asp-route-id="@item.AppointmentId" class="action-btn edit-btn" title="Edit">
+                               @*  <a asp-action="UpSert" asp-route-id="@item.AppointmentId" class="action-btn edit-btn" title="Edit">
                                     <i class="bi bi-pencil-square"></i>
-                                </a>
+                                </a> *@
                                 @if (item.Status?.ToLower() == "scheduled")
                                 {
                                     <button type="button" class="action-btn confirm-btn" title="Confirm"
@@ -203,7 +203,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="detailsModalLabel">
-                    <i class="bi bi-calendar-event"></i> Appointment Details
+                    <i class="bi bi-calendar-event"></i> Client Details
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -424,7 +424,7 @@
 
     .table-header-row {
         display: grid;
-        grid-template-columns: 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr;
+        grid-template-columns: 1.5fr 1.5fr 1.5fr;
         gap: 1px;
         background-color: #2d5016;
     }
@@ -445,7 +445,7 @@
 
     .table-row {
         display: grid;
-        grid-template-columns: 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr;
+        grid-template-columns: 1.5fr 1.5fr 1.5fr;
         gap: 1px;
         background-color: #f8f9fa;
         border-bottom: 1px solid #e8f5e8;
@@ -776,7 +776,7 @@
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
-                            <h6 class="card-title mb-0">Appointment Information</h6>
+                            <h6 class="card-title mb-0">Client Information</h6>
                         </div>
                         <div class="card-body">
                             <div class="row">
