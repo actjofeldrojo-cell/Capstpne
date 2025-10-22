@@ -87,6 +87,29 @@ namespace CAPS.Controllers
 
             bool isNewClient = client.ClientId == 0;
 
+            // Prevent identical first and last name (e.g., "John John")
+            if (!string.IsNullOrWhiteSpace(client.FirstName) && !string.IsNullOrWhiteSpace(client.LastName))
+            {
+                if (string.Equals(client.FirstName.Trim(), client.LastName.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError("", "First name and last name cannot be the same.");
+                    return View(client);
+                }
+            }
+
+            // Duplicate check by FirstName + LastName (case-insensitive, active clients)
+            var normalizedFirst = (client.FirstName ?? "").Trim().ToLower();
+            var normalizedLast = (client.LastName ?? "").Trim().ToLower();
+            bool duplicateExists = db.Clients.Any(c => c.IsActive &&
+                c.FirstName.ToLower() == normalizedFirst &&
+                c.LastName.ToLower() == normalizedLast);
+
+            if (isNewClient && duplicateExists)
+            {
+                ModelState.AddModelError("", "A client with the same first and last name already exists.");
+                return View(client);
+            }
+
             if (isNewClient)
             {
                 // Create Client from bound data
@@ -359,7 +382,6 @@ namespace CAPS.Controllers
                {
                    staffId = s.StaffId,
                    fullName = s.FullName,
-                   role = s.Role,
                    expertise = s.Expertise,
                    IsCurrentlyInService = s.IsCurrentlyInService()
                })
