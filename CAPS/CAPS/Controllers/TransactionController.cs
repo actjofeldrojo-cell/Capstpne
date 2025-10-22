@@ -258,6 +258,18 @@ namespace CAPS.Controllers
                                         }
                                     }
                                     
+                                    // NEW: Mark all active in-service appointments for this client as Completed
+                                    var inServiceAppointments = db.Appointments
+                                        .Where(a => a.ClientId == transaction.ClientId && a.IsActive && a.Status == "In-Service")
+                                        .ToList();
+
+                                    foreach (var appt in inServiceAppointments)
+                                    {
+                                        appt.Status = "Completed";
+                                        appt.DateModified = DateTime.Now;
+                                        db.Appointments.Update(appt);
+                                    }
+
                                     decimal changeAmount = 0;
                                     if (tenderedAmount.HasValue && tenderedAmount.Value > 0)
                                     {
@@ -310,7 +322,7 @@ namespace CAPS.Controllers
                             TempData["SuccessMessage"] = "Transaction updated successfully!";
                         }
                         
-                        return RedirectToAction(nameof(Index));
+                        return RedirectToAction("Index", "Client");
                     }
                     catch (Exception ex)
                     {
@@ -420,13 +432,24 @@ namespace CAPS.Controllers
         }
 
         // GET: Transaction/Report
-        public ActionResult Report(DateTime? fromDate = null, DateTime? toDate = null)
+        public ActionResult Report(DateTime? fromDate = null, DateTime? toDate = null, string clientSearch = null)
         {
             var query = db.Transactions
                 .Include(t => t.Client)
                 .Include(t => t.Service)
                 .Include(t => t.Staff)
                 .Where(t => t.IsActive);
+
+            // Apply client search filter if provided
+            if (!string.IsNullOrWhiteSpace(clientSearch))
+            {
+                var search = clientSearch.Trim();
+                query = query.Where(t => 
+                    t.Client.FirstName.Contains(search) || 
+                    t.Client.LastName.Contains(search) ||
+                    (t.Client.FirstName + " " + t.Client.LastName).Contains(search));
+                ViewBag.ClientSearch = clientSearch;
+            }
 
             // Apply date filters if provided
             if (fromDate.HasValue)
@@ -439,7 +462,7 @@ namespace CAPS.Controllers
                 query = query.Where(t => t.TransactionDate.Date <= toDate.Value.Date);
             }
 
-            var transactions = query.OrderByDescending(t => t.TransactionDate).ToList();
+                var transactions = query.OrderByDescending(t => t.TransactionDate).ToList();
 
             // Calculate summary statistics
             var totalTransactions = transactions.Count;
