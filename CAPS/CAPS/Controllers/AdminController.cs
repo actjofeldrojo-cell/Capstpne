@@ -118,17 +118,17 @@ namespace CAPS.Controllers
                     .Take(7)
                     .ToListAsync();
 
-                // Staff performance: clients served per staff (this month)
-                var staffPerformance = await _context.Transactions
-                    .Where(t => t.IsActive && t.Status == "Completed" && t.TransactionDate >= thisMonth && t.StaffId != null)
-                    .GroupBy(t => t.StaffId)
-                    .Select(g => new StaffPerformanceData
+                // Staff performance: include all active staff and count clients served from appointments this month
+                var staffPerformance = await _context.Staffs
+                    .Where(s => s.IsActive)
+                    .Select(s => new StaffPerformanceData
                     {
-                        StaffName = _context.Staffs
-                            .Where(s => s.StaffId == g.Key)
-                            .Select(s => s.FullName)
-                            .FirstOrDefault(),
-                        ClientsServed = g.Select(t => t.ClientId).Distinct().Count()
+                        StaffName = s.FullName,
+                        ClientsServed = _context.Appointments
+                            .Where(a => a.IsActive && a.Status == "Completed" && a.AppointmentDate >= thisMonth && a.StaffId == s.StaffId)
+                            .Select(a => a.ClientId)
+                            .Distinct()
+                            .Count()
                     })
                     .OrderByDescending(sp => sp.ClientsServed)
                     .Take(10)

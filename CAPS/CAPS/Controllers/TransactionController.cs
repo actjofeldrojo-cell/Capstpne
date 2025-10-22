@@ -202,11 +202,14 @@ namespace CAPS.Controllers
                                         decimal finalServiceAmount = serviceAmount - serviceDiscount;
                                         if (finalServiceAmount < 0) finalServiceAmount = 0;
                                         
+                                        // Get the appointment first to use its StaffId
+                                        Models.Appointment appointment = db.Appointments.Find(transaction.AppointmentId);
+                                        
                                         var serviceTransaction = new Transaction
                                         {
                                             ClientId = transaction.ClientId,
                                             ServiceId = availedService.Service.ServiceId,
-                                            StaffId = transaction.StaffId,
+                                            StaffId = appointment.StaffId, // Use the staff from the appointment
                                             TransactionDate = DateTime.Now,
                                             Amount = serviceAmount,
                                             PaymentMethod = transaction.PaymentMethod,
@@ -220,8 +223,6 @@ namespace CAPS.Controllers
                                             DiscountPercentage = discountPercentage ?? 0,
                                             AppointmentId = transaction.AppointmentId
                                         };
-
-                                        Models.Appointment appointment = db.Appointments.Find(transaction.AppointmentId);
                                         appointment.Status = "Completed";
                                         
                                         // Update appointment status to mark it as completed and paid
