@@ -79,7 +79,7 @@
                 <div class="table-header-cell">Client Name</div>
                 <div class="table-header-cell">Availed Services</div>
                 <div class="table-header-cell">Amount to Pay</div>
-                <div class="table-header-cell">For Payment</div>
+                @* <div class="table-header-cell">For Payment</div> *@
             </div>
         </div>
         <div class="table-body" id="transactionsTable">
@@ -125,13 +125,13 @@
                                 <div class="amount-value">Total: ₱@totalClientAmount.ToString("N2")</div>
                             </div>
                         </div>
-                        <div class="table-cell">
+                       @*  <div class="table-cell">
                             <a href="@Url.Action("UpSert", "Transaction", new { id = firstTransaction.TransactionId })"
                                class="payment-btn"
                                title="For Payment">
                                 <i class="bi bi-pencil-square"></i> For Payment
                             </a>
-                        </div>
+                        </div> *@
                     </div>
                 </div>
             }

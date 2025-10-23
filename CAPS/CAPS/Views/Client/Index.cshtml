@@ -31,6 +31,13 @@
         </div>
     }
 
+    <style>
+        .mb-4{
+            display:flex;
+            justify-content:space-between;
+        }
+    </style>
+
     <!-- Search and Register New Client Button -->
     <div class="row mb-4">
         <div class="col-md-4 text-start">
@@ -38,7 +45,7 @@
                 <i class="bi bi-plus-lg"></i> Register new client
             </a>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-6">
             <form method="get" asp-action="Index" class="d-flex">
                 <div class="input-group">
                     <input type="text" name="searchName" class="form-control" placeholder="Search by client name" value="@ViewBag.CurrentSearch">
@@ -65,7 +72,8 @@
                     <div class="table-header-cell">Name</div>
                     <div class="table-header-cell">Preferences</div>
                     <div class="table-header-cell">Phone</div>
-                    <div class="table-header-cell">Registered On</div>
+                    @* <div class="table-header-cell">Registered On</div> *@
+                    <div class="table-header-cell">Appointment Date</div>
                     <div class="table-header-cell">Availed Services</div>
                     <div class="table-header-cell">Status</div>
                     <div class="table-header-cell">Actions</div>
@@ -77,6 +85,8 @@
                 {
                     @foreach (var client in Model)
                     {
+                        Appointment latestAppointment = client.Appointments.OrderByDescending(q => q.AppointmentDate).FirstOrDefault();
+
                         <div class="table-row">
                             <div class="table-cell">
                                 <div class="client-name">@client.FirstName @client.LastName</div>
@@ -116,8 +126,11 @@
                             <div class="table-cell">
                                 <div class="client-phone">@client.PhoneNumber</div>
                             </div>
-                            <div class="table-cell">
+@*                             <div class="table-cell">
                                 <div class="registered-date">@client.DateRegistered.ToString("yyyy-MM-dd")</div>
+                            </div> *@
+                            <div class="table-cell">
+                                <div class="appointment-date">@latestAppointment.AppointmentDate</div>
                             </div>
                             <div class="table-cell">
                                 @if (client.Appointments != null && client.Appointments.Any(a => a.IsActive && a.Duration > 0))
@@ -171,7 +184,7 @@
                                 <div class="action-buttons">
                                     @Html.ActionLink("", "ServiceExtend", new { id = client.ClientId }, new { @class = "action-btn extend-btn", title = "Service Extend" })
                                     <button type="button" class="action-btn service-btn" title="In-Service"
-                                            onclick="setClientForInService(@client.ClientId, '@client.FirstName', '@client.LastName')"
+                                            onclick="setClientForInService(@client.ClientId, '@client.FirstName', '@client.LastName', @latestAppointment.AppointmentId)"
                                             data-bs-toggle="modal" data-bs-target="#inServiceModal">
                                         <i class="bi bi-person-check"></i>
                                     </button>
@@ -245,7 +258,7 @@
                         </div>
 
                         <div class="form-section staff-section">
-                            <label for="selectedStaff" class="section-label">Select Staff</label>
+                            <label for="selectedStaff" class="section-label">Select Therapist</label>
                             <select id="selectedStaff" name="selectedStaff" class="dropdown-select" required>
                                 <option value="">-Select Staff-</option>
                                 <!-- Staff will be loaded via AJAX -->
@@ -303,15 +316,33 @@
         border: 2px solid #2d5016;
         border-radius: 8px;
         color: #2d5016;
+        padding: 12px 24px;
+        width: 50%;
+        justify-content: end;
+        
         
     }
 
     .btn-outline-secondary {
-        text-align: center;
-        align-items: center;
-        justify-content: center;
+        background-color: #ffffff;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 12px 24px;
+        color: #2d5016;
     }
 
+    .btn-primary {
+        background-color: #ffffff;
+        border: 2px solid #2d5016;
+        border-radius: 8px;
+        padding: 12px 24px;
+        color: #2d5016;
+    }
+
+    .btn-primary:hover, .btn-outline-secondary:hover {
+            background-color: #2d5016;
+            color: #ffffff;
+    }
 
     .register-client-btn {
         background-color: #ffffff;
@@ -949,12 +980,16 @@
 @section Scripts {
     <script>
         let currentClientId = null;
+        let AppointmentId = 0;
 
-        function setClientForInService(clientId, firstName, lastName) {
+        function setClientForInService(clientId, firstName, lastName, appointmentId) {
             currentClientId = clientId;
             document.getElementById('clientId').value = clientId;
             document.getElementById('clientName').textContent = firstName + ' ' + lastName;
+            AppointmentId = appointmentId;
 
+            console.log(AppointmentId);
+            
             // Load data for the modal
             loadServices();
             loadRooms();
@@ -998,11 +1033,11 @@
                 .then(response => response.json())
                 .then(data => {
                     const select = document.getElementById('selectedStaff');
-                    select.innerHTML = '<option value="">-- Select Staff --</option>';
+                    select.innerHTML = '<option value="">-- Select Therapist --</option>';
                     data.forEach(staff => {
                         const option = document.createElement('option');
                         option.value = staff.staffId;
-                        option.textContent = `${staff.fullName} - ${staff.expertise}`;
+                        option.textContent = staff.fullName;
                         select.appendChild(option);
                     });
                 })
@@ -1037,6 +1072,9 @@
             selectedServices.forEach(serviceId => {
                 formData.append('selectedServices', serviceId);
             });
+
+            formData.append('appointmentId', AppointmentId);
+            console.log(AppointmentId);
 
             fetch('/Client/InService', {
                 method: 'POST',

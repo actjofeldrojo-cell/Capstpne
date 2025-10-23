@@ -46,8 +46,13 @@
                     <form asp-action="Login" method ="post">
                         @Html.AntiForgeryToken()
 
-                        <!-- Colori ni og red para sa validation -->
-                        @Html.ValidationSummary()
+                        <!-- Validation messages with red background and padding -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-error">
+                @Html.ValidationSummary()
+            </div>
+        }
 
                         <div class="form-group">
                             <label for="username" class="form-label">Username</label>
@@ -237,6 +242,23 @@
         background-color: #f8d7da;
         border-color: #f5c6cb;
         color: #721c24;
+    }
+    
+    .validation-error {
+        background-color: #f8d7da;
+        border-radius: 5px;
+        color: red;
+        margin: 10px;
+        border: 1px solid red;
+        text-align: center;
+        text-decoration: none;
+        padding: 5px;
+        list-style: none;
+    }
+    
+    .validation-error ul {
+        
+        list-style: none;
     }
 
     .btn-close {

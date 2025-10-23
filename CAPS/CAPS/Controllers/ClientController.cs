@@ -1,3 +1,4 @@
+using CAPS.Migrations;
 using CAPS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,27 +11,41 @@ namespace CAPS.Controllers
         readonly AppDbContext db;
         public ClientController(AppDbContext db) { this.db = db; }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchName)
         {
-            var clients = await db.Clients
+            // Base query: show all active clients with their appointments/services
+            var query = db.Clients
                 .Include(c => c.Appointments)
                     .ThenInclude(a => a.Service)
                 .Where(c => c.IsActive)
-                .ToListAsync();
+                .AsQueryable();
 
-            // Filter out clients who have completed payments (have transactions with "Completed" status)
-            var clientsWithCompletedPayments = await db.Transactions
-                .Where(t => t.IsActive && t.Status == "Completed")
+            // Optional search by first or last name (used by the view's search box)
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                var search = searchName.Trim();
+                query = query.Where(c =>
+                    EF.Functions.Like(c.FirstName, "%" + search + "%") ||
+                    EF.Functions.Like(c.LastName, "%" + search + "%"));
+                ViewBag.CurrentSearch = searchName;
+            }
+
+            var clients = await query.ToListAsync();
+
+            // Exclude clients who already completed a payment today
+            var today = DateTime.Today;
+            var paidClientIdsToday = await db.Transactions
+                .Where(t => t.IsActive && t.Status == "Completed" && t.TransactionDate.Date == today)
                 .Select(t => t.ClientId)
                 .Distinct()
                 .ToListAsync();
 
-            // Only show clients who don't have completed payments
-            var filteredClients = clients
-                .Where(c => !clientsWithCompletedPayments.Contains(c.ClientId))
+            var readyClients = clients
+                .Where(c => !paidClientIdsToday.Contains(c.ClientId))
+                .OrderByDescending(c => c.DateRegistered)
                 .ToList();
 
-            return View(filteredClients);
+            return View(readyClients);
         }
 
         //[HttpPost]
@@ -57,11 +72,11 @@ namespace CAPS.Controllers
         // Update and Insert Viewing
         public ActionResult UpSert(int? id)
         {
-            return View(id == null ? new Client() { IsActive = true } : db.Clients.FirstOrDefault(c => c.ClientId == id));
+            return View(id == null ? new Models.Client() { IsActive = true } : db.Clients.FirstOrDefault(c => c.ClientId == id));
         }
 
         [HttpPost]
-        public ActionResult UpSert(Client client, string[] ComfortItemPreferences)
+        public ActionResult UpSert(Models.Client client, string[] ComfortItemPreferences, DateTime AppointmentDate)
         {
             // Handle checkbox values for comfort items
             if (ComfortItemPreferences != null && ComfortItemPreferences.Length > 0)
@@ -73,26 +88,53 @@ namespace CAPS.Controllers
 
             bool isNewClient = client.ClientId == 0;
 
-            if (isNewClient)
+            // Prevent identical first and last name (e.g., "John John")
+            if (!string.IsNullOrWhiteSpace(client.FirstName) && !string.IsNullOrWhiteSpace(client.LastName))
             {
-                // Check if client with same phone number already exists
-                var existingClient = db.Clients
-                    .FirstOrDefault(c => c.PhoneNumber == client.PhoneNumber && c.IsActive);
-
-                if (existingClient != null)
+                if (string.Equals(client.FirstName.Trim(), client.LastName.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
-                    // Client already exists - this is a duplicate registration
-                    // Set flag to show retention modal
-                    ViewBag.ShowRetentionModal = true;
-                    ViewBag.ExistingClient = existingClient;
-                    ViewBag.IsDuplicateRegistration = true;
+                    ModelState.AddModelError("", "First name and last name cannot be the same.");
                     return View(client);
                 }
+            }
 
+            // Duplicate check by FirstName + LastName (case-insensitive, active clients)
+            var normalizedFirst = (client.FirstName ?? "").Trim().ToLower();
+            var normalizedLast = (client.LastName ?? "").Trim().ToLower();
+            bool duplicateExists = db.Clients.Any(c => c.IsActive &&
+                c.FirstName.ToLower() == normalizedFirst &&
+                c.LastName.ToLower() == normalizedLast);
+
+            if (isNewClient && duplicateExists)
+            {
+                ModelState.AddModelError("", "A client with the same first and last name already exists.");
+                return View(client);
+            }
+
+            if (isNewClient)
+            {
                 // Create Client from bound data
                 client.IsActive = true;
                 client.DateRegistered = DateTime.Now;
                 db.Clients.Add(client);
+                db.SaveChanges();
+
+                var appointment = new Models.Appointment
+                {
+                    ClientId = client.ClientId,
+                    ServiceId = 49,
+                    Duration = 0,
+                    Cost = 0,
+                    AppointmentDate = AppointmentDate,
+                    AppointmentTime = AppointmentDate.TimeOfDay,
+                    Status = "",
+                    Notes = "",
+                    IsActive = true,
+                    DateCreated = DateTime.Now,
+                    StaffId = 6
+                };
+
+                db.Appointments.Add(appointment);
             }
             else
             {
@@ -140,7 +182,7 @@ namespace CAPS.Controllers
         {
             try
             {
-                Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
+                Models.Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
                 if (client == null)
                 {
                     TempData["ErrorMessage"] = "Client not found.";
@@ -166,7 +208,7 @@ namespace CAPS.Controllers
         {
             try
             {
-                Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
+                Models.Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
                 if (client == null)
                 {
                     TempData["ErrorMessage"] = "Client not found.";
@@ -286,7 +328,7 @@ namespace CAPS.Controllers
                             // Ensure duration meets validation requirements (15-480 minutes)
                             var validDuration = Math.Max(15, Math.Min(480, duration));
 
-                            var newAppointment = new Appointment
+                            var newAppointment = new Models.Appointment
                             {
                                 ClientId = clientId,
                                 ServiceId = serviceId,
@@ -381,7 +423,7 @@ namespace CAPS.Controllers
 
         // Put Client In-Service
         [HttpPost]
-        public async Task<IActionResult> InService(int clientId, int[] selectedServices, int selectedRoom, int selectedStaff, string serviceNotes = "")
+        public async Task<IActionResult> InService(int clientId, int[] selectedServices, int selectedRoom, int selectedStaff, int appointmentId, string serviceNotes = "")
         {
             try
             {
@@ -414,22 +456,30 @@ namespace CAPS.Controllers
                     var service = await db.Services.FirstOrDefaultAsync(s => s.ServiceId == serviceId);
                     if (service != null)
                     {
-                        var appointment = new Appointment
-                        {
-                            ClientId = clientId,
-                            ServiceId = serviceId,
-                            Duration = service.Duration,
-                            Cost = service.Price,
-                            AppointmentDate = DateTime.Today,
-                            AppointmentTime = DateTime.Now.TimeOfDay,
-                            Status = "In-Service",
-                            Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}",
-                            IsActive = true,
-                            DateCreated = DateTime.Now,
-                            StaffId = selectedStaff
-                        };
-                        
-                        db.Appointments.Add(appointment);
+                        //var appointment = new Models.Appointment
+                        //{
+                        //    ClientId = clientId,
+                        //    ServiceId = serviceId,
+                        //    Duration = service.Duration,
+                        //    Cost = service.Price,
+                        //    AppointmentDate = DateTime.Today,
+                        //    AppointmentTime = DateTime.Now.TimeOfDay,
+                        //    Status = "In-Service",
+                        //    Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}",
+                        //    IsActive = true,
+                        //    DateCreated = DateTime.Now,
+                        //    StaffId = selectedStaff
+                        //};
+
+                        Models.Appointment appointment = db.Appointments.Find(appointmentId);
+                        appointment.ServiceId = serviceId;
+                        appointment.Duration = service.Duration;
+                        appointment.Cost = service.Price;
+                        appointment.Status = "In-Service";
+                        appointment.Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}";
+                        appointment.StaffId = selectedStaff;
+
+                        db.Appointments.Update(appointment);
                     }
                 }
 

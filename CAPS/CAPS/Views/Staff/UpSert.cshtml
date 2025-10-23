@@ -1,4 +1,4 @@
-﻿@model CAPS.Models.Staff
+@model CAPS.Models.Staff
 
 @{
     ViewData["Title"] = "Add New Staff";
@@ -27,14 +27,22 @@
 
                 <div class="form-fields">
                     <div class="form-group">
-                        <input asp-for="FullName" class="form-control" placeholder="First Name" required />
+                        <input asp-for="FullName" class="form-control" placeholder="FullName" required />
                         <span asp-validation-for="FullName" class="validation-message"></span>
                     </div>
 
                     <div class="form-group">
-                        <input asp-for="Expertise" class="form-control" placeholder="Last Name" required />
-                        <span asp-validation-for="Expertise" class="validation-message"></span>
+                        <select asp-for="Role" class="form-control" required>
+                            <option value="">Select Role</option>
+                            <option value="Massage Therapist">Massage Therapist</option>
+                            <option value="Aromatherapy Therapist">Aromatherapy Therapist</option>
+                            <option value="Reflexology Therapist">Reflexology Therapist</option>
+                            <option value="Facial/Beauty Therapist">Facial/Beauty Therapist</option>
+                        </select>
+                        <span asp-validation-for="Role" class="validation-message"></span>
                     </div>
+                    
+                    <input asp-for="Expertise" type="hidden" value="Not Specified" />
 
                     <div class="form-group">
                         <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" required />

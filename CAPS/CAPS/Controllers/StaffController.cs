@@ -1,4 +1,4 @@
-﻿using CAPS.Models;
+using CAPS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +17,8 @@ namespace CAPS.Controllers
                 .Select(s => new StaffWithAppointmentCount
                 {
                     Staff = s,
-                    TotalAppointments = db.Transactions.Count(a => a.StaffId == s.StaffId && a.IsActive),
+                    TotalAppointments = db.Appointments.Count(a => a.StaffId == s.StaffId && a.IsActive && 
+                        (a.Status == "Completed" || a.Status == "Scheduled" || a.Status == "In Progress")),
                     IsCurrentlyInService = s.IsCurrentlyInService()
                 })
                 .ToList();
@@ -73,8 +74,8 @@ namespace CAPS.Controllers
                 .Select(s => new
                 {
                     staffId = s.StaffId,
-                    fullName = s.FullName,
-                    expertise = s.Expertise,
+                    fullName = s.FullName + " - " + s.Role,
+                    role = s.Role,
                     isCurrentlyInService = s.IsCurrentlyInService(),
                     availabilityStatus = s.AvailabilityStatus
                 })

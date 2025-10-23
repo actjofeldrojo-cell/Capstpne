@@ -1,4 +1,4 @@
-﻿@model CAPS.Models.Client
+@model CAPS.Models.Client
 
 @{
     ViewBag.Title = "Guest Registration";
@@ -50,6 +50,8 @@
                 @Html.HiddenFor(m => m.ClientId)
                 @Html.HiddenFor(m => m.IsActive)
 
+                @Html.ValidationSummary(true, "", new { @class = "validation-summary" })
+
                 <div class="form-fields">
                     <div class="form-group">
                         <label for="FirstName" class="form-label">First Name</label>
@@ -91,6 +93,11 @@
                         <label for="MassagePressureLevel" class="form-label">Massage Pressure Level</label>
                         @Html.DropDownListFor(m => m.MassagePressureLevel, new SelectList(new[] { "Soft", "Medium", "Hard" }), "Select Pressure Level", new { @class = "form-control" })
                         @Html.ValidationMessageFor(m => m.MassagePressureLevel, "", new { @class = "validation-message" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="AppointmentDate" class="form-label">Appointment Date</label>
+                        @Html.TextBox("AppointmentDate", null, htmlAttributes: new { @class = "form-control", @type = "datetime-local" })
                     </div>
 
                     @* <div class="form-group">

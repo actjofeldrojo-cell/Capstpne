@@ -115,7 +115,23 @@ namespace CAPS.Controllers
                         Revenue = g.Sum(t => t.TotalAmount)
                     })
                     .OrderByDescending(s => s.BookingCount)
-                    .Take(5)
+                    .Take(7)
+                    .ToListAsync();
+
+                // Staff performance: include all active staff and count clients served from appointments this month
+                var staffPerformance = await _context.Staffs
+                    .Where(s => s.IsActive)
+                    .Select(s => new StaffPerformanceData
+                    {
+                        StaffName = s.FullName,
+                        ClientsServed = _context.Appointments
+                            .Where(a => a.IsActive && a.Status == "Completed" && a.AppointmentDate >= thisMonth && a.StaffId == s.StaffId)
+                            .Select(a => a.ClientId)
+                            .Distinct()
+                            .Count()
+                    })
+                    .OrderByDescending(sp => sp.ClientsServed)
+                    .Take(10)
                     .ToListAsync();
 
                 // Calculate percentages for service popularity
@@ -168,6 +184,9 @@ namespace CAPS.Controllers
                     
                     // Service Popularity
                     ServicePopularity = servicePopularity,
+                    
+                    // Staff Performance
+                    StaffPerformance = staffPerformance,
                     
                     // Product Inventory
                     TotalProducts = allProducts.Count,
@@ -273,6 +292,9 @@ namespace CAPS.Controllers
         // Service Popularity
         public List<ServicePopularityData> ServicePopularity { get; set; } = new List<ServicePopularityData>();
         
+        // Staff Performance
+        public List<StaffPerformanceData> StaffPerformance { get; set; } = new List<StaffPerformanceData>();
+        
         // Product Inventory
         public int TotalProducts { get; set; } = 0;
         public int LowStockProducts { get; set; } = 0;
@@ -306,5 +328,11 @@ namespace CAPS.Controllers
         public string Month { get; set; }
         public decimal Revenue { get; set; }
         public int Sales { get; set; }
+    }
+
+    public class StaffPerformanceData
+    {
+        public string StaffName { get; set; }
+        public int ClientsServed { get; set; }
     }
 }

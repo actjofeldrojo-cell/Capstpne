@@ -31,17 +31,22 @@
         </div>
         <div class="card-body">
             <form method="get" asp-action="Report" class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label for="clientSearch" class="form-label">Client Name</label>
+                    <input type="text" id="clientSearch" name="clientSearch" class="form-control" 
+                           placeholder="Search by client name" value="@ViewBag.ClientSearch">
+                </div>
+                <div class="col-md-3">
                     <label for="fromDate" class="form-label">From Date</label>
                     <input type="date" id="fromDate" name="fromDate" class="form-control" 
                            value="@(ViewBag.FromDate?.ToString("yyyy-MM-dd"))">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="toDate" class="form-label">To Date</label>
                     <input type="date" id="toDate" name="toDate" class="form-control" 
                            value="@(ViewBag.ToDate?.ToString("yyyy-MM-dd"))">
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-3 d-flex align-items-end">
                     <div class="btn-group w-100">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search me-1"></i>Filter
@@ -52,12 +57,6 @@
                     </div>
                 </div>
             </form>
-            <div class="row g-3 mt-1">
-                <div class="col-md-4">
-                    <label for="clientSearch" class="form-label">Search Client</label>
-                    <input type="text" id="clientSearch" class="form-control" placeholder="Type client name or phone" />
-                </div>
-            </div>
         </div>
     </div>
 
@@ -122,6 +121,77 @@
             <small class="d-block text-muted">Select a date range to filter results</small>
         </div>
     }
+    
+    <!-- Analytics Dashboard Cards -->
+    <div class="row mb-4">
+        <!-- Card 1: Total Payments -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Total Payments</h5>
+                    <h2 class="display-5 fw-bold">@ViewBag.TotalPayments</h2>
+                    <p class="text-muted">All time successful payments</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 2: In-Service Today -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">In-Service Today</h5>
+                    <h2 class="display-5 fw-bold">@ViewBag.InServiceToday</h2>
+                    <p class="text-muted">Active clients ready to serve</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 3: Total Revenue This Month -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-info">Monthly Revenue</h5>
+                    <h2 class="display-5 fw-bold">₱@(((decimal)ViewBag.MonthlyRevenue).ToString("N0"))</h2>
+                    <p class="text-muted">Revenue this month</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 4: Total Revenue for Today -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">Today's Revenue</h5>
+                    <h2 class="display-5 fw-bold">₱@(((decimal)ViewBag.TodayRevenue).ToString("N0"))</h2>
+                    <p class="text-muted">Revenue for today</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 5: Total Clients Successfully Paid -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <div class="card border-dark h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Paid Clients</h5>
+                    <h2 class="display-5 fw-bold">@ViewBag.PaidClients</h2>
+                    <p class="text-muted">Successfully paid clients</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 6: Low Stock Alert -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <div class="card border-danger h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-danger">Inactive Clients</h5>
+                    <h2 class="display-5 fw-bold">@ViewBag.LowStockCount</h2>
+                    <p class="text-muted">Clients with inactive status</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analytics Charts section removed -->
 
     <!-- Transactions Table -->
     <div class="card">
@@ -140,7 +210,7 @@
                                 <th>Date</th>
                                 <th>Client Name</th>
                                 <th>Service</th>
-                                <th>Staff</th>
+                                <th>Therapist</th>
                                 <th>Amount</th>
                                 <th>Total Amount</th>
                                 @* <th>Payment Method</th> *@
@@ -268,11 +338,6 @@
                 ]
             });
 
-            // Client search: filter on Client Name column (index 1)
-            $('#clientSearch').on('keyup change', function() {
-                table.column(1).search(this.value).draw();
-            });
-
             // Set default date range if not provided
             if (!$('#fromDate').val() && !$('#toDate').val()) {
                 var today = new Date();
@@ -280,6 +345,22 @@
                 $('#fromDate').val(firstDay.toISOString().split('T')[0]);
                 $('#toDate').val(today.toISOString().split('T')[0]);
             }
+            
+            // Client search functionality
+            $('#clientSearch').on('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    $(this).closest('form').submit();
+                }
+            });
+            
+            // Clear search when clicking the clear button
+            $('a.btn-outline-secondary').on('click', function() {
+                $('#clientSearch').val('');
+                $('#fromDate').val('');
+                $('#toDate').val('');
+            });
+            
+            // Chart code removed
         });
     </script>
 }

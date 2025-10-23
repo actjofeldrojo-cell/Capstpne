@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CAPS.Models
@@ -17,6 +17,9 @@ namespace CAPS.Models
 
         [Required]
         public string Expertise { get; set; }
+
+        [Required]
+        public string Role { get; set; }
 
         [Required]
         [Phone(ErrorMessage = "Invalid phone number format.")]
