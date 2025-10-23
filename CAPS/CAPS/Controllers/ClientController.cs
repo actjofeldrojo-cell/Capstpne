@@ -1,3 +1,4 @@
+using CAPS.Migrations;
 using CAPS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -71,11 +72,11 @@ namespace CAPS.Controllers
         // Update and Insert Viewing
         public ActionResult UpSert(int? id)
         {
-            return View(id == null ? new Client() { IsActive = true } : db.Clients.FirstOrDefault(c => c.ClientId == id));
+            return View(id == null ? new Models.Client() { IsActive = true } : db.Clients.FirstOrDefault(c => c.ClientId == id));
         }
 
         [HttpPost]
-        public ActionResult UpSert(Client client, string[] ComfortItemPreferences)
+        public ActionResult UpSert(Models.Client client, string[] ComfortItemPreferences, DateTime AppointmentDate)
         {
             // Handle checkbox values for comfort items
             if (ComfortItemPreferences != null && ComfortItemPreferences.Length > 0)
@@ -116,6 +117,24 @@ namespace CAPS.Controllers
                 client.IsActive = true;
                 client.DateRegistered = DateTime.Now;
                 db.Clients.Add(client);
+                db.SaveChanges();
+
+                var appointment = new Models.Appointment
+                {
+                    ClientId = client.ClientId,
+                    ServiceId = 49,
+                    Duration = 0,
+                    Cost = 0,
+                    AppointmentDate = AppointmentDate,
+                    AppointmentTime = AppointmentDate.TimeOfDay,
+                    Status = "",
+                    Notes = "",
+                    IsActive = true,
+                    DateCreated = DateTime.Now,
+                    StaffId = 6
+                };
+
+                db.Appointments.Add(appointment);
             }
             else
             {
@@ -163,7 +182,7 @@ namespace CAPS.Controllers
         {
             try
             {
-                Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
+                Models.Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
                 if (client == null)
                 {
                     TempData["ErrorMessage"] = "Client not found.";
@@ -189,7 +208,7 @@ namespace CAPS.Controllers
         {
             try
             {
-                Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
+                Models.Client client = db.Clients.FirstOrDefault(c => c.ClientId == id);
                 if (client == null)
                 {
                     TempData["ErrorMessage"] = "Client not found.";
@@ -309,7 +328,7 @@ namespace CAPS.Controllers
                             // Ensure duration meets validation requirements (15-480 minutes)
                             var validDuration = Math.Max(15, Math.Min(480, duration));
 
-                            var newAppointment = new Appointment
+                            var newAppointment = new Models.Appointment
                             {
                                 ClientId = clientId,
                                 ServiceId = serviceId,
@@ -404,7 +423,7 @@ namespace CAPS.Controllers
 
         // Put Client In-Service
         [HttpPost]
-        public async Task<IActionResult> InService(int clientId, int[] selectedServices, int selectedRoom, int selectedStaff, string serviceNotes = "")
+        public async Task<IActionResult> InService(int clientId, int[] selectedServices, int selectedRoom, int selectedStaff, int appointmentId, string serviceNotes = "")
         {
             try
             {
@@ -437,22 +456,30 @@ namespace CAPS.Controllers
                     var service = await db.Services.FirstOrDefaultAsync(s => s.ServiceId == serviceId);
                     if (service != null)
                     {
-                        var appointment = new Appointment
-                        {
-                            ClientId = clientId,
-                            ServiceId = serviceId,
-                            Duration = service.Duration,
-                            Cost = service.Price,
-                            AppointmentDate = DateTime.Today,
-                            AppointmentTime = DateTime.Now.TimeOfDay,
-                            Status = "In-Service",
-                            Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}",
-                            IsActive = true,
-                            DateCreated = DateTime.Now,
-                            StaffId = selectedStaff
-                        };
-                        
-                        db.Appointments.Add(appointment);
+                        //var appointment = new Models.Appointment
+                        //{
+                        //    ClientId = clientId,
+                        //    ServiceId = serviceId,
+                        //    Duration = service.Duration,
+                        //    Cost = service.Price,
+                        //    AppointmentDate = DateTime.Today,
+                        //    AppointmentTime = DateTime.Now.TimeOfDay,
+                        //    Status = "In-Service",
+                        //    Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}",
+                        //    IsActive = true,
+                        //    DateCreated = DateTime.Now,
+                        //    StaffId = selectedStaff
+                        //};
+
+                        Models.Appointment appointment = db.Appointments.Find(appointmentId);
+                        appointment.ServiceId = serviceId;
+                        appointment.Duration = service.Duration;
+                        appointment.Cost = service.Price;
+                        appointment.Status = "In-Service";
+                        appointment.Notes = $"Room: {room.RoomNumber} | Staff: {staff.FullName} | {serviceNotes}";
+                        appointment.StaffId = selectedStaff;
+
+                        db.Appointments.Update(appointment);
                     }
                 }
 
